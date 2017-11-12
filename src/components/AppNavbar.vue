@@ -7,7 +7,7 @@ Modified by Archomeda:
 <template>
   <header>
     <container>
-      <router-link to="/">discord.js</router-link>
+      <router-link to="/">discord.js-commando-plus</router-link>
 
       <nav>
         <router-link to="/docs">Documentation</router-link><!--

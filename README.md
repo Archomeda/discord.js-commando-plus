@@ -1,6 +1,6 @@
 # discord.js
 
-> The website housing documentation for discord.js
+> The website housing documentation for discord.js-commando-plus, based on [hydrabolt/discord.js-site](https://github.com/hydrabolt/discord.js-site).
 
 ## Build Setup
 
