@@ -1,0 +1,79 @@
+@import url('https://fonts.googleapis.com/css?family=Roboto+Condensed:400,700|Roboto+Mono:400,700|Roboto:400,400i,700');
+
+body {
+  font-family: $font-regular;
+  background: $color-navbar-bg;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: $font-header;
+  font-weight: normal;
+}
+
+a {
+  transition: color 0.3s, border-color 0.3s, background-color 0.3s;
+  color: $color-primary;
+  text-decoration: none;
+
+  &:hover {
+    color: lighten($color-primary, 20%);
+  }
+}
+
+pre {
+  tab-size: 2;
+  white-space: pre-wrap
+}
+
+code {
+  padding: 2px 4px;
+}
+
+.fade-enter-active, .fade-leave-active {
+  transition: opacity 0.3s;
+}
+.fade-enter, .fade-leave-to {
+  opacity: 0;
+}
+
+.fade-resize-enter-active, .fade-resize-leave-active {
+  transition: opacity 0.3s, transform 0.3s;
+  transform-origin: top;
+}
+.fade-resize-enter, .fade-resize-leave-to {
+  opacity: 0;
+  transform: scale(0.95);
+}
+
+.fade-slide-enter-active, .fade-slide-leave-active {
+  transition: opacity 0.15s, transform 0.15s;
+}
+.fade-slide-enter, .fade-slide-leave-to {
+  opacity: 0;
+  transform: translateX(30px);
+}
+
+.animated-list-item {
+  transition: all 0.3s;
+}
+.animated-list-enter, .animated-list-leave-to {
+  opacity: 0;
+  transform: scale(0.4);
+}
+.animated-list-leave-active {
+  position: absolute;
+
+  .small-badge {
+    display: none;
+  }
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
+}
