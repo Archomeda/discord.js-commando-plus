@@ -9,6 +9,11 @@ matrix:
     - node_js: "8"
       env: BUILD_DOCS=true
 
+branches:
+  only:
+  - gh-pages-src
+  - /.*/
+
 cache:
   directories:
     - node_modules
@@ -21,4 +26,3 @@ script:
 env:
   global:
     - ENCRYPTION_LABEL: "40c022fcc411"
-
