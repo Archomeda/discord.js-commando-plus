@@ -3,17 +3,17 @@
 
 set -e
 
-if [ "$TRAVIS_BRANCH" != "stable" -o -n "$TRAVIS_TAG" -o "$TRAVIS_PULL_REQUEST" != "false" ]; then
-  echo -e "\e[36m\e[1mNot building for a stable branch push - building without deploying."
+if [ "$TRAVIS_BRANCH" != "gh-pages-src" -o -n "$TRAVIS_TAG" -o "$TRAVIS_PULL_REQUEST" != "false" ]; then
+  echo -e "\e[36m\e[1mNot building for a gh-pages-src branch push - building without deploying."
   npm run build
   exit 0
 fi
 
-echo -e "\e[36m\e[1mBuilding for a stable branch push - building and deploying."
+echo -e "\e[36m\e[1mBuilding for a gh-pages-src branch push - building and deploying."
 
-# Initialise some useful variables
+# Initialize some useful variables
 REPO=`git config remote.origin.url`
-SSH_REPO=${REPO/https:\/\/github.com\//git@github.com:}
+TARGET_REPO=${REPO/https:\/\/github.com\//git@github.com:}
 SHA=`git rev-parse --verify HEAD`
 
 # Decrypt and add the ssh key
@@ -37,6 +37,6 @@ npm run build
 cd dist
 git add --all .
 git config user.name "Travis CI"
-git config user.email "$COMMIT_AUTHOR_EMAIL"
+git config user.email "travis@travis-ci.org"
 git commit -m "Site build: ${SHA}" || true
-git push $SSH_REPO $TARGET_BRANCH
+git push $TARGET_REPO $TARGET_BRANCH
