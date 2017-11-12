@@ -39,9 +39,9 @@ fi
 
 build
 
-# Initialise some useful variables
+# Initialize some useful variables
 REPO=`git config remote.origin.url`
-SSH_REPO=${REPO/https:\/\/github.com\//git@github.com:}
+TARGET_REPO=${REPO/https:\/\/github.com\//git@github.com:}
 SHA=`git rev-parse --verify HEAD`
 
 # Decrypt and add the ssh key
@@ -66,6 +66,6 @@ mv docs/docs.json out/$SOURCE.json
 cd out
 git add .
 git config user.name "Travis CI"
-git config user.email "$COMMIT_AUTHOR_EMAIL"
+git config user.email "travis@travis-ci.org"
 git commit -m "Docs build for ${SOURCE_TYPE} ${SOURCE}: ${SHA}" || true
-git push $SSH_REPO $TARGET_BRANCH
+git push $TARGET_REPO $TARGET_BRANCH
