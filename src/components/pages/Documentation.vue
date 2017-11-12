@@ -24,6 +24,9 @@ Modified by Archomeda:
 
     data() {
       return {
+        sources: {
+          [CommandoPlusSource.id]: CommandoPlusSource,
+        },
         source: CommandoPlusSource,
         tag: CommandoPlusSource.defaultTag,
       };
