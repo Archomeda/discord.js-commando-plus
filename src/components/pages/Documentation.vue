@@ -1,3 +1,10 @@
+<!--
+Original file by hydrabolt at https://github.com/hydrabolt/discord.js-site/blob/master/src/components/pages/Documentation.vue
+Modified by Archomeda:
+ - Include Archomeda/discord.js-commando-plus related documentation
+ - Remove hydrabolt/discord.js, Gawdl3y/discord.js-commando and devsnek/discord-rpc documentation
+-->
+
 <template>
   <div id="docs">
     <docs-navbar :sources="sources" :source="source" />
@@ -6,9 +13,7 @@
 </template>
 
 <script>
-  import MainSource from '../../data/MainSource';
-  import CommandoSource from '../../data/CommandoSource';
-  import RPCSource from '../../data/RPCSource';
+  import CommandoPlusSource from '../../data/CommandoPlusSource';
   import DocsNavbar from '../docs/Navbar.vue';
 
   export default {
@@ -19,13 +24,8 @@
 
     data() {
       return {
-        sources: {
-          [MainSource.id]: MainSource,
-          [CommandoSource.id]: CommandoSource,
-          [RPCSource.id]: RPCSource,
-        },
-        source: MainSource,
-        tag: MainSource.defaultTag,
+        source: CommandoPlusSource,
+        tag: CommandoPlusSource.defaultTag,
       };
     },
 
@@ -45,10 +45,10 @@
           this.setSource(route.params.source);
         } else {
           this.$router.replace({ name: 'docs-file', params: {
-            source: MainSource.id,
-            tag: MainSource.defaultTag,
-            category: MainSource.defaultFile.category,
-            file: MainSource.defaultFile.id,
+            source: CommandoPlusSource.id,
+            tag: CommandoPlusSource.defaultTag,
+            category: CommandoPlusSource.defaultFile.category,
+            file: CommandoPlusSource.defaultFile.id,
           } });
           return;
         }

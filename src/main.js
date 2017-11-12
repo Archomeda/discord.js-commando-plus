@@ -1,3 +1,9 @@
+/**
+ * Original file by hydrabolt at https://github.com/hydrabolt/discord.js-site/blob/master/src/main.js
+ * Modified by Archomeda:
+ *  - Remove the home page and redirect to the documentation automatically instead
+ */
+
 import Vue from 'vue';
 import VueRouter from 'vue-router';
 import marked from 'marked';
@@ -5,7 +11,6 @@ import { hljs } from './util';
 
 import App from './App';
 import UnknownPageComponent from './components/UnknownPage.vue';
-import HomePageComponent from './components/pages/Home.vue';
 import DocumentationPageComponent from './components/pages/Documentation.vue';
 import UnknownRoutePageComponent from './components/pages/UnknownRoute.vue';
 import ContainerComponent from './components/Container.vue';
@@ -24,7 +29,7 @@ require('./styles/master.scss');
 Vue.use(VueRouter);
 const router = new VueRouter({
   routes: [
-    { path: '/', name: 'home', component: HomePageComponent },
+    { path: '/', redirect: '/docs' },
     { path: '/docs', name: 'docs', component: DocumentationPageComponent, children: [
       { path: ':source', name: 'docs-source', component: DocsLoaderComponent, children: [
         { path: ':tag', name: 'docs-tag', component: DocsViewerComponent, children: [
