@@ -1,5 +1,5 @@
 # Built-in commands
-Commando has built-in commands that should be useful for just about any bot.
+Commando-Plus has built-in commands that should be useful for just about any bot.
 
 ## Utility (util)
 ### help (util:help)
