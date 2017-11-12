@@ -39,6 +39,12 @@ fi
 
 build
 
+# Only commit docs whenever it's required, aka only when $BUILD_DOCS is true
+if [ "$BUILD_DOCS" != "true" ]; then
+  echo -e "\e[36m\e[1mSkip building docs."
+  exit 0
+fi
+
 # Initialize some useful variables
 REPO=`git config remote.origin.url`
 TARGET_REPO=${REPO/https:\/\/github.com\//git@github.com:}
