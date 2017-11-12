@@ -1,21 +1,21 @@
+<!--
+Original file by hydrabolt at https://github.com/hydrabolt/discord.js-site/blob/master/src/components/Stats.vue
+Modified by Archomeda:
+ - Change references
+ - Remove discord.js stats
+-->
+
 <template>
   <footer>
     <container>
-      <strong><router-link to="/">discord.js</router-link></strong>
-      <p>A powerful library for interacting with the Discord API</p>
-      <stats />
+      <strong><router-link to="/">discord.js-commando-plus</router-link></strong>
     </container>
   </footer>
 </template>
 
 <script>
-  import Stats from './Stats.vue';
-
   export default {
     name: 'footer',
-    components: {
-      Stats,
-    },
   };
 </script>
 

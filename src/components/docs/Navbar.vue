@@ -1,11 +1,13 @@
+<!--
+Original file by hydrabolt at https://github.com/hydrabolt/discord.js-site/blob/master/src/components/Stats.vue
+Modified by Archomeda:
+ - Remove source selector
+-->
+
 <template>
   <div id="docs-navbar">
     <container>
       View docs for
-
-      <select v-model="sourceChoice">
-        <option v-for="source in sources" :value="source.id">{{ source.name }}</option>
-      </select>
 
       <transition name="fade" mode="out-in" @enter="updateTagChoice">
         <select v-if="tags" v-model="tagChoice" :key="source.id">

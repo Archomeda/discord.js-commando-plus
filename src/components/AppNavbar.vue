@@ -1,3 +1,9 @@
+<!--
+Original file by hydrabolt at https://github.com/hydrabolt/discord.js-site/blob/master/src/components/AppNavbar.vue
+Modified by Archomeda:
+ - Change GitHub link to Archomeda/discord.js-commando-plus
+-->
+
 <template>
   <header>
     <container>
@@ -5,7 +11,7 @@
 
       <nav>
         <router-link to="/docs">Documentation</router-link><!--
-        --><a href="https://github.com/hydrabolt/discord.js">GitHub</a>
+        --><a href="https://github.com/Archomeda/discord.js-commando-plus">GitHub</a>
       </nav>
     </container>
   </header>
