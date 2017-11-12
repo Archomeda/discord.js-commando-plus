@@ -1,37 +1,24 @@
-# Commando
-[![Discord](https://discordapp.com/api/guilds/222078108977594368/embed.png)](https://discord.gg/bRCvFy9)
-[![Downloads](https://img.shields.io/npm/dt/discord.js-commando.svg)](https://www.npmjs.com/package/discord.js-commando)
-[![Version](https://img.shields.io/npm/v/discord.js-commando.svg)](https://www.npmjs.com/package/discord.js-commando)
-[![Dependency status](https://david-dm.org/Gawdl3y/discord.js-commando.svg)](https://david-dm.org/Gawdl3y/discord.js-commando)
-[![Build status](https://travis-ci.org/hydrabolt/discord.js.svg)](https://travis-ci.org/hydrabolt/discord.js)
+# Commando-Plus
+[![Dependency status](https://david-dm.org/Archomeda/discord.js-commando-plus.svg)](https://david-dm.org/Archomeda/discord.js-commando-plus)
+[![Build status](https://travis-ci.org/Archomeda/discord.js-commando-plus.svg)](https://travis-ci.org/Archomeda/discord.js-commando-plus)
+
+**This is still a work in progress.**
 
 ## About
-Commando is the official command framework for [discord.js](https://github.com/hydrabolt/discord.js).
-It is flexible, fully object-oriented, easy to use, and makes it trivial to create your own powerful commands.
+Commando-Plus extends on [Commando](https://github.com/Gawdl3y/discord.js-commando). Info snippet from Commando:
+> It is flexible, fully object-oriented, easy to use, and makes it trivial to create your own powerful commands.
 Additionally, it makes full use of ES2017's `async`/`await` functionality for clear, concise code that is simple to write and easy to comprehend.
 
-## Features
-- Plain command names and aliases
-- Regular expression triggers
-- Robust parsing of arguments (with "quoted strings" support)
-- Sophisticated argument system (optional)
-	* Automatic prompting for arguments that aren't provided
-	* Type system with rules, automatic validation, and parsing to usable values
-		- Basic types (string, integer, float, boolean)
-		- Discord objects (user, member, role, channel, message)
-		- User-defined custom types
-	* Automatic re-prompting of invalid arguments
-	* Optional arguments with default values
-	* Infinite arguments (arguments that accept as many values as provided)
-- Multiple responses to commands
-- Command editing (user edits their message that triggered the command, and the bot's response updates with it)
-- Command reloading, as well as loading/unloading
-- Command throttling/cooldowns
+If you are looking for better support, and do not plan to use any of the features of Commando-Plus, please use Commando instead.
+This repository is mostly here to support my own Discord bots in order to share common used code between them without having to manually duplicate them in every repository.
+
+## Features on top of Commando
+- Todo
 
 ## Installation
 **Node 7.6.0 or newer is required.**  
-`npm install discord.js-commando --save`
+`npm install archomeda/discord.js-commando-plus --save`
 
 ## Documentation
-[View the docs here.](https://discord.js.org/#/docs/commando)  
-See the [discord.js documentation](https://discord.js.org/#/docs) as well.
+- [Commando-Plus documentation](https://archomeda.github.io/discord.js-commando-plus)
+- [discord.js documentation](https://discord.js.org/#/docs)

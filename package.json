@@ -1,16 +1,10 @@
 {
-	"name": "discord.js-commando",
-	"version": "0.9.0",
-	"description": "The official command framework for Discord.js",
+	"name": "discord.js-commando-plus",
+	"version": "11.2.0",
+	"description": "An unofficial fork of discord.js-commando",
+	"repository": "Archomeda/discord.js-commando-plus",
+	"author": "Archomeda",
 	"license": "Apache-2.0",
-	"author": "Schuyler Cebulskie <Gawdl3y@gawdl3y.com> (https://gawdl3y.com/)",
-	"repository": {
-		"type": "git",
-		"url": "https://github.com/Gawdl3y/discord.js-commando.git"
-	},
-	"bugs": {
-		"url": "https://github.com/Gawdl3y/discord.js-commando/issues"
-	},
 	"keywords": [
 		"discord",
 		"bot",
