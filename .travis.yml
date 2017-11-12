@@ -1,14 +1,22 @@
 language: node_js
+
 node_js:
   - "8"
+
+branches:
+  only:
+  - gh-pages-src
+  - /.*/
+
 cache:
   directories:
     - node_modules
+
 install: npm install
+
 script:
   - bash ./deploy/deploy.sh
+
 env:
   global:
     - ENCRYPTION_LABEL: "40c022fcc411"
-dist: trusty
-sudo: false
