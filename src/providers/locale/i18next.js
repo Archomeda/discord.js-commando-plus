@@ -69,7 +69,7 @@ class I18nextLocaleProvider extends LocaleProvider {
             backend: {
                 loadPath: [
                     path.resolve(path.join(this.directory, 'locales', '{{lng}}', '{{ns}}.json')),
-                    path.resolve(path.join(__dirname, '..', 'locales', '{{lng}}', '{{ns}}.json'))
+                    path.resolve(path.join(__dirname, '..', '..', 'locales', '{{lng}}', '{{ns}}.json'))
                 ]
             },
             interpolation: { escape: s => s }
