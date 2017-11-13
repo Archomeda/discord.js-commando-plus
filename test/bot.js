@@ -50,7 +50,7 @@ client
 		`);
 	});
 
-client.setProvider(
+client.setSettingsProvider(
 	sqlite.open(path.join(__dirname, 'database.sqlite3')).then(db => new commando.SQLiteProvider(db))
 ).catch(console.error);
 

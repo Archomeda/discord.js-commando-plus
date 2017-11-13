@@ -1,30 +1,28 @@
-const SettingProvider = require('./base');
+/*
+ Original author: Gawdl3y
+ Modified by: Archomeda
+ - Moved from ./src/providers/base.js to ./src/providers/settings/base.js
+ - Renamed SettingProvider to SettingsProvider
+ - Moved some code from SQLiteProvider to SettingsProvider to decrease code duplication
+ */
+
+/* eslint-disable no-unused-vars, valid-jsdoc */
+const Guild = require('discord.js').Guild;
 
 /**
- * Uses an SQLite database to store settings with guilds
- * @extends {SettingProvider}
+ * Loads and stores settings associated with guilds
+ * @abstract
  */
-class SQLiteProvider extends SettingProvider {
-	/**
-	 * @external SQLiteDatabase
-	 * @see {@link https://www.npmjs.com/package/sqlite}
-	 */
-
-	/**
-	 * @param {SQLiteDatabase} db - Database for the provider
-	 */
-	constructor(db) {
-		super();
+class SettingsProvider {
+	constructor() {
+		if(this.constructor.name === 'SettingsProvider') {
+			throw new Error('The base SettingsProvider cannot be instantiated.');
+		}
 
 		/**
-		 * Database that will be used for storing/retrieving settings
-		 * @type {SQLiteDatabase}
-		 */
-		this.db = db;
-
-		/**
-		 * Client that the provider is for (set once the client is ready, after using {@link CommandoClient#setProvider})
-		 * @name SQLiteProvider#client
+		 * Client that the provider is for
+		 * (set once the client is ready, after using {@link CommandoClient#setSettingsProvider}).
+		 * @name SettingsProvider#client
 		 * @type {CommandoClient}
 		 * @readonly
 		 */
@@ -38,62 +36,29 @@ class SQLiteProvider extends SettingProvider {
 		this.settings = new Map();
 
 		/**
-		 * Listeners on the Client, mapped by the event name
+		 * Listeners on the Client, mapped by the event name.
 		 * @type {Map}
 		 * @private
 		 */
 		this.listeners = new Map();
-
-		/**
-		 * Prepared statement to insert or replace a settings row
-		 * @type {SQLiteStatement}
-		 * @private
-		 */
-		this.insertOrReplaceStmt = null;
-
-		/**
-		 * Prepared statement to delete an entire settings row
-		 * @type {SQLiteStatement}
-		 * @private
-		 */
-		this.deleteStmt = null;
-
-		/**
-		 * @external SQLiteStatement
-		 * @see {@link https://www.npmjs.com/package/sqlite}
-		 */
 	}
 
-	async init(client) {
+	/**
+	 * Initialises the provider by connecting to databases and/or caching all data in memory.
+	 * {@link CommandoClient#setSettingsProvider} will automatically call this once the client is ready.
+	 * @param {CommandoClient} client - Client that will be using the provider
+	 * @return {Promise<void>}
+	 */
+	init(client) {
 		this.client = client;
-		await this.db.run('CREATE TABLE IF NOT EXISTS settings (guild INTEGER PRIMARY KEY, settings TEXT)');
+		this.initListeners();
+	}
 
-		// Load all settings
-		const rows = await this.db.all('SELECT CAST(guild as TEXT) as guild, settings FROM settings');
-		for(const row of rows) {
-			let settings;
-			try {
-				settings = JSON.parse(row.settings);
-			} catch(err) {
-				client.emit('warn', `SQLiteProvider couldn't parse the settings stored for guild ${row.guild}.`);
-				continue;
-			}
-
-			const guild = row.guild !== '0' ? row.guild : 'global';
-			this.settings.set(guild, settings);
-			if(guild !== 'global' && !client.guilds.has(row.guild)) continue;
-			this.setupGuild(guild, settings);
-		}
-
-		// Prepare statements
-		const statements = await Promise.all([
-			this.db.prepare('INSERT OR REPLACE INTO settings VALUES(?, ?)'),
-			this.db.prepare('DELETE FROM settings WHERE guild = ?')
-		]);
-		this.insertOrReplaceStmt = statements[0];
-		this.deleteStmt = statements[1];
-
-		// Listen for changes
+	/**
+	 * Initializes the listeners the settings provider should listen to for changes.
+	 * @private
+	 */
+	initListeners() {
 		this.listeners
 			.set('commandPrefixChange', (guild, prefix) => this.set(guild, 'prefix', prefix))
 			.set('commandStatusChange', (guild, command, enabled) => this.set(guild, `cmd-${command.name}`, enabled))
@@ -105,67 +70,88 @@ class SQLiteProvider extends SettingProvider {
 			})
 			.set('commandRegister', command => {
 				for(const [guild, settings] of this.settings) {
-					if(guild !== 'global' && !client.guilds.has(guild)) continue;
-					this.setupGuildCommand(client.guilds.get(guild), command, settings);
+					if(guild !== 'global' && !this.client.guilds.has(guild)) continue;
+					this.setupGuildCommand(this.client.guilds.get(guild), command, settings);
 				}
 			})
 			.set('groupRegister', group => {
 				for(const [guild, settings] of this.settings) {
-					if(guild !== 'global' && !client.guilds.has(guild)) continue;
-					this.setupGuildGroup(client.guilds.get(guild), group, settings);
+					if(guild !== 'global' && !this.client.guilds.has(guild)) continue;
+					this.setupGuildGroup(this.client.guilds.get(guild), group, settings);
 				}
 			});
-		for(const [event, listener] of this.listeners) client.on(event, listener);
+		for(const [event, listener] of this.listeners) this.client.on(event, listener);
 	}
 
-	async destroy() {
-		// Finalise prepared statements
-		await Promise.all([
-			this.insertOrReplaceStmt.finalize(),
-			this.deleteStmt.finalize()
-		]);
-
-		// Remove all listeners from the client
+	/**
+	 * Destroys the provider, removing any event listeners.
+	 * @return {Promise<void>}
+	 */
+	destroy() {
+        // Remove all listeners from the client
 		for(const [event, listener] of this.listeners) this.client.removeListener(event, listener);
 		this.listeners.clear();
 	}
 
+	/**
+	 * Obtains a setting for a guild
+	 * @param {Guild|string} guild - Guild the setting is associated with (or 'global')
+	 * @param {string} key - Name of the setting
+	 * @param {*} [defVal] - Value to default to if the setting isn't set on the guild
+	 * @return {*}
+	 */
 	get(guild, key, defVal) {
 		const settings = this.settings.get(this.constructor.getGuildID(guild));
 		return settings ? typeof settings[key] !== 'undefined' ? settings[key] : defVal : defVal;
 	}
 
-	async set(guild, key, val) {
+	/**
+	 * Sets a setting for a guild
+	 * @param {Guild|string} guild - Guild to associate the setting with (or 'global')
+	 * @param {string} key - Name of the setting
+	 * @param {*} val - Value of the setting
+	 * @return {Promise<*>} New value of the setting
+	 */
+	set(guild, key, val) {
 		guild = this.constructor.getGuildID(guild);
 		let settings = this.settings.get(guild);
 		if(!settings) {
 			settings = {};
 			this.settings.set(guild, settings);
 		}
-
 		settings[key] = val;
-		await this.insertOrReplaceStmt.run(guild !== 'global' ? guild : 0, JSON.stringify(settings));
 		if(guild === 'global') this.updateOtherShards(key, val);
 		return val;
 	}
 
-	async remove(guild, key) {
+	/**
+	 * Removes a setting from a guild
+	 * @param {Guild|string} guild - Guild the setting is associated with (or 'global')
+	 * @param {string} key - Name of the setting
+	 * @return {Promise<*>} Old value of the setting
+	 * @abstract
+	 */
+	remove(guild, key) {
 		guild = this.constructor.getGuildID(guild);
 		const settings = this.settings.get(guild);
 		if(!settings || typeof settings[key] === 'undefined') return undefined;
 
 		const val = settings[key];
 		settings[key] = undefined;
-		await this.insertOrReplaceStmt.run(guild !== 'global' ? guild : 0, JSON.stringify(settings));
 		if(guild === 'global') this.updateOtherShards(key, undefined);
 		return val;
 	}
 
-	async clear(guild) {
+	/**
+	 * Removes all settings in a guild
+	 * @param {Guild|string} guild - Guild to clear the settings of
+	 * @return {Promise<void>}
+	 * @abstract
+	 */
+	clear(guild) {
 		guild = this.constructor.getGuildID(guild);
 		if(!this.settings.has(guild)) return;
 		this.settings.delete(guild);
-		await this.deleteStmt.run(guild !== 'global' ? guild : 0);
 	}
 
 	/**
@@ -178,13 +164,13 @@ class SQLiteProvider extends SettingProvider {
 		if(typeof guild !== 'string') throw new TypeError('The guild must be a guild ID or "global".');
 		guild = this.client.guilds.get(guild) || null;
 
-		// Load the command prefix
+        // Load the command prefix
 		if(typeof settings.prefix !== 'undefined') {
 			if(guild) guild._commandPrefix = settings.prefix;
 			else this.client._commandPrefix = settings.prefix;
 		}
 
-		// Load all command/group statuses
+        // Load all command/group statuses
 		for(const command of this.client.registry.commands.values()) this.setupGuildCommand(guild, command, settings);
 		for(const group of this.client.registry.groups.values()) this.setupGuildGroup(guild, group, settings);
 	}
@@ -234,16 +220,28 @@ class SQLiteProvider extends SettingProvider {
 		key = JSON.stringify(key);
 		val = typeof val !== 'undefined' ? JSON.stringify(val) : 'undefined';
 		this.client.shard.broadcastEval(`
-			if(this.shard.id !== ${this.client.shard.id} && this.provider && this.provider.settings) {
-				let global = this.provider.settings.get('global');
+			if(this.shard.id !== ${this.client.shard.id} && this.settingsProvider && this.settingsProvider.settings) {
+				let global = this.settingsProvider.settings.get('global');
 				if(!global) {
 					global = {};
-					this.provider.settings.set('global', global);
+					this.settingsProvider.settings.set('global', global);
 				}
 				global[${key}] = ${val};
 			}
 		`);
 	}
+
+	/**
+	 * Obtains the ID of the provided guild, or throws an error if it isn't valid
+	 * @param {Guild|string} guild - Guild to get the ID of
+	 * @return {string} ID of the guild, or 'global'
+	 */
+	static getGuildID(guild) {
+		if(guild instanceof Guild) return guild.id;
+		if(guild === 'global' || guild === null) return 'global';
+		if(typeof guild === 'string' && !isNaN(guild)) return guild;
+		throw new TypeError('Invalid guild specified. Must be a Guild instance, guild ID, "global", or null.');
+	}
 }
 
-module.exports = SQLiteProvider;
+module.exports = SettingsProvider;

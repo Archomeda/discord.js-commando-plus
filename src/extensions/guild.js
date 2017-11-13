@@ -1,5 +1,5 @@
 const Command = require('../commands/base');
-const GuildSettingsHelper = require('../providers/helper');
+const GuildSettingsHelper = require('../providers/settings/helper');
 
 /** Contains additional methods and properties that are added to the discord.js Guild class */
 class GuildExtension {

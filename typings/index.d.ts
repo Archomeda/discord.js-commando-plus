@@ -205,12 +205,12 @@ declare module 'discord.js-commando' {
 		public commandPrefix: string;
 		public dispatcher: CommandDispatcher;
 		public readonly owners: User[];
-		public provider: SettingProvider;
+		public settingsProvider: SettingsProvider;
 		public registry: CommandRegistry;
 		public settings: GuildSettingsHelper;
 
 		public isOwner(user: UserResolvable): boolean;
-		public setProvider(provider: SettingProvider | Promise<SettingProvider>): Promise<void>;
+		public setSettingsProvider(provider: SettingsProvider | Promise<SettingsProvider>): Promise<void>;
 
 		on(event: string, listener: Function): this;
 		on(event: 'commandBlocked', listener: (message: CommandMessage, reason: string) => void): this;
@@ -335,36 +335,48 @@ declare module 'discord.js-commando' {
 		public set(key: string, value: any): Promise<any>;
 	}
 
-	export class SettingProvider {
-		public clear(guild: Guild | string): Promise<void>;
-		public destroy(): Promise<void>;
-		public get(guild: Guild | string, key: string, defVal?: any): any;
-		public getGuildID(guild: Guild | string): string;
-		public init(client: CommandoClient): Promise<void>;
-		public remove(guild: Guild | string, key: string): Promise<any>;
-		public set(guild: Guild | string, key: string, val: any): Promise<any>;
-	}
-
-	export class SQLiteProvider extends SettingProvider {
-		public constructor(db: SQLiteDatabase);
-
+	export class SettingsProvider {
 		public readonly client: CommandoClient;
-		public db: SQLiteDatabase;
-		private deleteStmt: SQLiteStatement;
-		private insertOrReplaceStmt: SQLiteStatement;
 		private listeners: Map<any, any>;
 		private settings: Map<any, any>;
 
 		public clear(guild: Guild | string): Promise<void>;
 		public destroy(): Promise<void>;
 		public get(guild: Guild | string, key: string, defVal?: any): any;
+		public getGuildID(guild: Guild | string): string;
 		public init(client: CommandoClient): Promise<void>;
+		private initListeners(): void;
 		public remove(guild: Guild | string, key: string): Promise<any>;
 		public set(guild: Guild | string, key: string, val: any): Promise<any>;
 		private setupGuild(guild: string, settings: {}): void;
 		private setupGuildCommand(guild: Guild, command: Command, settings: {}): void;
 		private setupGuildGroup(guild: Guild, group: CommandGroup, settings: {}): void;
 		private updateOtherShards(key: string, val: any): void;
+	}
+
+	export class SQLiteSettingsProvider extends SettingsProvider {
+		public constructor(db: SQLiteDatabase);
+
+		public db: SQLiteDatabase;
+		private deleteStmt: SQLiteStatement;
+		private insertOrReplaceStmt: SQLiteStatement;
+
+		public clear(guild: Guild | string): Promise<void>;
+		public destroy(): Promise<void>;
+		public init(client: CommandoClient): Promise<void>;
+		public remove(guild: Guild | string, key: string): Promise<any>;
+		public set(guild: Guild | string, key: string, val: any): Promise<any>;
+	}
+
+	export class YAMLSettingsProvider extends SettingsProvider {
+		public constructor(folder: string);
+
+		public readonly folder: string;
+
+		public clear(guild: Guild | string): Promise<void>;
+		public init(client: CommandoClient): Promise<void>;
+		public remove(guild: Guild | string, key: string): Promise<any>;
+		public set(guild: Guild | string, key: string, val: any): Promise<any>;
 	}
 
 	type ArgumentCollectorResult = {

@@ -43,7 +43,7 @@ To use it, install the `sqlite` module with NPM (`npm install --save sqlite`). T
 ```javascript
 const sqlite = require('sqlite');
 
-client.setProvider(
+client.setSettingsProvider(
 	sqlite.open(path.join(__dirname, 'settings.sqlite3')).then(db => new Commando.SQLiteProvider(db))
 ).catch(console.error);
 ```

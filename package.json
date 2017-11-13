@@ -33,6 +33,7 @@
 	},
 	"peerDependencies": {
 		"discord.js": "^11.2.0",
+		"js-yaml": "^3.10.0",
 		"sqlite": "^2.0.0"
 	},
 	"engines": {

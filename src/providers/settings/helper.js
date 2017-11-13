@@ -1,4 +1,4 @@
-/** Helper class to use {@link SettingProvider} methods for a specific Guild */
+/** Helper class to use {@link SettingsProvider} methods for a specific Guild */
 class GuildSettingsHelper {
 	/**
 	 * @param {CommandoClient} client - Client to use the provider of
@@ -26,11 +26,11 @@ class GuildSettingsHelper {
 	 * @param {string} key - Name of the setting
 	 * @param {*} [defVal] - Value to default to if the setting isn't set
 	 * @return {*}
-	 * @see {@link SettingProvider#get}
+	 * @see {@link SettingsProvider#get}
 	 */
 	get(key, defVal) {
-		if(!this.client.provider) throw new Error('No settings provider is available.');
-		return this.client.provider.get(this.guild, key, defVal);
+		if(!this.client.settingsProvider) throw new Error('No settings provider is available.');
+		return this.client.settingsProvider.get(this.guild, key, defVal);
 	}
 
 	/**
@@ -38,32 +38,32 @@ class GuildSettingsHelper {
 	 * @param {string} key - Name of the setting
 	 * @param {*} val - Value of the setting
 	 * @return {Promise<*>} New value of the setting
-	 * @see {@link SettingProvider#set}
+	 * @see {@link SettingsProvider#set}
 	 */
 	set(key, val) {
-		if(!this.client.provider) throw new Error('No settings provider is available.');
-		return this.client.provider.set(this.guild, key, val);
+		if(!this.client.settingsProvider) throw new Error('No settings provider is available.');
+		return this.client.settingsProvider.set(this.guild, key, val);
 	}
 
 	/**
 	 * Removes a setting from the guild
 	 * @param {string} key - Name of the setting
 	 * @return {Promise<*>} Old value of the setting
-	 * @see {@link SettingProvider#remove}
+	 * @see {@link SettingsProvider#remove}
 	 */
 	remove(key) {
-		if(!this.client.provider) throw new Error('No settings provider is available.');
-		return this.client.provider.remove(this.guild, key);
+		if(!this.client.settingsProvider) throw new Error('No settings provider is available.');
+		return this.client.settingsProvider.remove(this.guild, key);
 	}
 
 	/**
 	 * Removes all settings in the guild
 	 * @return {Promise<void>}
-	 * @see {@link SettingProvider#clear}
+	 * @see {@link SettingsProvider#clear}
 	 */
 	clear() {
-		if(!this.client.provider) throw new Error('No settings provider is available.');
-		return this.client.provider.clear(this.guild);
+		if(!this.client.settingsProvider) throw new Error('No settings provider is available.');
+		return this.client.settingsProvider.clear(this.guild);
 	}
 }
 

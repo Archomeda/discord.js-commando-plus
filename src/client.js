@@ -1,7 +1,14 @@
+/*
+ Original author: Gawdl3y
+ Modified by: Archomeda
+ - Renamed CommandoClient.provider to CommandoClient.settingsProvider
+ - Renamed CommandoClient.setProvider() to CommandoClient.setSettingsProvider()
+ */
+
 const discord = require('discord.js');
 const CommandRegistry = require('./registry');
 const CommandDispatcher = require('./dispatcher');
-const GuildSettingsHelper = require('./providers/helper');
+const GuildSettingsHelper = require('./providers/settings/helper');
 
 /**
  * Discord.js Client with a command framework
@@ -46,9 +53,9 @@ class CommandoClient extends discord.Client {
 
 		/**
 		 * The client's setting provider
-		 * @type {?SettingProvider}
+		 * @type {?SettingsProvider}
 		 */
-		this.provider = null;
+		this.settingsProvider = null;
 
 		/**
 		 * Shortcut to use setting provider methods for the global settings
@@ -137,13 +144,13 @@ class CommandoClient extends discord.Client {
 	}
 
 	/**
-	 * Sets the setting provider to use, and initialises it once the client is ready
-	 * @param {SettingProvider|Promise<SettingProvider>} provider Provider to use
+	 * Sets the settings provider to use, and initializes it once the client is ready
+	 * @param {SettingProvider|Promise<SettingsProvider>} provider Provider to use
 	 * @return {Promise<void>}
 	 */
-	async setProvider(provider) {
+	async setSettingsProvider(provider) {
 		provider = await provider;
-		this.provider = provider;
+		this.settingsProvider = provider;
 
 		if(this.readyTimestamp) {
 			this.emit('debug', `Provider set to ${provider.constructor.name} - initialising...`);
@@ -152,7 +159,7 @@ class CommandoClient extends discord.Client {
 			return undefined;
 		}
 
-		this.emit('debug', `Provider set to ${provider.constructor.name} - will initialise once ready.`);
+		this.emit('debug', `Provider set to ${provider.constructor.name} - will initialize once ready.`);
 		await new Promise(resolve => {
 			this.once('ready', () => {
 				this.emit('debug', `Initialising provider...`);
@@ -165,7 +172,7 @@ class CommandoClient extends discord.Client {
 	}
 
 	destroy() {
-		super.destroy().then(() => this.provider ? this.provider.destroy() : undefined);
+		super.destroy().then(() => this.settingsProvider ? this.settingsProvider.destroy() : undefined);
 	}
 }
 

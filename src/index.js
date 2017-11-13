@@ -15,9 +15,9 @@ module.exports = {
 	util: require('./util'),
 	version: require('../package').version,
 
-	SettingProvider: require('./providers/base'),
+	SettingProvider: require('./providers/settings/base'),
 	get SQLiteProvider() {
-		return require('./providers/sqlite');
+		return require('./providers/settings/sqlite');
 	}
 };
 
