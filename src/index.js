@@ -29,6 +29,11 @@ module.exports = {
     },
     get YAMLSettingsProvider() {
         return require('./providers/settings/yaml');
+    },
+
+    StorageProvider: require('./providers/storage/base'),
+    get MongoStorageProvider() {
+        return require('./providers/storage/mongo');
     }
 };
 

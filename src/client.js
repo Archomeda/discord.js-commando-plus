@@ -5,6 +5,7 @@
  - Renamed CommandoClient.setProvider() to CommandoClient.setSettingsProvider()
  - Added CommandoClient.initProvider()
  - Added CommandoClient.cacheProvider, CommandoClient.setCacheProvider()
+ - Added CommandoClient.storageProvider, CommandoClient.setStorageProvider()
  - Changed CommandoClient.setSettingsProvider()
  */
 
@@ -77,6 +78,12 @@ class CommandoClient extends discord.Client {
          * @type {?SettingsProvider}
          */
         this.settingsProvider = null;
+
+        /**
+         * The client's storage provider.
+         * @type {?StorageProvider}
+         */
+        this.storageProvider = null;
 
         /**
          * Shortcut to use setting provider methods for the global settings.
@@ -209,8 +216,19 @@ class CommandoClient extends discord.Client {
     }
 
     /**
+     * Sets the storage provider to use, and initializes it once the client is ready.
+     * @param {StorageProvider|Promise<StorageProvider>} provider - The storage provider to use
+     * @return {Promise<void>} The promise.
+     */
+    async setStorageProvider(provider) {
+        provider = await provider;
+        this.storageProvider = provider;
+        return this.initProvider(provider, 'storage provider');
+    }
+
+    /**
      * Initializes a provider.
-     * @param {CacheProvider|SettingsProvider} provider - The provider to initialize
+     * @param {CacheProvider|SettingsProvider|StorageProvider} provider - The provider to initialize
      * @param {string} logName - The name to log when initializing
      * @return {Promise<void>} The promise.
      * @private

@@ -1,3 +1,8 @@
+declare module 'mongoose' {
+    export interface Mongoose {}
+    export interface Schema {}
+}
+
 declare module 'node-cache' {
     export interface NodeCache {}
 }
@@ -13,6 +18,7 @@ declare module 'sqlite' {
 
 declare module 'discord.js-commando' {
     import { Channel, Client, ClientOptions, ClientUserSettings, Collection, DMChannel, Emoji, GroupDMChannel, Guild, GuildChannel, GuildMember, GuildResolvable, Message, MessageAttachment, MessageEmbed, MessageOptions, MessageReaction, ReactionEmoji, RichEmbed, Role, Snowflake, StringResolvable, TextChannel, User, UserResolvable, Webhook } from 'discord.js';
+    import { Mongoose, Schema as MongooseSchema } from 'mongoose';
     import { NodeCache } from 'node-cache';
     import { Redis } from 'redis';
     import { Database as SQLiteDatabase, Statement as SQLiteStatement } from 'sqlite';
@@ -229,13 +235,15 @@ declare module 'discord.js-commando' {
         public dispatcher: CommandDispatcher;
         public readonly owners: User[];
         public settingsProvider: SettingsProvider;
+        public storageProvider: StorageProvider;
         public registry: CommandRegistry;
         public settings: GuildSettingsHelper;
 
-        private initProvider(provider: CacheProvider | SettingsProvider, logName: string): Promise<void>;
+        private initProvider(provider: CacheProvider | SettingsProvider | StorageProvider, logName: string): Promise<void>;
         public isOwner(user: UserResolvable): boolean;
         public setCacheProvider(provider: CacheProvider | Promise<CacheProvider>): Promise<void>;
         public setSettingsProvider(provider: SettingsProvider | Promise<SettingsProvider>): Promise<void>;
+        public setStorageProvider(provider: StorageProvider | Promise<StorageProvider>): Promise<void>;
 
         on(event: string, listener: Function): this;
         on(event: 'commandBlocked', listener: (message: CommandMessage, reason: string) => void): this;
@@ -371,6 +379,15 @@ declare module 'discord.js-commando' {
         public remove(table: string, key: string): Promise<boolean>;
     }
 
+    export class MongoStorageProvider extends StorageProvider {
+        public readonly db: Mongoose;
+        private models: Map;
+
+        public destroy(): Promise<void>;
+        public model(modelName: string): any;
+        public registerModel(modelName: string, modelSchema: MongooseSchema): void;
+    }
+
     export class RedisCacheProvider extends CacheProvider {
         public constructor(redis: Redis);
 
@@ -399,6 +416,13 @@ declare module 'discord.js-commando' {
         private setupGuildCommand(guild: Guild, command: Command, settings: {}): void;
         private setupGuildGroup(guild: Guild, group: CommandGroup, settings: {}): void;
         private updateOtherShards(key: string, val: any): void;
+    }
+
+    export class StorageProvider {
+        public readonly client: CommandoClient;
+
+        public destroy(): Promise<void>;
+        public init(client: CommandoClient): Promise<void>;
     }
 
     export class SQLiteSettingsProvider extends SettingsProvider {
