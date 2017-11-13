@@ -70,6 +70,7 @@ module.exports = class HelpCommand extends Command {
 		} else {
 			const messages = [];
 			try {
+				/* eslint-disable indent */
 				messages.push(await msg.direct(stripIndents`
 					${oneLine`
 						To run a command in ${msg.guild || 'any server'},
@@ -92,6 +93,7 @@ module.exports = class HelpCommand extends Command {
 						`).join('\n\n')
 					}
 				`, { split: true }));
+				/* eslint-enable indent */
 				if(msg.channel.type !== 'dm') messages.push(await msg.reply('Sent you a DM with information.'));
 			} catch(err) {
 				messages.push(await msg.reply('Unable to send you the help DM. You probably have DMs disabled.'));

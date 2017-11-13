@@ -37,10 +37,10 @@ class YAMLSettingsProvider extends SettingsProvider {
 	async init(client) {
 		await super.init(client);
 
-        // Load all settings
+		// Load all settings
 		const files = (await readdirAsync(this.folder))
-            .filter(p => path.extname(p) === '.yml')
-            .map(p => path.join(this.folder, p));
+			.filter(p => path.extname(p) === '.yml')
+			.map(p => path.join(this.folder, p));
 
 		this.settings = new Map(await Promise.all(files.map(async p => {
 			const guild = path.basename(p, '.yml');

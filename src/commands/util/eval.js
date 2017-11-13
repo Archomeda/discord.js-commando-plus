@@ -96,6 +96,7 @@ module.exports = class EvalCommand extends Command {
 		const prepend = `\`\`\`javascript\n${prependPart}\n`;
 		const append = `\n${appendPart}\n\`\`\``;
 		if(input) {
+			/* eslint-disable indent */
 			return discord.splitMessage(tags.stripIndents`
 				${editable ? `
 					*Input*
@@ -108,6 +109,7 @@ module.exports = class EvalCommand extends Command {
 				${inspected}
 				\`\`\`
 			`, 1900, '\n', prepend, append);
+			/* eslint-enable indent */
 		} else {
 			return discord.splitMessage(tags.stripIndents`
 				*Callback executed after ${hrDiff[0] > 0 ? `${hrDiff[0]}s ` : ''}${hrDiff[1] / 1000000}ms.*

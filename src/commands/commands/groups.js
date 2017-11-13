@@ -20,11 +20,13 @@ module.exports = class ListGroupsCommand extends Command {
 	}
 
 	run(msg) {
+		/* eslint-disable indent */
 		return msg.reply(stripIndents`
 			__**Groups**__
 			${this.client.registry.groups.map(grp =>
 				`**${grp.name}:** ${grp.isEnabledIn(msg.guild) ? 'Enabled' : 'Disabled'}`
 			).join('\n')}
 		`);
+		/* eslint-enable indent */
 	}
 };

@@ -88,7 +88,7 @@ class SettingsProvider {
 	 * @return {Promise<void>}
 	 */
 	destroy() {
-        // Remove all listeners from the client
+		// Remove all listeners from the client
 		for(const [event, listener] of this.listeners) this.client.removeListener(event, listener);
 		this.listeners.clear();
 	}
@@ -164,13 +164,13 @@ class SettingsProvider {
 		if(typeof guild !== 'string') throw new TypeError('The guild must be a guild ID or "global".');
 		guild = this.client.guilds.get(guild) || null;
 
-        // Load the command prefix
+		// Load the command prefix
 		if(typeof settings.prefix !== 'undefined') {
 			if(guild) guild._commandPrefix = settings.prefix;
 			else this.client._commandPrefix = settings.prefix;
 		}
 
-        // Load all command/group statuses
+		// Load all command/group statuses
 		for(const command of this.client.registry.commands.values()) this.setupGuildCommand(guild, command, settings);
 		for(const group of this.client.registry.groups.values()) this.setupGuildGroup(guild, group, settings);
 	}
