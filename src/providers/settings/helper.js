@@ -3,8 +3,8 @@
  */
 class GuildSettingsHelper {
     /**
-	 * @param {CommandoClient} client - Client to use the provider of.
-	 * @param {?Guild} guild - Guild the settings are for.
+	 * @param {CommandoClient} client - Client to use the provider of
+	 * @param {?Guild} guild - Guild the settings are for
 	 * @private
 	 */
     constructor(client, guild) {
@@ -25,8 +25,8 @@ class GuildSettingsHelper {
 
     /**
 	 * Gets a setting in the guild.
-	 * @param {string} key - Name of the setting.
-	 * @param {*} [defVal] - Value to default to if the setting isn't set.
+	 * @param {string} key - Name of the setting
+	 * @param {*} [defVal] - Value to default to if the setting isn't set
 	 * @return {*} The value of the setting.
 	 * @see {@link SettingsProvider#get}
 	 */
@@ -37,8 +37,8 @@ class GuildSettingsHelper {
 
     /**
 	 * Sets a setting for the guild.
-	 * @param {string} key - Name of the setting.
-	 * @param {*} val - Value of the setting.
+	 * @param {string} key - Name of the setting
+	 * @param {*} val - Value of the setting
 	 * @return {Promise<*>} New value of the setting.
 	 * @see {@link SettingsProvider#set}
 	 */
@@ -49,7 +49,7 @@ class GuildSettingsHelper {
 
     /**
 	 * Removes a setting from the guild.
-	 * @param {string} key - Name of the setting.
+	 * @param {string} key - Name of the setting
 	 * @return {Promise<*>} Old value of the setting.
 	 * @see {@link SettingsProvider#remove}
 	 */

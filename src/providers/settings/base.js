@@ -45,7 +45,7 @@ class SettingsProvider {
     /**
 	 * Initializes the provider by connecting to databases and/or caching all data in memory.
 	 * {@link CommandoClient#setSettingsProvider} will automatically call this once the client is ready.
-	 * @param {CommandoClient} client - Client that will be using the provider.
+	 * @param {CommandoClient} client - Client that will be using the provider
 	 * @return {Promise<void>} The promise.
 	 */
     init(client) {
@@ -95,9 +95,9 @@ class SettingsProvider {
 
     /**
 	 * Obtains a setting for a guild.
-	 * @param {Guild|string} guild - Guild the setting is associated with (or 'global').
-	 * @param {string} key - Name of the setting.
-	 * @param {*} [defVal] - Value to default to if the setting isn't set on the guild.
+	 * @param {Guild|string} guild - Guild the setting is associated with (or 'global')
+	 * @param {string} key - Name of the setting
+	 * @param {*} [defVal] - Value to default to if the setting isn't set on the guild
 	 * @return {*} The value of the setting.
 	 */
     get(guild, key, defVal) {
@@ -107,9 +107,9 @@ class SettingsProvider {
 
     /**
 	 * Sets a setting for a guild.
-	 * @param {Guild|string} guild - Guild to associate the setting with (or 'global').
-	 * @param {string} key - Name of the setting.
-	 * @param {*} val - Value of the setting.
+	 * @param {Guild|string} guild - Guild to associate the setting with (or 'global')
+	 * @param {string} key - Name of the setting
+	 * @param {*} val - Value of the setting
 	 * @return {Promise<*>} The new value of the setting.
 	 */
     set(guild, key, val) {
@@ -126,8 +126,8 @@ class SettingsProvider {
 
     /**
 	 * Removes a setting from a guild.
-	 * @param {Guild|string} guild - Guild the setting is associated with (or 'global').
-	 * @param {string} key - Name of the setting.
+	 * @param {Guild|string} guild - Guild the setting is associated with (or 'global')
+	 * @param {string} key - Name of the setting
 	 * @return {Promise<*>} The old value of the setting.
 	 */
     remove(guild, key) {
@@ -143,7 +143,7 @@ class SettingsProvider {
 
     /**
 	 * Removes all settings in a guild.
-	 * @param {Guild|string} guild - Guild to clear the settings of.
+	 * @param {Guild|string} guild - Guild to clear the settings of
 	 * @return {Promise<void>} The promise.
 	 */
     clear(guild) {
@@ -154,8 +154,8 @@ class SettingsProvider {
 
     /**
 	 * Loads all settings for a guild.
-	 * @param {string} guild - Guild ID to load the settings of (or 'global').
-	 * @param {Object} settings - Settings to load.
+	 * @param {string} guild - Guild ID to load the settings of (or 'global')
+	 * @param {Object} settings - Settings to load
      * @return {void}
 	 * @private
 	 */
@@ -183,9 +183,9 @@ class SettingsProvider {
 
     /**
 	 * Sets up a command's status in a guild from the guild's settings.
-	 * @param {?Guild} guild - Guild to set the status in.
-	 * @param {Command} command - Command to set the status of.
-	 * @param {Object} settings - Settings of the guild.
+	 * @param {?Guild} guild - Guild to set the status in
+	 * @param {Command} command - Command to set the status of
+	 * @param {Object} settings - Settings of the guild
      * @return {void}
 	 * @private
 	 */
@@ -201,9 +201,9 @@ class SettingsProvider {
 
     /**
 	 * Sets up a group's status in a guild from the guild's settings.
-	 * @param {?Guild} guild - Guild to set the status in.
-	 * @param {CommandGroup} group - Group to set the status of.
-	 * @param {Object} settings - Settings of the guild.
+	 * @param {?Guild} guild - Guild to set the status in
+	 * @param {CommandGroup} group - Group to set the status of
+	 * @param {Object} settings - Settings of the guild
      * @return {void}
 	 * @private
 	 */
@@ -219,8 +219,8 @@ class SettingsProvider {
 
     /**
 	 * Updates a global setting on all other shards if using the {@link ShardingManager}.
-	 * @param {string} key - Key of the setting to update.
-	 * @param {*} val - Value of the setting.
+	 * @param {string} key - Key of the setting to update
+	 * @param {*} val - Value of the setting
      * @return {void}
      * @private
 	 */
@@ -242,7 +242,7 @@ class SettingsProvider {
 
     /**
 	 * Obtains the ID of the provided guild, or throws an error if it isn't valid.
-	 * @param {Guild|string} guild - Guild to get the ID of.
+	 * @param {Guild|string} guild - Guild to get the ID of
 	 * @return {string} ID of the guild, or 'global'.
 	 */
     static getGuildID(guild) {

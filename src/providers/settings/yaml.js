@@ -19,8 +19,7 @@ const unlinkAsync = promisify(fs.unlink);
  */
 class YAMLSettingsProvider extends SettingsProvider {
     /**
-	 * Constructs a new YAML settings provider.
-	 * @param {string} folder - The path to the folder where the YAML setting files are stored.
+	 * @param {string} folder - The path to the folder where the YAML setting files are stored
 	 */
     constructor(folder) {
         super();

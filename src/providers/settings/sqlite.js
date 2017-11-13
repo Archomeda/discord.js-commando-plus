@@ -18,7 +18,7 @@ class SQLiteSettingsProvider extends SettingsProvider {
 	 */
 
     /**
-	 * @param {SQLiteDatabase} db - Database for the provider.
+	 * @param {SQLiteDatabase} db - Database for the provider
 	 */
     constructor(db) {
         super();
