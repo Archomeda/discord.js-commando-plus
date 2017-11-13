@@ -23,6 +23,11 @@ module.exports = {
         return require('./providers/cache/redis');
     },
 
+    LocaleProvider: require('./providers/locale/base'),
+    get I18nextLocaleProvider() {
+        return require('./providers/locale/i18next');
+    },
+
     SettingsProvider: require('./providers/settings/base'),
     get SQLiteSettingsProvider() {
         return require('./providers/settings/sqlite');

@@ -5,6 +5,7 @@
  - Renamed CommandoClient.setProvider() to CommandoClient.setSettingsProvider()
  - Added CommandoClient.initProvider()
  - Added CommandoClient.cacheProvider, CommandoClient.setCacheProvider()
+ - Added CommandoClient.localeProvider, CommandoClient.setLocaleProvider()
  - Added CommandoClient.storageProvider, CommandoClient.setStorageProvider()
  - Changed CommandoClient.setSettingsProvider()
  */
@@ -72,6 +73,12 @@ class CommandoClient extends discord.Client {
          * @type {?CacheProvider}
          */
         this.cacheProvider = null;
+
+        /**
+         * The client's locale provider.
+         * @type {?LocaleProvider}
+         */
+        this.localeProvider = null;
 
         /**
          * The client's settings provider.
@@ -205,6 +212,17 @@ class CommandoClient extends discord.Client {
     }
 
     /**
+     * Sets the locale provider to use, and initializes it once the client is ready.
+     * @param {LocaleProvider|Promise<LocaleProvider>} provider - The locale provider to use
+     * @return {Promise<void>} The promise.
+     */
+    async setLocaleProvider(provider) {
+        provider = await provider;
+        this.localeProvider = provider;
+        return this.initProvider(provider, 'locale provider');
+    }
+
+    /**
      * Sets the settings provider to use, and initializes it once the client is ready.
      * @param {SettingsProvider|Promise<SettingsProvider>} provider - The settings provider to use
      * @return {Promise<void>} The promise.
@@ -228,7 +246,7 @@ class CommandoClient extends discord.Client {
 
     /**
      * Initializes a provider.
-     * @param {CacheProvider|SettingsProvider|StorageProvider} provider - The provider to initialize
+     * @param {CacheProvider|LocaleProvider|SettingsProvider|StorageProvider} provider - The provider to initialize
      * @param {string} logName - The name to log when initializing
      * @return {Promise<void>} The promise.
      * @private

@@ -1,3 +1,7 @@
+declare module '18next' {
+    export interface i18next {}
+}
+
 declare module 'mongoose' {
     export interface Mongoose {}
     export interface Schema {}
@@ -18,6 +22,7 @@ declare module 'sqlite' {
 
 declare module 'discord.js-commando' {
     import { Channel, Client, ClientOptions, ClientUserSettings, Collection, DMChannel, Emoji, GroupDMChannel, Guild, GuildChannel, GuildMember, GuildResolvable, Message, MessageAttachment, MessageEmbed, MessageOptions, MessageReaction, ReactionEmoji, RichEmbed, Role, Snowflake, StringResolvable, TextChannel, User, UserResolvable, Webhook } from 'discord.js';
+    import { i18next } from 'i8next';
     import { Mongoose, Schema as MongooseSchema } from 'mongoose';
     import { NodeCache } from 'node-cache';
     import { Redis } from 'redis';
@@ -233,15 +238,17 @@ declare module 'discord.js-commando' {
         public cacheProvider: CacheProvider;
         public commandPrefix: string;
         public dispatcher: CommandDispatcher;
+        public localeProvider: LocaleProvider;
         public readonly owners: User[];
         public settingsProvider: SettingsProvider;
         public storageProvider: StorageProvider;
         public registry: CommandRegistry;
         public settings: GuildSettingsHelper;
 
-        private initProvider(provider: CacheProvider | SettingsProvider | StorageProvider, logName: string): Promise<void>;
+        private initProvider(provider: CacheProvider | LocaleProvider | SettingsProvider | StorageProvider, logName: string): Promise<void>;
         public isOwner(user: UserResolvable): boolean;
         public setCacheProvider(provider: CacheProvider | Promise<CacheProvider>): Promise<void>;
+        public setLocaleProvider(provider: LocaleProvider | Promise<LocaleProvider>): Promise<void>;
         public setSettingsProvider(provider: SettingsProvider | Promise<SettingsProvider>): Promise<void>;
         public setStorageProvider(provider: StorageProvider | Promise<StorageProvider>): Promise<void>;
 
@@ -368,6 +375,25 @@ declare module 'discord.js-commando' {
         public set(key: string, value: any): Promise<any>;
     }
 
+    export class I18nextLocaleProvider extends LocaleProvider {
+        public constructor(i18next: i18next, language: string, directory: string);
+
+        public readonly directory: string;
+        public language: string;
+        public readonly localizer: i18next;
+    }
+
+    export class LocaleProvider {
+        public readonly client: CommandClient;
+
+        public destroy(): Promise<void>;
+        public init(client: CommandoClient): Promise<void>;
+        public preloadNamespace(namespace: string): Promise<void>;
+        public preloadNamespaces(namespaces: string[]): Promise<void>;
+        public tl(namespace: string, key: string, vars: {}): Promise<string>;
+        public translate(namespace: string, key: string, vars: {}): Promise<string>;
+    }
+
     export class MemoryCacheProvider extends CacheProvider {
         public constructor(nodeCache: NodeCache);
 
@@ -440,9 +466,9 @@ declare module 'discord.js-commando' {
     }
 
     export class YAMLSettingsProvider extends SettingsProvider {
-        public constructor(folder: string);
+        public constructor(directory: string);
 
-        public readonly folder: string;
+        public readonly directory: string;
 
         public clear(guild: Guild | string): Promise<void>;
         public init(client: CommandoClient): Promise<void>;

@@ -20,33 +20,33 @@ const unlinkAsync = promisify(fs.unlink);
  */
 class YAMLSettingsProvider extends SettingsProvider {
     /**
-     * @param {string} folder - The path to the folder where the YAML setting files are stored
+     * @param {string} directory - The path to the directory where the YAML setting files are stored
      * @example
      * // Create and use a new YAML settings provider
-     * client.setSettingsProvider(new YAMLSettingsProvider('path/to/config/folder'));
+     * client.setSettingsProvider(new YAMLSettingsProvider('path/to/config/directory'));
      */
-    constructor(folder) {
+    constructor(directory) {
         super();
 
         /**
-         * The absolute path to the folder where the YAML setting files are stored.
-         * @name YAMLSettingsProvider#path
+         * The absolute path to the directory where the YAML setting files are stored.
+         * @name YAMLSettingsProvider#directory
          * @type {string}
          * @readonly
          */
-        Object.defineProperty(this, 'folder', { value: path.resolve(folder) });
+        Object.defineProperty(this, 'directory', { value: path.resolve(directory) });
     }
 
     async init(client) {
         await super.init(client);
 
         // Load all settings
-        if (!fs.existsSync(this.folder)) {
-            fs.mkdirSync(this.folder);
+        if (!fs.existsSync(this.directory)) {
+            fs.mkdirSync(this.directory);
         }
-        const files = (await readdirAsync(this.folder))
+        const files = (await readdirAsync(this.directory))
             .filter(p => path.extname(p) === '.yml')
-            .map(p => path.join(this.folder, p));
+            .map(p => path.join(this.directory, p));
 
         this.settings = new Map(await Promise.all(files.map(async p => {
             const guild = path.basename(p, '.yml');
@@ -70,7 +70,7 @@ class YAMLSettingsProvider extends SettingsProvider {
     async set(guild, key, val) {
         guild = this.constructor.getGuildID(guild);
         val = await super.set(guild, key, val);
-        await writeFileAsync(path.join(this.folder, `${guild}.yml`), yaml.safeDump(this.settings.get(guild)));
+        await writeFileAsync(path.join(this.directory, `${guild}.yml`), yaml.safeDump(this.settings.get(guild)));
         return val;
     }
 
@@ -81,7 +81,7 @@ class YAMLSettingsProvider extends SettingsProvider {
             return undefined;
         }
 
-        await writeFileAsync(path.join(this.folder, `${guild}.yml`), yaml.safeDump(this.settings.get(guild)));
+        await writeFileAsync(path.join(this.directory, `${guild}.yml`), yaml.safeDump(this.settings.get(guild)));
         return val;
     }
 
@@ -91,7 +91,7 @@ class YAMLSettingsProvider extends SettingsProvider {
             return;
         }
         await super.clear(guild);
-        await unlinkAsync(path.join(this.folder, `${guild}.yaml`));
+        await unlinkAsync(path.join(this.directory, `${guild}.yaml`));
     }
 }
 
