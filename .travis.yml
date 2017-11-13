@@ -15,10 +15,9 @@ branches:
   - /.*/
 
 cache:
+  yarn: true
   directories:
     - node_modules
-
-install: npm install
 
 script:
   - bash ./deploy/deploy.sh
