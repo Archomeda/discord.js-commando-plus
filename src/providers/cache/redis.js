@@ -29,7 +29,7 @@ class RedisCacheProvider extends CacheProvider {
         /**
          * The Redis instance that is used for caching.
          * @name RedisCacheProvider#cache
-         * @type {NodeCache}
+         * @type {Redis}
          * @readonly
          */
         Object.defineProperty(this, 'cache', { value: redis });
