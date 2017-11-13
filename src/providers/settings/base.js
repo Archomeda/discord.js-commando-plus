@@ -44,7 +44,7 @@ class SettingsProvider {
 	}
 
 	/**
-	 * Initialises the provider by connecting to databases and/or caching all data in memory.
+	 * Initializes the provider by connecting to databases and/or caching all data in memory.
 	 * {@link CommandoClient#setSettingsProvider} will automatically call this once the client is ready.
 	 * @param {CommandoClient} client - Client that will be using the provider
 	 * @return {Promise<void>}
@@ -129,7 +129,6 @@ class SettingsProvider {
 	 * @param {Guild|string} guild - Guild the setting is associated with (or 'global')
 	 * @param {string} key - Name of the setting
 	 * @return {Promise<*>} Old value of the setting
-	 * @abstract
 	 */
 	remove(guild, key) {
 		guild = this.constructor.getGuildID(guild);
@@ -146,7 +145,6 @@ class SettingsProvider {
 	 * Removes all settings in a guild
 	 * @param {Guild|string} guild - Guild to clear the settings of
 	 * @return {Promise<void>}
-	 * @abstract
 	 */
 	clear(guild) {
 		guild = this.constructor.getGuildID(guild);

@@ -145,7 +145,7 @@ class CommandoClient extends discord.Client {
 
 	/**
 	 * Sets the settings provider to use, and initializes it once the client is ready
-	 * @param {SettingProvider|Promise<SettingsProvider>} provider Provider to use
+	 * @param {SettingsProvider|Promise<SettingsProvider>} provider Provider to use
 	 * @return {Promise<void>}
 	 */
 	async setSettingsProvider(provider) {

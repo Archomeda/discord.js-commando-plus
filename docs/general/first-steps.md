@@ -36,7 +36,7 @@ client.registry
 ```
 
 Commando-Plus has built-in command prefix configuration per-guild, as well as enabling and disabling commands per-guild.
-In order for this to persist across restarts, you should use a [SettingProvider](https://archomeda.github.io/discord.js-commando-plus/#/docs/commando-plus/master/class/SettingProvider).
+In order for this to persist across restarts, you should use a [SettingsProvider](https://archomeda.github.io/discord.js-commando-plus/#/docs/commando-plus/master/class/SettingsProvider).
 There is a built-in SQLiteProvider that comes with Commando-Plus, which stores all settings in an SQLite3 database.
 To use it, install the `sqlite` module with NPM (`npm install --save sqlite`). Then, set the provider on the client:
 
