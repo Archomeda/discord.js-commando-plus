@@ -1,5 +1,5 @@
 # First steps
-The first thing you need to do to use Commando-Plus is ensure you're creating a [CommandoClient](https://discord.js.org/#/docs/commando/master/class/CommandoClient)
+The first thing you need to do to use Commando-Plus is ensure you're creating a [CommandoClient](https://archomeda.github.io/discord.js-commando-plus/#/docs/commando-plus/master/class/CommandoClient)
 rather than the regular discord.js [Client](https://discord.js.org/#/docs/main/master/class/Client).
 A CommandoClient is just an extension of the base Client, so all options, properties, methods, and events on Client are also on CommandoClient.
 
