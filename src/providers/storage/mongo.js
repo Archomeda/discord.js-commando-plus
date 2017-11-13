@@ -6,7 +6,7 @@ const StorageProvider = require('./base');
 
 /**
  * Handles storage for data via Mongoose.
- * @abstract
+ * @extends {StorageProvider}
  */
 class MongoStorageProvider extends StorageProvider {
     /**
