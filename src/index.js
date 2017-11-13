@@ -16,12 +16,18 @@ module.exports = {
     version: require('../package').version,
 
     CacheProvider: require('./providers/cache/base'),
+    get MemoryCacheProvider() {
+        return require('./providers/cache/memory');
+    },
+    get RedisCacheProvider() {
+        return require('./providers/cache/redis');
+    },
 
     SettingsProvider: require('./providers/settings/base'),
-    get SQLiteProvider() {
+    get SQLiteSettingsProvider() {
         return require('./providers/settings/sqlite');
     },
-    get YAMLProvider() {
+    get YAMLSettingsProvider() {
         return require('./providers/settings/yaml');
     }
 };

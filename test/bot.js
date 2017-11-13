@@ -77,10 +77,10 @@ client
 
 if (sqlite) {
     client.setSettingsProvider(
-        sqlite.open(path.join(__dirname, 'database.sqlite3')).then(db => new commando.SQLiteProvider(db))
+        sqlite.open(path.join(__dirname, 'database.sqlite3')).then(db => new commando.SQLiteSettingsProvider(db))
     ).catch(console.error);
 } else if (yaml) {
-    client.setSettingsProvider(new commando.YAMLProvider(path.join(__dirname, 'config')))
+    client.setSettingsProvider(new commando.YAMLSettingsProvider(path.join(__dirname, 'config')))
         .catch(console.error);
 }
 
