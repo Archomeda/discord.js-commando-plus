@@ -2,25 +2,25 @@ const stripIndents = require('common-tags').stripIndents;
 const Command = require('../base');
 
 module.exports = class ListGroupsCommand extends Command {
-	constructor(client) {
-		super(client, {
-			name: 'groups',
-			aliases: ['list-groups', 'show-groups'],
-			group: 'commands',
-			memberName: 'groups',
-			description: 'Lists all command groups.',
-			details: 'Only administrators may use this command.',
-			guarded: true
-		});
-	}
+    constructor(client) {
+        super(client, {
+            name: 'groups',
+            aliases: ['list-groups', 'show-groups'],
+            group: 'commands',
+            memberName: 'groups',
+            description: 'Lists all command groups.',
+            details: 'Only administrators may use this command.',
+            guarded: true
+        });
+    }
 
-	hasPermission(msg) {
-		if(!msg.guild) return this.client.isOwner(msg.author);
-		return msg.member.hasPermission('ADMINISTRATOR') || this.client.isOwner(msg.author);
-	}
+    hasPermission(msg) {
+        if (!msg.guild) { return this.client.isOwner(msg.author); }
+        return msg.member.hasPermission('ADMINISTRATOR') || this.client.isOwner(msg.author);
+    }
 
-	run(msg) {
-		/* eslint-disable indent */
+    run(msg) {
+        /* eslint-disable indent */
 		return msg.reply(stripIndents`
 			__**Groups**__
 			${this.client.registry.groups.map(grp =>
@@ -28,5 +28,5 @@ module.exports = class ListGroupsCommand extends Command {
 			).join('\n')}
 		`);
 		/* eslint-enable indent */
-	}
+    }
 };

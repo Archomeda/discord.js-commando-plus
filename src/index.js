@@ -1,24 +1,24 @@
 const discord = require('discord.js');
 
 module.exports = {
-	Client: require('./client'),
-	CommandoClient: require('./client'),
-	Command: require('./commands/base'),
-	CommandGroup: require('./commands/group'),
-	CommandMessage: require('./commands/message'),
-	ArgumentCollector: require('./commands/collector'),
-	Argument: require('./commands/argument'),
-	ArgumentType: require('./types/base'),
-	FriendlyError: require('./errors/friendly'),
-	CommandFormatError: require('./errors/command-format'),
+    Client: require('./client'),
+    CommandoClient: require('./client'),
+    Command: require('./commands/base'),
+    CommandGroup: require('./commands/group'),
+    CommandMessage: require('./commands/message'),
+    ArgumentCollector: require('./commands/collector'),
+    Argument: require('./commands/argument'),
+    ArgumentType: require('./types/base'),
+    FriendlyError: require('./errors/friendly'),
+    CommandFormatError: require('./errors/command-format'),
 
-	util: require('./util'),
-	version: require('../package').version,
+    util: require('./util'),
+    version: require('../package').version,
 
-	SettingsProvider: require('./providers/settings/base'),
-	get SQLiteProvider() {
-		return require('./providers/settings/sqlite');
-	}
+    SettingsProvider: require('./providers/settings/base'),
+    get SQLiteProvider() {
+        return require('./providers/settings/sqlite');
+    }
 };
 
 require('./extensions/guild').applyToClass(discord.Guild);
