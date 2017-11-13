@@ -17,6 +17,10 @@ class MemoryCacheProvider extends CacheProvider {
 
     /**
      * @param {NodeCache} nodeCache - The NodeCache instance
+     * @example
+     * // Create and use a new memory cache provider
+     * const nodeCache = require('node-cache');
+     * client.setCacheProvider(new MemoryCacheProvider(new NodeCache()));
      */
     constructor(nodeCache) {
         super();

@@ -17,6 +17,10 @@ class RedisCacheProvider extends CacheProvider {
 
     /**
      * @param {Redis} redis - The Redis instance
+     * @example
+     * // Create and use a new Redis cache provider
+     * const redis = require('redis');
+     * client.setCacheProvider(new RedisCacheProvider(redis.createClient({ /* options *\/ })));
      */
     constructor(redis) {
         super();

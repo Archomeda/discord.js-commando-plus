@@ -19,6 +19,10 @@ class SQLiteSettingsProvider extends SettingsProvider {
 
     /**
      * @param {SQLiteDatabase} db - Database for the provider
+     * @example
+     * // Create and use a new SQLite settings provider
+     * const sqlite = require('sqlite');
+     * client.setSettingsProvider(sqlite.open('database.sqlite3')).then(db => new SQLiteSettingsProvider(db));
      */
     constructor(db) {
         super();
