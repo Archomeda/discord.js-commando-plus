@@ -31,6 +31,7 @@
     "eslint": "^4.0.0",
     "js-yaml": "^3.10.0",
     "jsdoc-strip-async-await": "^0.1.0",
+    "mongoose": "^4.13.2",
     "node-cache": "^4.1.1",
     "redis": "^2.8.0",
     "sqlite": "^2.0.0",
@@ -39,6 +40,7 @@
   "peerDependencies": {
     "discord.js": "^11.2.0",
     "js-yaml": "^3.10.0",
+    "mongoose": "^4.13.2",
     "node-cache": "^4.1.1",
     "redis": "^2.8.0",
     "sqlite": "^2.0.0"
