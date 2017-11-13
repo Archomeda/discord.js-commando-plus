@@ -15,6 +15,8 @@ module.exports = {
     util: require('./util'),
     version: require('../package').version,
 
+    CacheProvider: require('./providers/cache/base'),
+
     SettingsProvider: require('./providers/settings/base'),
     get SQLiteProvider() {
         return require('./providers/settings/sqlite');

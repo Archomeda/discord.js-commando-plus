@@ -1,6 +1,7 @@
 /*
  Original author: Archomeda
  */
+
 const fs = require('fs');
 const path = require('path');
 const { promisify } = require('util');
@@ -19,17 +20,17 @@ const unlinkAsync = promisify(fs.unlink);
  */
 class YAMLSettingsProvider extends SettingsProvider {
     /**
-	 * @param {string} folder - The path to the folder where the YAML setting files are stored
-	 */
+     * @param {string} folder - The path to the folder where the YAML setting files are stored
+     */
     constructor(folder) {
         super();
 
         /**
-		 * The absolute path to the folder where the YAML setting files are stored.
-		 * @name YAMLSettingsProvider#path
-		 * @type {string}
-		 * @readonly
-		 */
+         * The absolute path to the folder where the YAML setting files are stored.
+         * @name YAMLSettingsProvider#path
+         * @type {string}
+         * @readonly
+         */
         Object.defineProperty(this, 'folder', { value: path.resolve(folder) });
     }
 
@@ -49,7 +50,9 @@ class YAMLSettingsProvider extends SettingsProvider {
             let data = {};
             try {
                 data = yaml.safeLoad(await readFileAsync(p));
-                if (guild === 'global' || client.guilds.has(guild)) { this.setupGuild(guild, data); }
+                if (guild === 'global' || client.guilds.has(guild)) {
+                    this.setupGuild(guild, data);
+                }
             } catch (err) {
                 client.emit(
                     'warn',
@@ -71,7 +74,9 @@ class YAMLSettingsProvider extends SettingsProvider {
     async remove(guild, key) {
         guild = this.constructor.getGuildID(guild);
         const val = await super.remove(guild, key);
-        if (typeof val === 'undefined') { return undefined; }
+        if (typeof val === 'undefined') {
+            return undefined;
+        }
 
         await writeFileAsync(path.join(this.folder, `${guild}.yml`), yaml.safeDump(this.settings.get(guild)));
         return val;
@@ -79,7 +84,9 @@ class YAMLSettingsProvider extends SettingsProvider {
 
     async clear(guild) {
         guild = this.constructor.getGuildID(guild);
-        if (!this.settings.has(guild)) { return; }
+        if (!this.settings.has(guild)) {
+            return;
+        }
         await super.clear(guild);
         await unlinkAsync(path.join(this.folder, `${guild}.yaml`));
     }

@@ -3,6 +3,9 @@
  Modified by: Archomeda
  - Renamed CommandoClient.provider to CommandoClient.settingsProvider
  - Renamed CommandoClient.setProvider() to CommandoClient.setSettingsProvider()
+ - Added CommandoClient.initProvider()
+ - Added CommandoClient.cacheProvider, CommandoClient.setCacheProvider()
+ - Changed CommandoClient.setSettingsProvider()
  */
 
 const discord = require('discord.js');
@@ -16,58 +19,76 @@ const GuildSettingsHelper = require('./providers/settings/helper');
  */
 class CommandoClient extends discord.Client {
     /**
-	 * Options for a CommandoClient
-	 * @typedef {ClientOptions} CommandoClientOptions
-	 * @property {boolean} [selfbot=false] - Whether the command dispatcher should be in selfbot mode
-	 * @property {string} [commandPrefix=!] - Default command prefix
-	 * @property {number} [commandEditableDuration=30] - Time in seconds that command messages should be editable
-	 * @property {boolean} [nonCommandEditable=true] - Whether messages without commands can be edited to a command
-	 * @property {boolean} [unknownCommandResponse=true] - Whether the bot should respond to an unknown command
-	 * @property {string|string[]|Set<string>} [owner] - ID of the bot owner's Discord user, or multiple IDs
-	 * @property {string} [invite] - Invite URL to the bot's support server
-	 */
+     * Options for a CommandoClient
+     * @typedef {ClientOptions} CommandoClientOptions
+     * @property {boolean} [selfbot=false] - Whether the command dispatcher should be in selfbot mode
+     * @property {string} [commandPrefix=!] - Default command prefix
+     * @property {number} [commandEditableDuration=30] - Time in seconds that command messages should be editable
+     * @property {boolean} [nonCommandEditable=true] - Whether messages without commands can be edited to a command
+     * @property {boolean} [unknownCommandResponse=true] - Whether the bot should respond to an unknown command
+     * @property {string|string[]|Set<string>} [owner] - ID of the bot owner's Discord user, or multiple IDs
+     * @property {string} [invite] - Invite URL to the bot's support server
+     */
 
     /**
-	 * @param {CommandoClientOptions} [options] - Options for the client
-	 */
+     * @param {CommandoClientOptions} [options] - Options for the client
+     */
     constructor(options = {}) {
-        if (typeof options.selfbot === 'undefined') { options.selfbot = false; }
-        if (typeof options.commandPrefix === 'undefined') { options.commandPrefix = '!'; }
-        if (options.commandPrefix === null) { options.commandPrefix = ''; }
-        if (typeof options.commandEditableDuration === 'undefined') { options.commandEditableDuration = 30; }
-        if (typeof options.nonCommandEditable === 'undefined') { options.nonCommandEditable = true; }
-        if (typeof options.unknownCommandResponse === 'undefined') { options.unknownCommandResponse = true; }
+        if (typeof options.selfbot === 'undefined') {
+            options.selfbot = false;
+        }
+        if (typeof options.commandPrefix === 'undefined') {
+            options.commandPrefix = '!';
+        }
+        if (options.commandPrefix === null) {
+            options.commandPrefix = '';
+        }
+        if (typeof options.commandEditableDuration === 'undefined') {
+            options.commandEditableDuration = 30;
+        }
+        if (typeof options.nonCommandEditable === 'undefined') {
+            options.nonCommandEditable = true;
+        }
+        if (typeof options.unknownCommandResponse === 'undefined') {
+            options.unknownCommandResponse = true;
+        }
         super(options);
 
         /**
-		 * The client's command registry
-		 * @type {CommandRegistry}
-		 */
+         * The client's command registry.
+         * @type {CommandRegistry}
+         */
         this.registry = new CommandRegistry(this);
 
         /**
-		 * The client's command dispatcher
-		 * @type {CommandDispatcher}
-		 */
+         * The client's command dispatcher.
+         * @type {CommandDispatcher}
+         */
         this.dispatcher = new CommandDispatcher(this, this.registry);
 
         /**
-		 * The client's setting provider
-		 * @type {?SettingsProvider}
-		 */
+         * The client's cache provider.
+         * @type {?CacheProvider}
+         */
+        this.cacheProvider = null;
+
+        /**
+         * The client's settings provider.
+         * @type {?SettingsProvider}
+         */
         this.settingsProvider = null;
 
         /**
-		 * Shortcut to use setting provider methods for the global settings
-		 * @type {GuildSettingsHelper}
-		 */
+         * Shortcut to use setting provider methods for the global settings.
+         * @type {GuildSettingsHelper}
+         */
         this.settings = new GuildSettingsHelper(this, null);
 
         /**
-		 * Internal global command prefix, controlled by the {@link CommandoClient#commandPrefix} getter/setter
-		 * @type {?string}
-		 * @private
-		 */
+         * Internal global command prefix, controlled by the {@link CommandoClient#commandPrefix} getter/setter.
+         * @type {?string}
+         * @private
+         */
         this._commandPrefix = null;
 
         // Set up command handling
@@ -102,11 +123,11 @@ class CommandoClient extends discord.Client {
     }
 
     /**
-	 * Global command prefix. An empty string indicates that there is no default prefix, and only mentions will be used.
-	 * Setting to `null` means that the default prefix from {@link CommandoClient#options} will be used instead.
-	 * @type {string}
-	 * @emits {@link CommandoClient#commandPrefixChange}
-	 */
+     * Global command prefix. An empty string indicates that there is no default prefix, and only mentions will be used.
+     * Setting to `null` means that the default prefix from {@link CommandoClient#options} will be used instead.
+     * @type {string}
+     * @emits {@link CommandoClient#commandPrefixChange}
+     */
     get commandPrefix() {
         if (typeof this._commandPrefix === 'undefined' || this._commandPrefix === null) {
             return this.options.commandPrefix;
@@ -120,61 +141,94 @@ class CommandoClient extends discord.Client {
     }
 
     /**
-	 * Owners of the bot, set by the {@link CommandoClientOptions#owner} option
-	 * <info>If you simply need to check if a user is an owner of the bot, please instead use
-	 * {@link CommandoClient#isOwner}.</info>
-	 * @type {?Array<User>}
-	 * @readonly
-	 */
+     * Owners of the bot, set by the {@link CommandoClientOptions#owner} option
+     * <info>If you simply need to check if a user is an owner of the bot, please instead use
+     * {@link CommandoClient#isOwner}.</info>
+     * @type {?Array<User>}
+     * @readonly
+     */
     get owners() {
-        if (!this.options.owner) { return null; }
-        if (typeof this.options.owner === 'string') { return [this.users.get(this.options.owner)]; }
+        if (!this.options.owner) {
+            return null;
+        }
+        if (typeof this.options.owner === 'string') {
+            return [this.users.get(this.options.owner)];
+        }
         const owners = [];
-        for (const owner of this.options.owner) { owners.push(this.users.get(owner)); }
+        for (const owner of this.options.owner) {
+            owners.push(this.users.get(owner));
+        }
         return owners;
     }
 
     /**
-	 * Checks whether a user is an owner of the bot (in {@link CommandoClientOptions#owner})
-	 * @param {UserResolvable} user - User to check for ownership
-	 * @return {boolean}
-	 */
+     * Checks whether a user is an owner of the bot (in {@link CommandoClientOptions#owner}).
+     * @param {UserResolvable} user - User to check for ownership
+     * @return {boolean} True if the user is an owner; false otherwise.
+     */
     isOwner(user) {
-        if (!this.options.owner) { return false; }
+        if (!this.options.owner) {
+            return false;
+        }
         user = this.resolver.resolveUser(user);
-        if (!user) { throw new RangeError('Unable to resolve user.'); }
-        if (typeof this.options.owner === 'string') { return user.id === this.options.owner; }
-        if (this.options.owner instanceof Array) { return this.options.owner.includes(user.id); }
-        if (this.options.owner instanceof Set) { return this.options.owner.has(user.id); }
+        if (!user) {
+            throw new RangeError('Unable to resolve user.');
+        }
+        if (typeof this.options.owner === 'string') {
+            return user.id === this.options.owner;
+        }
+        if (this.options.owner instanceof Array) {
+            return this.options.owner.includes(user.id);
+        }
+        if (this.options.owner instanceof Set) {
+            return this.options.owner.has(user.id);
+        }
         throw new RangeError('The client\'s "owner" option is an unknown value.');
     }
 
     /**
-	 * Sets the settings provider to use, and initializes it once the client is ready
-	 * @param {SettingsProvider|Promise<SettingsProvider>} provider Provider to use
-	 * @return {Promise<void>}
-	 */
+     * Sets the cache provider to use, and initializes it once the client is ready.
+     * @param {CacheProvider|Promise<CacheProvider>} provider - The cache provider to use
+     * @return {Promise<void>} The promise.
+     */
+    async setCacheProvider(provider) {
+        provider = await provider;
+        this.cacheProvider = provider;
+        return this.initProvider(provider, 'cache provider');
+    }
+
+    /**
+     * Sets the settings provider to use, and initializes it once the client is ready.
+     * @param {SettingsProvider|Promise<SettingsProvider>} provider - The settings provider to use
+     * @return {Promise<void>} The promise.
+     */
     async setSettingsProvider(provider) {
         provider = await provider;
         this.settingsProvider = provider;
+        return this.initProvider(provider, 'settings provider');
+    }
 
+    /**
+     * Initializes a provider.
+     * @param {CacheProvider|SettingsProvider} provider - The provider to initialize
+     * @param {string} logName - The name to log when initializing
+     * @return {Promise<void>} The promise.
+     * @private
+     */
+    async initProvider(provider, logName) {
         if (this.readyTimestamp) {
-            this.emit('debug', `Provider set to ${provider.constructor.name} - initialising...`);
+            this.emit('debug', `Set ${logName} to ${provider.constructor.name} - initializing...`);
             await provider.init(this);
-            this.emit('debug', 'Provider finished initialisation.');
-            return undefined;
-        }
-
-        this.emit('debug', `Provider set to ${provider.constructor.name} - will initialize once ready.`);
-        await new Promise(resolve => {
-            this.once('ready', () => {
-                this.emit('debug', `Initialising provider...`);
-                resolve(provider.init(this));
+        } else {
+            this.emit('debug', `Set ${logName} to ${provider.constructor.name} - initialize once client is ready`);
+            await new Promise(resolve => {
+                this.once('ready', () => {
+                    this.emit('debug', `Initializing ${logName}...`);
+                    resolve(provider.init(this));
+                });
             });
-        });
-
-        this.emit('debug', 'Provider finished initialisation.');
-        return undefined;
+        }
+        this.emit('debug', `Finished initialization of ${logName}`);
     }
 
     destroy() {

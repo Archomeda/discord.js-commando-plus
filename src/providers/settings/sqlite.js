@@ -13,40 +13,40 @@ const SettingsProvider = require('./base');
  */
 class SQLiteSettingsProvider extends SettingsProvider {
     /**
-	 * @external SQLiteDatabase
-	 * @see {@link https://www.npmjs.com/package/sqlite}
-	 */
+     * @external SQLiteDatabase
+     * @see {@link https://www.npmjs.com/package/sqlite}
+     */
 
     /**
-	 * @param {SQLiteDatabase} db - Database for the provider
-	 */
+     * @param {SQLiteDatabase} db - Database for the provider
+     */
     constructor(db) {
         super();
 
         /**
-		 * Database that will be used for storing/retrieving settings.
-		 * @type {SQLiteDatabase}
-		 */
+         * Database that will be used for storing/retrieving settings.
+         * @type {SQLiteDatabase}
+         */
         this.db = db;
 
         /**
-		 * Prepared statement to insert or replace a settings row.
-		 * @type {SQLiteStatement}
-		 * @private
-		 */
+         * Prepared statement to insert or replace a settings row.
+         * @type {SQLiteStatement}
+         * @private
+         */
         this.insertOrReplaceStmt = null;
 
         /**
-		 * Prepared statement to delete an entire settings row.
-		 * @type {SQLiteStatement}
-		 * @private
-		 */
+         * Prepared statement to delete an entire settings row.
+         * @type {SQLiteStatement}
+         * @private
+         */
         this.deleteStmt = null;
 
         /**
-		 * @external SQLiteStatement
-		 * @see {@link https://www.npmjs.com/package/sqlite}
-		 */
+         * @external SQLiteStatement
+         * @see {@link https://www.npmjs.com/package/sqlite}
+         */
     }
 
     async init(client) {
@@ -66,7 +66,9 @@ class SQLiteSettingsProvider extends SettingsProvider {
 
             const guild = row.guild !== '0' ? row.guild : 'global';
             this.settings.set(guild, settings);
-            if (guild !== 'global' && !client.guilds.has(row.guild)) { continue; }
+            if (guild !== 'global' && !client.guilds.has(row.guild)) {
+                continue;
+            }
             this.setupGuild(guild, settings);
         }
 
@@ -98,7 +100,9 @@ class SQLiteSettingsProvider extends SettingsProvider {
     async remove(guild, key) {
         guild = this.constructor.getGuildID(guild);
         const val = await super.remove(guild, key);
-        if (typeof val === 'undefined') { return undefined; }
+        if (typeof val === 'undefined') {
+            return undefined;
+        }
 
         await this.insertOrReplaceStmt.run(guild !== 'global' ? guild : 0, JSON.stringify(this.settings.get(guild)));
         return val;
@@ -106,7 +110,9 @@ class SQLiteSettingsProvider extends SettingsProvider {
 
     async clear(guild) {
         guild = this.constructor.getGuildID(guild);
-        if (!this.settings.has(guild)) { return; }
+        if (!this.settings.has(guild)) {
+            return;
+        }
         await super.clear(guild);
         await this.deleteStmt.run(guild !== 'global' ? guild : 0);
     }
