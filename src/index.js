@@ -18,6 +18,9 @@ module.exports = {
     SettingsProvider: require('./providers/settings/base'),
     get SQLiteProvider() {
         return require('./providers/settings/sqlite');
+    },
+    get YAMLProvider() {
+        return require('./providers/settings/yaml');
     }
 };
 

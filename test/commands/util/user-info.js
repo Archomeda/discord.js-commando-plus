@@ -2,31 +2,31 @@ const stripIndents = require('common-tags').stripIndents;
 const commando = require('../../../src');
 
 module.exports = class UserInfoCommand extends commando.Command {
-	constructor(client) {
-		super(client, {
-			name: 'user-info',
-			aliases: ['user', '🗒'],
-			group: 'util',
-			memberName: 'user-info',
-			description: 'Gets information about a user.',
-			examples: ['user-info @Crawl#3208', 'user-info Crawl'],
-			guildOnly: true,
+    constructor(client) {
+        super(client, {
+            name: 'user-info',
+            aliases: ['user', '🗒'],
+            group: 'util',
+            memberName: 'user-info',
+            description: 'Gets information about a user.',
+            examples: ['user-info @Crawl#3208', 'user-info Crawl'],
+            guildOnly: true,
 
-			args: [
-				{
-					key: 'member',
-					label: 'user',
-					prompt: 'What user would you like to snoop on?',
-					type: 'member'
-				}
-			]
-		});
-	}
+            args: [
+                {
+                    key: 'member',
+                    label: 'user',
+                    prompt: 'What user would you like to snoop on?',
+                    type: 'member'
+                }
+            ]
+        });
+    }
 
-	async run(msg, args) {
-		const member = args.member;
-		const user = member.user;
-		return msg.reply(stripIndents`
+    async run(msg, args) {
+        const member = args.member;
+        const user = member.user;
+        return msg.reply(stripIndents`
 			Info on **${user.username}#${user.discriminator}** (ID: ${user.id})
 
 			**❯ Member Details**
@@ -39,5 +39,5 @@ module.exports = class UserInfoCommand extends commando.Command {
 			 • Status: ${user.presence.status}
 			 • Game: ${user.presence.game ? user.presence.game.name : 'None'}
 		`);
-	}
+    }
 };

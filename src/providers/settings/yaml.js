@@ -37,6 +37,9 @@ class YAMLSettingsProvider extends SettingsProvider {
         await super.init(client);
 
         // Load all settings
+        if (!fs.existsSync(this.folder)) {
+            fs.mkdirSync(this.folder);
+        }
         const files = (await readdirAsync(this.folder))
             .filter(p => path.extname(p) === '.yml')
             .map(p => path.join(this.folder, p));

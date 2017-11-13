@@ -12,8 +12,8 @@
 	],
 	"scripts": {
 		"test": "\"$npm_execpath\" run lint && \"$npm_execpath\" run docs:test",
-		"lint": "eslint src",
-		"lint:fix": "eslint --fix src",
+		"lint": "eslint src test",
+		"lint:fix": "eslint --fix src test",
 		"docs": "docgen --source src --custom docs/index.yml --output docs/docs.json --jsdoc jsdoc.json",
 		"docs:test": "docgen --source src --custom docs/index.yml --jsdoc jsdoc.json"
 	},
@@ -26,9 +26,12 @@
 	},
 	"devDependencies": {
 		"@types/node": "^7.0.0",
+		"discord.js": "^11.2.0",
 		"discord.js-docgen": "hydrabolt/discord.js-docgen",
 		"eslint": "^4.0.0",
 		"jsdoc-strip-async-await": "^0.1.0",
+		"js-yaml": "^3.10.0",
+		"sqlite": "^2.0.0",
 		"typescript": "^2.0.0"
 	},
 	"peerDependencies": {
@@ -37,6 +40,6 @@
 		"sqlite": "^2.0.0"
 	},
 	"engines": {
-		"node": ">=7.6.0"
+		"node": ">=8.0.0"
 	}
 }

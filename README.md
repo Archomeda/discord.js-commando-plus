@@ -16,7 +16,7 @@ This repository is mostly here to support my own Discord bots in order to share 
 - Todo
 
 ## Installation
-**Node 7.6.0 or newer is required.**  
+**Node 8.0.0 or newer is required.**  
 `npm install archomeda/discord.js-commando-plus --save`
 
 ## Documentation
