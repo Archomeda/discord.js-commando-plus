@@ -65,6 +65,10 @@ require('./extensions/guild').applyToClass(discord.Guild);
  * @see {@link https://discord.js.org/#/docs/main/master/class/DMChannel}
  */
 /**
+ * @external Emoji
+ * @see {@link https://discord.js.org/#/docs/main/master/class/Emoji}
+ */
+/**
  * @external GroupDMChannel
  * @see {@link https://discord.js.org/#/docs/main/master/class/GroupDMChannel}
  */
@@ -101,8 +105,24 @@ require('./extensions/guild').applyToClass(discord.Guild);
  * @see {@link https://discord.js.org/#/docs/main/master/typedef/MessageOptions}
  */
 /**
+ * @external PermissionResolvable
+ * @see {@link https://discord.js.org/#/docs/main/master/typedef/PermissionResolvable}
+ */
+/**
+ * @external ReactionEmoji
+ * @see {@link https://discord.js.org/#/docs/main/master/class/ReactionEmoji}
+ */
+/**
+ * @external RichEmbed
+ * @see {@link https://discord.js.org/#/docs/main/master/class/RichEmbed}
+ */
+/**
  * @external Role
  * @see {@link https://discord.js.org/#/docs/main/master/class/Role}
+ */
+/**
+ * @external ShardingManager
+ * @see {@link https://discord.js.org/#/docs/main/master/class/ShardingManager}
  */
 /**
  * @external StringResolvable
@@ -121,24 +141,8 @@ require('./extensions/guild').applyToClass(discord.Guild);
  * @see {@link https://discord.js.org/#/docs/main/master/class/UserResolvable}
  */
 /**
- * @external Emoji
- * @see {@link https://discord.js.org/#/docs/main/master/class/Emoji}
- */
-/**
- * @external ReactionEmoji
- * @see {@link https://discord.js.org/#/docs/main/master/class/ReactionEmoji}
- */
-/**
  * @external Webhook
  * @see {@link https://discord.js.org/#/docs/main/master/class/Webhook}
- */
-/**
- * @external RichEmbed
- * @see {@link https://discord.js.org/#/docs/main/master/class/RichEmbed}
- */
-/**
- * @external ShardingManager
- * @see {@link https://discord.js.org/#/docs/main/master/class/ShardingManager}
  */
 /**
  * @external RequireAllOptions

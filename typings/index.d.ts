@@ -21,7 +21,7 @@ declare module 'sqlite' {
 }
 
 declare module 'discord.js-commando' {
-    import { Channel, Client, ClientOptions, ClientUserSettings, Collection, DMChannel, Emoji, GroupDMChannel, Guild, GuildChannel, GuildMember, GuildResolvable, Message, MessageAttachment, MessageEmbed, MessageOptions, MessageReaction, ReactionEmoji, RichEmbed, Role, Snowflake, StringResolvable, TextChannel, User, UserResolvable, Webhook } from 'discord.js';
+    import { Channel, Client, ClientOptions, ClientUserSettings, Collection, DMChannel, Emoji, GroupDMChannel, Guild, GuildChannel, GuildMember, GuildResolvable, Message, MessageAttachment, MessageEmbed, MessageOptions, MessageReaction, PermissionResolvable, ReactionEmoji, RichEmbed, Role, Snowflake, StringResolvable, TextChannel, User, UserResolvable, Webhook } from 'discord.js';
     import { i18next } from 'i8next';
     import { Mongoose, Schema as MongooseSchema } from 'mongoose';
     import { NodeCache } from 'node-cache';
@@ -113,6 +113,7 @@ declare module 'discord.js-commando' {
         public patterns: RegExp[];
         public throttling: ThrottlingOptions;
 
+        public getMissingPermissions(message: CommandMessage): PermissionResolvable[];
         public hasPermission(message: CommandMessage): boolean;
         public isEnabledIn(guild: GuildResolvable): boolean;
         public isUsable(message: Message): boolean;
