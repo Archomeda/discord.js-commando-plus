@@ -6,8 +6,8 @@
  */
 
 const ArgumentType = require('./base');
-const formatDisambiguation = require('../util').formatDisambiguation;
-const escapeMarkdown = require('discord.js').escapeMarkdown;
+const { escapeMarkdown } = require('discord.js');
+const { formatDisambiguation } = require('../util');
 
 class ChannelArgumentType extends ArgumentType {
     constructor(client) {
@@ -34,10 +34,10 @@ class ChannelArgumentType extends ArgumentType {
         if (exactChannels.length > 0) {
             channels = exactChannels;
         }
-        return `${formatDisambiguation(msg.client, {
-            label: msg.client.localeProvider.tl('common', 'channels'),
+        return channels.length <= 15 ? `${formatDisambiguation(this.client, {
+            label: this.client.localeProvider.tl('common', 'channels'),
             list: channels.map(chan => escapeMarkdown(chan.name))
-        })}\n`;
+        })}\n` : this.client.localeProvider.tl('common', 'output-multiple-channels');
     }
 
     parse(value, msg) {

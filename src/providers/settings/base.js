@@ -6,7 +6,7 @@
  - Moved some code from SQLiteProvider to SettingsProvider to decrease code duplication
  */
 
-const Guild = require('discord.js').Guild;
+const { Guild } = require('discord.js');
 
 /**
  * Loads and stores settings associated with guilds.

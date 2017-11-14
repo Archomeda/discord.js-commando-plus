@@ -136,7 +136,12 @@ class CommandMessage {
             this.message.member = await this.message.guild.fetchMember(this.message.author);
         }
 
-        // Make sure the command is usable
+        // Obtain the member for the ClientUser if it doesn't already exist
+        if (this.message.channel.type === 'text' && !this.message.guild.members.has(this.client.user.id)) {
+            await this.message.guild.fetchMember(this.client.user.id);
+        }
+
+        // Make sure the command is usable in this context
         if (this.command.guildOnly && !this.message.guild) {
             /**
              * Emitted when a command is prevented from running.
@@ -149,17 +154,24 @@ class CommandMessage {
             return this.reply(`The \`${this.command.name}\` command must be used in a server channel.`);
         }
 
-        // Check if the command doesn't have permission to be run
-        const missingPermissions = this.command.getMissingPermissions(this);
-        if (missingPermissions.length > 0) {
+        if (this.command.nsfw && !this.message.channel.nsfw) {
+            this.client.emit('commandBlocked', this, 'nsfw');
+            return this.reply(`The \`${this.command.name}\` command can only be used in NSFW channels.`);
+        }
+
+        // Ensure the user has permission to use the command
+        const hasPermission = this.command.hasPermission(this);
+        if (!hasPermission || typeof hasPermission === 'string') {
             this.client.emit('commandBlocked', this, 'permission');
-            // TODO: Format missing permissions
-            return this.reply(`You do not have permission to use the \`${this.command.name}\` command.`);
+            if (typeof hasPermission === 'string') {
+                return this.reply(hasPermission);
+            } else {
+                return this.reply(`You do not have permission to use the \`${this.command.name}\` command.`);
+            }
         }
 
         // Ensure the client user has the required permissions
         if (this.message.channel.type === 'text' && this.command.clientPermissions) {
-            // TODO: Format missing permissions
             const missing = this.message.channel.permissionsFor(this.client.user)
                 .missing(this.command.clientPermissions);
             if (missing.length > 0) {

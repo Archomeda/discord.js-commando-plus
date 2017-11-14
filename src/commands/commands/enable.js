@@ -1,13 +1,11 @@
 /*
  Original author: Gawdl3y
  Modified by: Archomeda
- - Changed disambiguation() to formatDisambiguation()
  - Added support for localization
  */
 
 const { oneLine } = require('common-tags');
 const Command = require('../base');
-const formatDisambiguation = require('../../util').formatDisambiguation;
 
 module.exports = class EnableCommandCommand extends Command {
     constructor(client) {
@@ -29,38 +27,7 @@ module.exports = class EnableCommandCommand extends Command {
                     key: 'cmdOrGrp',
                     label: 'command/group',
                     prompt: 'Which command or group would you like to enable?',
-                    validate: val => {
-                        if (!val) {
-                            return false;
-                        }
-                        const groups = this.client.registry.findGroups(val);
-                        if (groups.length === 1) {
-                            return true;
-                        }
-                        const commands = this.client.registry.findCommands(val);
-                        if (commands.length === 1) {
-                            return true;
-                        }
-                        if (commands.length === 0 && groups.length === 0) {
-                            return false;
-                        }
-
-                        const list = [];
-                        if (commands.length > 0) {
-                            list.push({
-                                label: this.client.localeProvider.tl('common', 'commands'),
-                                list: commands.map(c => c.name)
-                            });
-                        }
-                        if (groups.length > 0) {
-                            list.push({
-                                label: this.client.localeProvider.tl('common', 'groups'),
-                                list: groups.map(g => g.name)
-                            });
-                        }
-                        return formatDisambiguation(this.client, list);
-                    },
-                    parse: val => this.client.registry.findGroups(val)[0] || this.client.registry.findCommands(val)[0]
+                    type: 'command-or-group'
                 }
             ]
         });

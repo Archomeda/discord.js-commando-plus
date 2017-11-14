@@ -7,7 +7,7 @@
 
 const { stripIndents, oneLine } = require('common-tags');
 const Command = require('../base');
-const formatDisambiguation = require('../../util').formatDisambiguation;
+const { formatDisambiguation } = require('../../util');
 
 module.exports = class HelpCommand extends Command {
     constructor(client) {
@@ -41,14 +41,17 @@ module.exports = class HelpCommand extends Command {
         const showAll = args.command && args.command.toLowerCase() === 'all';
         if (args.command && !showAll) {
             if (commands.length === 1) {
+                /* eslint-disable max-len */
                 let help = stripIndents`
 					${oneLine`
 						__Command **${commands[0].name}**:__ ${commands[0].description}
 						${commands[0].guildOnly ? ' (Usable only in servers)' : ''}
+						${commands[0].nsfw ? ' (NSFW)' : ''}
 					`}
 
 					**Format:** ${msg.anyUsage(`${commands[0].name}${commands[0].format ? ` ${commands[0].format}` : ''}`)}
 				`;
+                /* eslint-enable max-len */
                 if (commands[0].aliases.length > 0) {
                     help += `\n**Aliases:** ${commands[0].aliases.join(', ')}`;
                 }
@@ -88,7 +91,7 @@ module.exports = class HelpCommand extends Command {
         } else {
             const messages = [];
             try {
-                /* eslint-disable indent */
+                /* eslint-disable indent, max-len */
                 messages.push(await msg.direct(stripIndents`
 					${oneLine`
 						To run a command in ${msg.guild || 'any server'},
@@ -106,12 +109,12 @@ module.exports = class HelpCommand extends Command {
                     .map(grp => stripIndents`
 							__${grp.name}__
 							${(showAll ? grp.commands : grp.commands.filter(cmd => cmd.isUsable(msg)))
-                        .map(cmd => `**${cmd.name}:** ${cmd.description}`).join('\n')
+                        .map(cmd => `**${cmd.name}:** ${cmd.description}${cmd.nsfw ? ' (NSFW)' : ''}`).join('\n')
                         }
 						`).join('\n\n')
                     }
 				`, { split: true }));
-                /* eslint-enable indent */
+                /* eslint-enable indent, max-len */
                 if (msg.channel.type !== 'dm') {
                     messages.push(await msg.reply('Sent you a DM with information.'));
                 }

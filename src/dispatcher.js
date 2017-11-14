@@ -141,7 +141,7 @@ class CommandDispatcher {
                 if (cmdMsg.command) {
                     if (!cmdMsg.command.isEnabledIn(message.guild)) {
                         responses = await cmdMsg.reply(this.client.localeProvider.tl(
-                            'error', 'command-disabled', { command: cmdMsg.command.name }));
+                            'errors', 'command-disabled', { command: cmdMsg.command.name }));
                     } else if (!oldMessage || typeof oldCmdMsg !== 'undefined') {
                         responses = await cmdMsg.run();
                         if (typeof responses === 'undefined') { // eslint-disable-line max-depth
@@ -157,7 +157,7 @@ class CommandDispatcher {
                     this.client.emit('unknownCommand', cmdMsg);
                     if (this.client.options.unknownCommandResponse) {
                         responses = await cmdMsg.reply(this.client.localeProvider.tl(
-                            'error', 'command-unknown', {
+                            'errors', 'command-unknown', {
                                 usage: cmdMsg.anyUsage('help',
                                     message.guild ? undefined : null, message.guild ? undefined : null)
                             }));
@@ -316,7 +316,7 @@ class CommandDispatcher {
         if (prefix) {
             const escapedPrefix = escapeRegex(prefix);
             pattern = new RegExp(
-                `^(${escapedPrefix}\\s*|<@!?${this.client.user.id}>\\s+(?:${escapedPrefix})?)([^\\s]+)`, 'i'
+                `^(<@!?${this.client.user.id}>\\s+(?:${escapedPrefix}\\s*)?|${escapedPrefix}\\s*)([^\\s]+)`, 'i'
             );
         } else {
             pattern = new RegExp(`(^<@!?${this.client.user.id}>\\s+)([^\\s]+)`, 'i');

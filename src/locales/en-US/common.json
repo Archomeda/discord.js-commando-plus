@@ -3,9 +3,17 @@
   "commands": "[C|c]ommands",
   "disambiguation-list": "**{{label}}:** {{items}}",
   "groups": "[G|g]roups",
+  "members": "[M|m]embers",
   "roles": "[R|r]oles",
   "output-disambiguation-multiple": "[M|m]ultiple matches found. Please be more specific:\n{{items}}",
   "output-disambiguation-single": "[M|m]ultiple {{label}} found. Please be more specific: {{items}}.",
+  "output-multiple-channels": "[M|m]ultiple channels found. Please be more specific.",
+  "output-multiple-members": "[M|m]ultiple members found. Please be more specific.",
+  "output-multiple-roles": "[M|m]ultiple roles found. Please be more specific.",
   "output-multiple-users": "[M|m]ultiple users found. Please be more specific.",
+  "validate-number-above": "[P|p]lease enter a number that is {{min}} or above.",
+  "validate-number-below": "[P|p]lease enter a number that is {{max}} or below.",
+  "validate-string-count-above": "[P|p]lease give a minimum of {{min}} characters for the argument {{argument}}.",
+  "validate-string-count-below": "[P|p]lease give a maximum of {{max}} characters for the argument {{argument}}.",
   "users": "[U|u]sers"
 }

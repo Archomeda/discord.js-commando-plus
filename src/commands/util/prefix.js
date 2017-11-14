@@ -66,7 +66,9 @@ module.exports = class PrefixCommand extends Command {
             } else {
                 this.client.commandPrefix = prefix;
             }
-            response = prefix ? `Set the command prefix to \`${args.prefix}\`.` : 'Removed the command prefix entirely.';
+            response = prefix ?
+                `Set the command prefix to \`${args.prefix}\`.` :
+                'Removed the command prefix entirely.';
         }
 
         await msg.reply(`${response} To run commands, use ${msg.anyUsage('command')}.`);

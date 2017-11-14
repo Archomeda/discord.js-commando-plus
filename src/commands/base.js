@@ -2,7 +2,7 @@
  Original author: Gawdl3y
  Modified by: Archomeda
  - Changed Command.hasPermission()
- - Added Command.getMissingPermissions()
+ - Added support for localization
  */
 
 const path = require('path');
@@ -32,8 +32,10 @@ class Command {
      * @property {string} [details] - A detailed description of the command and its functionality
      * @property {string[]} [examples] - Usage examples of the command
      * @property {boolean} [guildOnly=false] - Whether or not the command should only function in a guild channel
+     * @property {boolean} [ownerOnly=false] - Whether or not the command is usable only by an owner
      * @property {PermissionResolvable[]} [clientPermissions] - Permissions required by the client to use the command
      * @property {PermissionResolvable[]} [userPermissions] - Permissions required by the user to use the command
+     * @property {boolean} [nsfw=false] - Whether the command is usable only in NSFW channels
      * @property {ThrottlingOptions} [throttling] - Options for throttling usages of the command
      * @property {boolean} [defaultHandling=true] - Whether or not the default command handling should be used.
      * If false, then only patterns will trigger the command.
@@ -139,6 +141,12 @@ class Command {
         this.guildOnly = Boolean(info.guildOnly);
 
         /**
+         * Whether the command can only be used by an owner.
+         * @type {boolean}
+         */
+        this.ownerOnly = Boolean(info.ownerOnly);
+
+        /**
          * Permissions required by the client to use the command.
          * @type {?PermissionResolvable[]}
          */
@@ -149,6 +157,12 @@ class Command {
          * @type {?PermissionResolvable[]}
          */
         this.userPermissions = info.userPermissions || null;
+
+        /**
+         * Whether the command can only be used in NSFW channels.
+         * @type {boolean}
+         */
+        this.nsfw = Boolean(info.nsfw);
 
         /**
          * Whether the default command handling is enabled for the command.
@@ -221,24 +235,32 @@ class Command {
     }
 
     /**
-     * Checks a user's permission in a guild.
+     * Checks if the user has permission to use the command.
      * @param {CommandMessage} message - The triggering command message
-     * @return {boolean} True if the user has permission; false otherwise.
+     * @param {boolean} [ownerOverride=true] - Whether the bot owner(s) will always have permission
+     * @return {boolean|string} Whether the user has permission, or an error message to respond with if they don't.
      */
-    hasPermission(message) {
-        return this.getMissingPermissions(message).length === 0;
-    }
-
-    /**
-     * Gets the required permissions that the user is missing.
-     * @param {CommandMessage} message - The triggering command message
-     * @return {PermissionResolvable[]} The missing permissions
-     */
-    getMissingPermissions(message) {
-        if (message.channel.type === 'text' && this.userPermissions) {
-            return message.channel.permissionsFor(message.author).missing(this.userPermissions);
+    hasPermission(message, ownerOverride = true) {
+        if (!this.ownerOnly && !this.userPermissions) {
+            return true;
         }
-        return [];
+        if (ownerOverride && this.client.isOwner(message.author)) {
+            return true;
+        }
+        if (this.ownerOnly && (ownerOverride || !this.client.isOwner(message.author))) {
+            return this.client.localeProvider.tl('errors', 'command-owner-only', { command: this.name });
+        }
+
+        if (message.channel.type === 'text' && this.userPermissions) {
+            const missing = message.channel.permissionsFor(message.author).missing(this.userPermissions);
+            return missing.length === 1 ?
+                this.client.localeProvider.tl('errors', 'command-missing-permission',
+                    { permission: permissions[missing[0]] }) :
+                this.client.localeProvider.tl('errors', 'command-missing-permissions',
+                    { permissions: missing.map(p => permissions[p]).join(', ') });
+        }
+
+        return true;
     }
 
     /**
@@ -336,11 +358,8 @@ class Command {
         if (this.guildOnly && message && !message.guild) {
             return false;
         }
-        let hasPermission = this.hasPermission(message);
-        if (typeof hasPermission === 'string') {
-            hasPermission = false;
-        }
-        return this.isEnabledIn(message.guild) && hasPermission;
+        const hasPermission = this.hasPermission(message);
+        return this.isEnabledIn(message.guild) && hasPermission && typeof hasPermission !== 'string';
     }
 
     /**

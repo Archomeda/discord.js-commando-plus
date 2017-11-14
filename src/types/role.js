@@ -6,8 +6,8 @@
  */
 
 const ArgumentType = require('./base');
-const escapeMarkdown = require('discord.js').escapeMarkdown;
-const formatDisambiguation = require('../util').formatDisambiguation;
+const { escapeMarkdown } = require('discord.js');
+const { formatDisambiguation } = require('../util');
 
 class RoleArgumentType extends ArgumentType {
     constructor(client) {
@@ -34,10 +34,10 @@ class RoleArgumentType extends ArgumentType {
         if (exactRoles.length > 0) {
             roles = exactRoles;
         }
-        return `${formatDisambiguation(msg.client, {
-            label: msg.client.localeProvider.tl('common', 'roles'),
+        return roles.length <= 15 ? `${formatDisambiguation(this.client, {
+            label: this.client.localeProvider.tl('common', 'roles'),
             list: roles.map(role => `${escapeMarkdown(role.name)}`)
-        })}\n`;
+        })}\n` : this.client.localeProvider.tl('common', 'output-multiple-roles');
     }
 
     parse(value, msg) {

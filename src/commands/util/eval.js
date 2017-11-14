@@ -15,6 +15,7 @@ module.exports = class EvalCommand extends Command {
             memberName: 'eval',
             description: 'Executes JavaScript code.',
             details: 'Only the bot owner(s) may use this command.',
+            ownerOnly: true,
 
             args: [
                 {
@@ -26,10 +27,6 @@ module.exports = class EvalCommand extends Command {
         });
 
         this.lastResult = null;
-    }
-
-    hasPermission(msg) {
-        return this.client.isOwner(msg.author);
     }
 
     run(msg, args) {
@@ -76,8 +73,12 @@ module.exports = class EvalCommand extends Command {
         let response = this.makeResultMessages(this.lastResult, hrDiff, args.script, msg.editable);
         if (msg.editable) {
             if (response instanceof Array) {
-                if (response.length > 0) { response = response.slice(1, response.length - 1); }
-                for (const re of response) { msg.say(re); }
+                if (response.length > 0) {
+                    response = response.slice(1, response.length - 1);
+                }
+                for (const re of response) {
+                    msg.say(re);
+                }
                 return null;
             } else {
                 return msg.edit(response);
@@ -93,27 +94,29 @@ module.exports = class EvalCommand extends Command {
             .replace(this.sensitivePattern, '--snip--');
         const split = inspected.split('\n');
         const last = inspected.length - 1;
-        const prependPart = inspected[0] !== '{' && inspected[0] !== '[' && inspected[0] !== "'" ? split[0] : inspected[0];
-        const appendPart = inspected[last] !== '}' && inspected[last] !== ']' && inspected[last] !== "'" ?
+        const prependPart = inspected[0] !== '{' && inspected[0] !== '[' && inspected[0] !== '\'' ?
+            split[0] :
+            inspected[0];
+        const appendPart = inspected[last] !== '}' && inspected[last] !== ']' && inspected[last] !== '\'' ?
             split[split.length - 1] :
             inspected[last];
         const prepend = `\`\`\`javascript\n${prependPart}\n`;
         const append = `\n${appendPart}\n\`\`\``;
         if (input) {
             /* eslint-disable indent */
-			return discord.splitMessage(tags.stripIndents`
+            return discord.splitMessage(tags.stripIndents`
 				${editable ? `
 					*Input*
 					\`\`\`javascript
 					${input}
 					\`\`\`` :
-				''}
+                ''}
 				*Executed in ${hrDiff[0] > 0 ? `${hrDiff[0]}s ` : ''}${hrDiff[1] / 1000000}ms.*
 				\`\`\`javascript
 				${inspected}
 				\`\`\`
 			`, 1900, '\n', prepend, append);
-			/* eslint-enable indent */
+            /* eslint-enable indent */
         } else {
             return discord.splitMessage(tags.stripIndents`
 				*Callback executed after ${hrDiff[0] > 0 ? `${hrDiff[0]}s ` : ''}${hrDiff[1] / 1000000}ms.*
@@ -128,7 +131,9 @@ module.exports = class EvalCommand extends Command {
         if (!this._sensitivePattern) {
             const client = this.client;
             let pattern = '';
-            if (client.token) { pattern += escapeRegex(client.token); }
+            if (client.token) {
+                pattern += escapeRegex(client.token);
+            }
             Object.defineProperty(this, '_sensitivePattern', { value: new RegExp(pattern, 'gi') });
         }
         return this._sensitivePattern;

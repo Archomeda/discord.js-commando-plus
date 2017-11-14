@@ -1,3 +1,9 @@
+/*
+ Original author: Gawdl3y
+ Modified by: Archomeda
+ - Added support for localization
+ */
+
 const ArgumentType = require('./base');
 
 class FloatArgumentType extends ArgumentType {
@@ -7,9 +13,16 @@ class FloatArgumentType extends ArgumentType {
 
     validate(value, msg, arg) {
         const float = Number.parseFloat(value);
-        return !Number.isNaN(float) &&
-            (arg.min === null || typeof arg.min === 'undefined' || float >= arg.min) &&
-            (arg.max === null || typeof arg.max === 'undefined' || float <= arg.max);
+        if (Number.isNaN(float)) {
+            return false;
+        }
+        if (arg.min !== null && typeof arg.min !== 'undefined' && float < arg.min) {
+            return this.client.localeProvider.tl('common', 'validate-number-above', { min: arg.min });
+        }
+        if (arg.max !== null && typeof arg.max !== 'undefined' && float > arg.max) {
+            return this.client.localeProvider.tl('common', 'validate-number-above', { max: arg.max });
+        }
+        return true;
     }
 
     parse(value) {

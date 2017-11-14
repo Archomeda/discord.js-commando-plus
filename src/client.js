@@ -267,8 +267,16 @@ class CommandoClient extends discord.Client {
         this.emit('debug', `Finished initialization of ${logName}`);
     }
 
-    destroy() {
-        super.destroy().then(() => this.settingsProvider ? this.settingsProvider.destroy() : undefined);
+    async destroy() {
+        await super.destroy();
+        if (this.provider) {
+            await Promise.all([
+                this.cacheProvider.destroy(),
+                this.localeProvider.destroy(),
+                this.settingsProvider.destroy(),
+                this.storageProvider.destroy()()
+            ]);
+        }
     }
 }
 

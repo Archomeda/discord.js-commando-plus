@@ -6,8 +6,8 @@
  */
 
 const ArgumentType = require('./base');
-const formatDisambiguation = require('../util').formatDisambiguation;
-const escapeMarkdown = require('discord.js').escapeMarkdown;
+const { escapeMarkdown } = require('discord.js');
+const { formatDisambiguation } = require('../util');
 
 class MemberArgumentType extends ArgumentType {
     constructor(client) {
@@ -38,10 +38,10 @@ class MemberArgumentType extends ArgumentType {
         if (exactMembers.length > 0) {
             members = exactMembers;
         }
-        return members.length <= 15 ? `${formatDisambiguation(msg.client, {
-            label: msg.client.localeProvider.tl('common', 'users'),
+        return members.length <= 15 ? `${formatDisambiguation(this.client, {
+            label: this.client.localeProvider.tl('common', 'members'),
             list: members.map(mem => `${escapeMarkdown(mem.user.tag)}`)
-        })}\n` : msg.client.localeProvider.tl('common', 'output-multiple-users');
+        })}\n` : this.client.localeProvider.tl('common', 'output-multiple-members');
     }
 
     parse(value, msg) {

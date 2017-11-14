@@ -10,7 +10,12 @@ class CommandFormatError extends FriendlyError {
      */
     constructor(msg) {
         super(msg.client.localeProvider.tl('errors', 'invalid-command-format', {
-            usage: msg.anyUsage(
+            usage: msg.usage(
+                msg.command.format,
+                msg.guild ? undefined : null,
+                msg.guild ? undefined : null
+            ),
+            help_usage: msg.anyUsage( // eslint-disable-line camelcase
                 `help ${msg.command.name}`,
                 msg.guild ? undefined : null,
                 msg.guild ? undefined : null

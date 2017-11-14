@@ -1,3 +1,9 @@
+/*
+ Original author: Gawdl3y
+ Modified by: Archomeda
+ - Added support for localization
+ */
+
 const ArgumentType = require('./base');
 
 class StringArgumentType extends ArgumentType {
@@ -6,9 +12,22 @@ class StringArgumentType extends ArgumentType {
     }
 
     validate(value, msg, arg) {
-        return Boolean(value) &&
-            (arg.min === null || typeof arg.min === 'undefined' || value.length >= arg.min) &&
-            (arg.max === null || typeof arg.max === 'undefined' || value.length <= arg.max);
+        if (!value) {
+            return false;
+        }
+        if (arg.min !== null && typeof arg.min !== 'undefined' && value.length < arg.min) {
+            return this.client.localeProvider.tl('common', 'validate-string-count-above', {
+                argument: arg.label,
+                min: arg.min
+            });
+        }
+        if (arg.max !== null && typeof arg.max !== 'undefined' && value.length > arg.max) {
+            return this.client.localeProvider.tl('common', 'validate-string-count-below', {
+                argument: arg.label,
+                max: arg.max
+            });
+        }
+        return true;
     }
 
     parse(value) {
