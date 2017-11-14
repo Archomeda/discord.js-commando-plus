@@ -6,7 +6,9 @@ class MessageArgumentType extends ArgumentType {
     }
 
     async validate(value, msg) {
-        if (!/^[0-9]+$/.test(value)) { return false; }
+        if (!/^[0-9]+$/.test(value)) {
+            return false;
+        }
         return Boolean(await msg.channel.fetchMessage(value).catch(() => null));
     }
 

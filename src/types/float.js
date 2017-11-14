@@ -8,8 +8,8 @@ class FloatArgumentType extends ArgumentType {
     validate(value, msg, arg) {
         const float = Number.parseFloat(value);
         return !Number.isNaN(float) &&
-			(arg.min === null || typeof arg.min === 'undefined' || float >= arg.min) &&
-			(arg.max === null || typeof arg.max === 'undefined' || float <= arg.max);
+            (arg.min === null || typeof arg.min === 'undefined' || float >= arg.min) &&
+            (arg.max === null || typeof arg.max === 'undefined' || float <= arg.max);
     }
 
     parse(value) {

@@ -8,8 +8,8 @@ class IntegerArgumentType extends ArgumentType {
     validate(value, msg, arg) {
         const int = Number.parseInt(value);
         return !Number.isNaN(int) &&
-			(arg.min === null || typeof arg.min === 'undefined' || int >= arg.min) &&
-			(arg.max === null || typeof arg.max === 'undefined' || int <= arg.max);
+            (arg.min === null || typeof arg.min === 'undefined' || int >= arg.min) &&
+            (arg.max === null || typeof arg.max === 'undefined' || int <= arg.max);
     }
 
     parse(value) {

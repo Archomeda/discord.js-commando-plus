@@ -1,3 +1,5 @@
 {
-
+  "command-disabled": "[T|t]he command `{{command}}` is disabled.",
+  "command-unknown": "[U|u]nknown command. Use {{usage}} to view the list of all commands.",
+  "invalid-command-format": "[I|i]nvalid command format. Use {{usage}} for more information"
 }
