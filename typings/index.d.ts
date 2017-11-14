@@ -391,8 +391,8 @@ declare module 'discord.js-commando' {
         public init(client: CommandoClient): Promise<void>;
         public preloadNamespace(namespace: string): Promise<void>;
         public preloadNamespaces(namespaces: string[]): Promise<void>;
-        public tl(namespace: string, key: string, vars: {}): Promise<string>;
-        public translate(namespace: string, key: string, vars: {}): Promise<string>;
+        public tl(namespace: string, key: string, vars: {}): string;
+        public translate(namespace: string, key: string, vars: {}): string;
     }
 
     export class MemoryCacheProvider extends CacheProvider {

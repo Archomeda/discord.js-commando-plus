@@ -50,7 +50,7 @@ class I18nextLocaleProvider extends LocaleProvider {
          * @type {string}
          * @readonly
          */
-        this.directory = path.resolve(directory);
+        this.directory = directory ? path.resolve(directory) : null;
     }
 
     async init(client) {
@@ -60,18 +60,20 @@ class I18nextLocaleProvider extends LocaleProvider {
             this.client.emit('warn', `Failed to load localization namespace '${ns}' for ${lng}: ${msg}`));
         this.localizer.on('onMissingKey', (lng, ns, key) =>
             this.client.emit('warn', `Missing translation for '${key}' in localization namespace '${ns}' for ${lng}`));
+
+        const paths = [];
+        if (this.directory) {
+            paths.push(path.resolve(path.join(this.directory, 'locales', '{{lng}}', '{{ns}}.json')));
+        }
+        paths.push(path.resolve(path.join(__dirname, '..', '..', 'locales', '{{lng}}', '{{ns}}.json')));
+
         this.localizer.use(FileBackend).init({
             lng: this.language,
             fallbackLng: 'en-US',
             ns: ['common', 'errors'],
             defaultNS: 'common',
             load: 'currentOnly',
-            backend: {
-                loadPath: [
-                    path.resolve(path.join(this.directory, 'locales', '{{lng}}', '{{ns}}.json')),
-                    path.resolve(path.join(__dirname, '..', '..', 'locales', '{{lng}}', '{{ns}}.json'))
-                ]
-            },
+            backend: { loadPath: paths },
             interpolation: { escape: s => s }
         });
     }

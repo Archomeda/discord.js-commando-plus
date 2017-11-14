@@ -1,6 +1,13 @@
+/*
+ Original author: Gawdl3y
+ Modified by: Archomeda
+ - Changed disambiguation() to formatDisambiguation()
+ - Added support for localization
+ */
+
 const oneLine = require('common-tags').oneLine;
 const Command = require('../base');
-const disambiguation = require('../../util').disambiguation;
+const formatDisambiguation = require('../../util').formatDisambiguation;
 
 module.exports = class UnloadCommandCommand extends Command {
     constructor(client) {
@@ -22,11 +29,20 @@ module.exports = class UnloadCommandCommand extends Command {
                     key: 'command',
                     prompt: 'Which command would you like to unload?',
                     validate: val => {
-                        if (!val) { return false; }
+                        if (!val) {
+                            return false;
+                        }
                         const commands = this.client.registry.findCommands(val);
-                        if (commands.length === 1) { return true; }
-                        if (commands.length === 0) { return false; }
-                        return disambiguation(commands, 'commands');
+                        if (commands.length === 1) {
+                            return true;
+                        }
+                        if (commands.length === 0) {
+                            return false;
+                        }
+                        return formatDisambiguation(this.client, {
+                            label: this.client.localeProvider.tl('common', 'commands'),
+                            list: commands
+                        });
                     },
                     parse: val => this.client.registry.findCommands(val)[0]
                 }

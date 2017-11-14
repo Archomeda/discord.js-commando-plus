@@ -1,3 +1,11 @@
 {
-
+  "channels": "[C|c]hannels",
+  "commands": "[C|c]ommands",
+  "disambiguation-list": "**{{label}}:** {{items}}",
+  "groups": "[G|g]roups",
+  "roles": "[R|r]oles",
+  "output-disambiguation-multiple": "[M|m]ultiple matches found. Please be more specific:\n{{items}}",
+  "output-disambiguation-single": "[M|m]ultiple {{label}} found. Please be more specific: {{items}}.",
+  "output-multiple-users": "[M|m]ultiple users found. Please be more specific.",
+  "users": "[U|u]sers"
 }

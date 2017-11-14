@@ -1,12 +1,70 @@
-function disambiguation(items, label, property = 'name') {
-    const itemList = items.map(item => `"${(property ? item[property] : item).replace(/ /g, '\xa0')}"`).join(',   ');
-    return `Multiple ${label} found, please be more specific: ${itemList}`;
+/*
+ Original author: Gawdl3y
+ Modified by: Archomeda
+ - Renamed disambiguation() to formatDisambiguation()
+ - Changed formatDisambiguation()
+ - Added formatFirstLetter()
+ */
+
+/**
+ * @typedef {Object} DisambiguationList
+ * @property {string} label - The list label
+ * @property {string[]} list - The item list
+ */
+
+/**
+ * Formats a disambiguation message.
+ * @param {CommandoClient} client - The client
+ * @param {DisambiguationList|DisambiguationList[]} items - The item(s)
+ * @return {string} The formatted disambiguation message.
+ */
+function formatDisambiguation(client, items) {
+    if (!items || (Array.isArray(items) && items.length === 0)) {
+        return '';
+    }
+    if (!Array.isArray(items)) {
+        items = [items];
+    }
+    if (items.length === 1) {
+        const itemList = items[0].list.map(i => i.replace(/ /g, '\xa0')).join(', ');
+        return client.localeProvider.tl('common', 'output-disambiguation-single', {
+            label: formatFirstLetter(items[0].label, true),
+            items: itemList
+        });
+    }
+
+    const resultList = [];
+    for (const subItems of items) {
+        const itemList = subItems.list.map(i => i.replace(/ /g, '\xa0')).join(', ');
+        resultList.push(client.localeProvider.tl('common', 'disambiguation-list', {
+            label: formatFirstLetter(subItems.label, false),
+            items: itemList
+        }));
+    }
+    return client.localeProvider.tl('common', 'output-disambiguation-multiple', { items: resultList.join('\n') });
+}
+
+/**
+ * Formats text where the first letter should be lowercase or uppercase.
+ * @param {string} text - The text; should start with [X|x] where X is the uppercase letter(s)
+ * and x the lowercase letter(s) (skips _ and * starting Discord formatting characters)
+ * @param {boolean} [lowercase=false] - True for lowercase, false for uppercase
+ * @return {string} The formatted text.
+ */
+function formatFirstLetter(text, lowercase = false) {
+    const token = lowercase ? '$1$3' : '$1$2';
+    text = text.replace(/^([*_\s]*)\[([^|]+)\|([^)]+)\]/, token);
+    return text;
 }
 
 function paginate(items, page = 1, pageLength = 10) {
     const maxPage = Math.ceil(items.length / pageLength);
-    if (page < 1) { page = 1; }
-    if (page > maxPage) { page = maxPage; }
+    if (page < 1) {
+        page = 1;
+    }
+    if (page > maxPage) {
+        page = maxPage;
+    }
     let startIndex = (page - 1) * pageLength;
     return {
         items: items.length > pageLength ? items.slice(startIndex, startIndex + pageLength) : items,
@@ -48,7 +106,8 @@ const permissions = {
 };
 
 module.exports = {
-    disambiguation,
+    formatDisambiguation,
+    formatFirstLetter,
     paginate,
     permissions
 };

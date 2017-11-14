@@ -1,6 +1,13 @@
+/*
+ Original author: Gawdl3y
+ Modified by: Archomeda
+ - Changed disambiguation() to formatDisambiguation()
+ - Added support for localization
+ */
+
 const { stripIndents, oneLine } = require('common-tags');
 const Command = require('../base');
-const disambiguation = require('../../util').disambiguation;
+const formatDisambiguation = require('../../util').formatDisambiguation;
 
 module.exports = class HelpCommand extends Command {
     constructor(client) {
@@ -42,24 +49,35 @@ module.exports = class HelpCommand extends Command {
 
 					**Format:** ${msg.anyUsage(`${commands[0].name}${commands[0].format ? ` ${commands[0].format}` : ''}`)}
 				`;
-                if (commands[0].aliases.length > 0) { help += `\n**Aliases:** ${commands[0].aliases.join(', ')}`; }
+                if (commands[0].aliases.length > 0) {
+                    help += `\n**Aliases:** ${commands[0].aliases.join(', ')}`;
+                }
                 help += `\n${oneLine`
 					**Group:** ${commands[0].group.name}
 					(\`${commands[0].groupID}:${commands[0].memberName}\`)
 				`}`;
-                if (commands[0].details) { help += `\n**Details:** ${commands[0].details}`; }
-                if (commands[0].examples) { help += `\n**Examples:**\n${commands[0].examples.join('\n')}`; }
+                if (commands[0].details) {
+                    help += `\n**Details:** ${commands[0].details}`;
+                }
+                if (commands[0].examples) {
+                    help += `\n**Examples:**\n${commands[0].examples.join('\n')}`;
+                }
 
                 const messages = [];
                 try {
                     messages.push(await msg.direct(help));
-                    if (msg.channel.type !== 'dm') { messages.push(await msg.reply('Sent you a DM with information.')); }
+                    if (msg.channel.type !== 'dm') {
+                        messages.push(await msg.reply('Sent you a DM with information.'));
+                    }
                 } catch (err) {
                     messages.push(await msg.reply('Unable to send you the help DM. You probably have DMs disabled.'));
                 }
                 return messages;
             } else if (commands.length > 1) {
-                return msg.reply(disambiguation(commands, 'commands'));
+                return msg.reply(formatDisambiguation(this.client, {
+                    label: this.client.localeProvider.tl('common', 'commands'),
+                    list: commands
+                }));
             } else {
                 return msg.reply(
                     `Unable to identify command. Use ${msg.usage(
@@ -71,7 +89,7 @@ module.exports = class HelpCommand extends Command {
             const messages = [];
             try {
                 /* eslint-disable indent */
-				messages.push(await msg.direct(stripIndents`
+                messages.push(await msg.direct(stripIndents`
 					${oneLine`
 						To run a command in ${msg.guild || 'any server'},
 						use ${Command.usage('command', msg.guild ? msg.guild.commandPrefix : null, this.client.user)}.
@@ -85,16 +103,18 @@ module.exports = class HelpCommand extends Command {
 					__**${showAll ? 'All commands' : `Available commands in ${msg.guild || 'this DM'}`}**__
 
 					${(showAll ? groups : groups.filter(grp => grp.commands.some(cmd => cmd.isUsable(msg))))
-						.map(grp => stripIndents`
+                    .map(grp => stripIndents`
 							__${grp.name}__
 							${(showAll ? grp.commands : grp.commands.filter(cmd => cmd.isUsable(msg)))
-								.map(cmd => `**${cmd.name}:** ${cmd.description}`).join('\n')
-							}
+                        .map(cmd => `**${cmd.name}:** ${cmd.description}`).join('\n')
+                        }
 						`).join('\n\n')
-					}
+                    }
 				`, { split: true }));
-				/* eslint-enable indent */
-                if (msg.channel.type !== 'dm') { messages.push(await msg.reply('Sent you a DM with information.')); }
+                /* eslint-enable indent */
+                if (msg.channel.type !== 'dm') {
+                    messages.push(await msg.reply('Sent you a DM with information.'));
+                }
             } catch (err) {
                 messages.push(await msg.reply('Unable to send you the help DM. You probably have DMs disabled.'));
             }

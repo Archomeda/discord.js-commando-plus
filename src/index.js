@@ -43,6 +43,11 @@ module.exports = {
 };
 
 require('./extensions/guild').applyToClass(discord.Guild);
+require('./extensions/message').applyToClass(discord.Message);
+const TextBasedChannelExtension = require('./extensions/text-based-channel');
+TextBasedChannelExtension.applyToClass(discord.DMChannel);
+TextBasedChannelExtension.applyToClass(discord.GroupDMChannel);
+TextBasedChannelExtension.applyToClass(discord.TextChannel);
 
 /**
  * @external Channel

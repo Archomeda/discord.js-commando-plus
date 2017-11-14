@@ -23,6 +23,8 @@ const commando = require('../src');
 const path = require('path');
 const oneLine = require('common-tags').oneLine;
 const auth = require('./auth');
+const i18next = require('i18next');
+
 let sqlite, yaml;
 if (mode === 'sqlite') {
     sqlite = require('sqlite');
@@ -74,6 +76,8 @@ client
 			${guild ? `in guild ${guild.name} (${guild.id})` : 'globally'}.
 		`);
     });
+
+client.setLocaleProvider(new commando.I18nextLocaleProvider(i18next, 'en-US'));
 
 if (sqlite) {
     client.setSettingsProvider(
