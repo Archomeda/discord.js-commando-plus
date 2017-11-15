@@ -280,11 +280,12 @@ class CommandRegistry {
 
     /**
      * Registers the default commands to the registry.
-     * @param {boolean} [help=true] - Whether or not to register the built-in help command
-     * @param {boolean} [prefix=true] - Whether or not to register the built-in prefix command
-     * @param {boolean} [eval_=true] - Whether or not to register the built-in eval command
-     * @param {boolean} [ping=true] - Whether or not to register the built-in ping command
-     * @param {boolean} [commandState=true] - Whether or not to register the built-in command state commands
+     * @param {Object} [options] - Object specifying what commands to register
+     * @param {boolean} [options.help=true] - Whether or not to register the built-in help command
+     * @param {boolean} [options.prefix=true] - Whether or not to register the built-in prefix command
+     * @param {boolean} [options.eval_=true] - Whether or not to register the built-in eval command
+     * @param {boolean} [options.ping=true] - Whether or not to register the built-in ping command
+     * @param {boolean} [options.commandState=true] - Whether or not to register the built-in command state commands
      * (enable, disable, reload, list groups)
      * @return {CommandRegistry} This.
      */
