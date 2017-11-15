@@ -274,7 +274,7 @@ class CommandoClient extends discord.Client {
                 this.cacheProvider.destroy(),
                 this.localeProvider.destroy(),
                 this.settingsProvider.destroy(),
-                this.storageProvider.destroy()()
+                this.storageProvider.destroy()
             ]);
         }
     }
