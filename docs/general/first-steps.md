@@ -10,41 +10,58 @@ This will give you full access to control everything about the bot, in any guild
 const Commando = require('discord.js-commando-plus');
 
 const client = new Commando.Client({
-	owner: '1234567890'
+    owner: '1234567890'
 });
 ```
 
-Then, to make use of the command framework (what else would you be doing with Commando-Plus?), you need to register your command groups, commands, and argument types,
+Then, to make use of the command framework, you need to register your command groups, commands, and argument types,
 in addition to any of the built-in stuff that you want make use of. This will look something like this:
 
 ```javascript
 const path = require('path');
 
 client.registry
-	// Registers your custom command groups
-	.registerGroups([
-		['fun', 'Fun commands'],
-		['some', 'Some group'],
-		['other', 'Some other group']
-	])
+    // Registers your custom command groups
+    .registerGroups([
+        ['fun', 'Fun commands'],
+        ['some', 'Some group'],
+        ['other', 'Some other group']
+    ])
 
-	// Registers all built-in groups, commands, and argument types
-	.registerDefaults()
+    // Registers all built-in groups, commands, and argument types
+    .registerDefaults()
 
-	// Registers all of your commands in the ./commands/ directory
-	.registerCommandsIn(path.join(__dirname, 'commands'));
+    // Registers all of your commands in the ./commands/ directory
+    .registerCommandsIn(path.join(__dirname, 'commands'));
 ```
 
 Commando-Plus has built-in command prefix configuration per-guild, as well as enabling and disabling commands per-guild.
 In order for this to persist across restarts, you should use a [SettingsProvider](https://archomeda.github.io/discord.js-commando-plus/#/docs/commando-plus/master/class/SettingsProvider).
-There is a built-in SQLiteProvider that comes with Commando-Plus, which stores all settings in an SQLite3 database.
-To use it, install the `sqlite` module with NPM (`npm install --save sqlite`). Then, set the provider on the client:
+There are two built-in settings providers:
+- SQLiteSettingsProvider that stores all settings in an SQLite3 database
+- YAMLSettingsProvider that stores all settings in per-guild YAML files
+
+As an example for the SQLiteSettingsProvider, in order to use it, install the `sqlite` package with NPM (`npm install sqlite --save`).
+Then, set the settings provider on the client:
 
 ```javascript
 const sqlite = require('sqlite');
 
 client.setSettingsProvider(
-	sqlite.open(path.join(__dirname, 'settings.sqlite3')).then(db => new Commando.SQLiteProvider(db))
+    sqlite.open(path.join(__dirname, 'settings.sqlite3')).then(db => new Commando.SQLiteProvider(db))
+).catch(console.error);
+```
+
+Commando-Plus requires you to use a localization backend.
+It comes with a built-in I18nextLocaleProvider that uses i18next as localization backend.
+Install the `i18next` and `i18next-node-fs-backend` packages with NPM (`npm install i18next i18next-node-fs-backend`).
+Then, set the locale provider on the client:
+
+```javascript
+const i18next = require('i18next');
+
+client.setLocaleProvider(
+    new Commando.I18nextLocaleProvider(i18next, 'en-US')
 ).catch(console.error);
 ```
 

@@ -4,6 +4,8 @@
       path: welcome.md
     - name: Installation
       path: installation.md
+    - name: Migrating from Commando
+      path: migrating.md
     - name: First steps
       path: first-steps.md
 - name: Commands
