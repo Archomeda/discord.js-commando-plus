@@ -3,10 +3,11 @@
  Modified by: Archomeda
  - Small fix in CommandMessage.parseArgs()
  - Changed CommandMessage.run()
+ - Added support for localization
  */
 
 const discord = require('discord.js');
-const { stripIndents, oneLine } = require('common-tags');
+const { oneLine } = require('common-tags');
 const Command = require('./base');
 const FriendlyError = require('../errors/friendly');
 const CommandFormatError = require('../errors/command-format');
@@ -151,12 +152,20 @@ class CommandMessage {
              * (built-in reasons are `guildOnly`, `permission`, and `throttling`)
              */
             this.client.emit('commandBlocked', this, 'guildOnly');
-            return this.reply(`The \`${this.command.name}\` command must be used in a server channel.`);
+            return this.reply(this.client.localeProvider.tl(
+                'errors',
+                'command-server-channels-only',
+                { command: this.command.name }
+            ));
         }
 
         if (this.command.nsfw && !this.message.channel.nsfw) {
             this.client.emit('commandBlocked', this, 'nsfw');
-            return this.reply(`The \`${this.command.name}\` command can only be used in NSFW channels.`);
+            return this.reply(this.client.localeProvider.tl(
+                'errors',
+                'command-nsfw-channels-only',
+                { command: this.command.name }
+            ));
         }
 
         // Ensure the user has permission to use the command
@@ -166,7 +175,11 @@ class CommandMessage {
             if (typeof hasPermission === 'string') {
                 return this.reply(hasPermission);
             } else {
-                return this.reply(`You do not have permission to use the \`${this.command.name}\` command.`);
+                return this.reply(this.client.localeProvider.tl(
+                    'errors',
+                    'command-missing-permissions-generic',
+                    { command: this.command.name }
+                ));
             }
         }
 
@@ -177,14 +190,17 @@ class CommandMessage {
             if (missing.length > 0) {
                 this.client.emit('commandBlocked', this, 'clientPermissions');
                 if (missing.length === 1) {
-                    return this.reply( // eslint-disable-next-line max-len
-                        `I need the "${permissions[missing[0]]}" permission for the \`${this.command.name}\` command to work.`
-                    );
+                    return this.reply(this.client.localeProvider.tl(
+                        'errors',
+                        'command-client-missing-permission',
+                        { command: this.command.name, permission: permissions[missing[0]] }
+                    ));
                 }
-                return this.reply(oneLine`
-					I need the following permissions for the \`${this.command.name}\` command to work:
-					${missing.map(perm => permissions[perm]).join(', ')}
-				`);
+                return this.reply(this.client.localeProvider.tl(
+                    'errors',
+                    'command-client-missing-permissions',
+                    { command: this.command.name, permissions: missing.map(p => permissions[p]).join(', ') }
+                ));
             }
         }
 
@@ -193,9 +209,11 @@ class CommandMessage {
         if (throttle && throttle.usages + 1 > this.command.throttling.usages) {
             const remaining = (throttle.start + (this.command.throttling.duration * 1000) - Date.now()) / 1000;
             this.client.emit('commandBlocked', this, 'throttling');
-            return this.reply( // eslint-disable-next-line max-len
-                `You may not use the \`${this.command.name}\` command again for another ${remaining.toFixed(1)} seconds.`
-            );
+            return this.reply(this.client.localeProvider.tl(
+                'errors',
+                'command-throttled',
+                { seconds: remaining.toFixed(0) }
+            ));
         }
 
         // Figure out the command arguments
@@ -211,7 +229,7 @@ class CommandMessage {
                     const err = new CommandFormatError(this);
                     return this.reply(err.message);
                 }
-                return this.reply('Cancelled command.');
+                return this.reply(this.client.localeProvider.tl('common', 'command-cancelled'));
             }
             args = result.values;
         }
@@ -269,18 +287,29 @@ class CommandMessage {
             if (err instanceof FriendlyError) {
                 return this.reply(err.message);
             } else {
+                let reply = this.client.localeProvider.tl('errors', 'command-error', {
+                    command: this.command.name,
+                    error: `${err.name}: ${err.message}`
+                });
                 const owners = this.client.owners;
-                let ownerList = owners ? owners.map((usr, i) => {
-                    const or = i === owners.length - 1 && owners.length > 1 ? 'or ' : '';
-                    return `${or}${discord.escapeMarkdown(usr.username)}#${usr.discriminator}`;
-                }).join(owners.length > 2 ? ', ' : ' ') : '';
-
-                const invite = this.client.options.invite;
-                return this.reply(stripIndents`
-					An error occurred while running the command: \`${err.name}: ${err.message}\`
-					You shouldn't ever receive an error like this.
-					Please contact ${ownerList || 'the bot owner'}${invite ? ` in this server: ${invite}` : '.'}
-				`);
+                if (owners) {
+                    const ownerList = owners.map(o => `${discord.escapeMarkdown(o.username)}#${o.discriminator}`);
+                    const invite = this.client.options.invite;
+                    if (ownerList.length === 1) {
+                        reply += ` ${this.client.localeProvider.tl(
+                            'errors',
+                            `contact-owners${invite ? '-in-server' : ''}`,
+                            { owners: ownerList.join(', '), invite }
+                        )}`;
+                    } else {
+                        reply += ` ${this.client.localeProvider.tl(
+                            'errors',
+                            `contact-owner${invite ? '-in-server' : ''}`,
+                            { owner: ownerList[0], invite }
+                        )}`;
+                    }
+                }
+                return this.reply(reply);
             }
         }
     }

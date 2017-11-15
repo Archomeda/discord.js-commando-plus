@@ -1,6 +1,7 @@
 {
   "channels": "[C|c]hannels",
   "commands": "[C|c]ommands",
+  "command-cancelled": "[T|t]he command has been cancelled.",
   "disambiguation-list": "**{{label}}:** {{items}}",
   "groups": "[G|g]roups",
   "members": "[M|m]embers",
