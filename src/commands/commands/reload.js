@@ -4,7 +4,6 @@
  - Added support for localization
  */
 
-const { oneLine } = require('common-tags');
 const Command = require('../base');
 
 module.exports = class ReloadCommandCommand extends Command {
@@ -14,12 +13,8 @@ module.exports = class ReloadCommandCommand extends Command {
             aliases: ['reload-command'],
             group: 'commands',
             memberName: 'reload',
-            description: 'Reloads a command or command group.',
-            details: oneLine`
-				The argument must be the name/ID (partial or whole) of a command or command group.
-				Providing a command group will reload all of the commands in that group.
-				Only the bot owner(s) may use this command.
-			`,
+            description: client.localeProvider.tl('help', 'commands.reload.description'),
+            details: client.localeProvider.tl('help', 'commands.reload.details'),
             examples: ['reload some-command'],
             ownerOnly: true,
             guarded: true,
@@ -28,7 +23,7 @@ module.exports = class ReloadCommandCommand extends Command {
                 {
                     key: 'cmdOrGrp',
                     label: 'command/group',
-                    prompt: 'Which command or group would you like to reload?',
+                    prompt: client.localeProvider.tl('help', 'commands.reload.args.command-or-group-prompt'),
                     type: 'command-or-group'
                 }
             ]
@@ -36,6 +31,9 @@ module.exports = class ReloadCommandCommand extends Command {
     }
 
     async run(msg, args) {
+        await this.client.localeProvider.preloadNamespace('commands');
+        const l10n = this.client.localeProvider;
+
         const { cmdOrGrp } = args;
         const isCmd = Boolean(cmdOrGrp.groupID);
         cmdOrGrp.reload();
@@ -43,32 +41,22 @@ module.exports = class ReloadCommandCommand extends Command {
         if (this.client.shard) {
             try {
                 await this.client.shard.broadcastEval(`
-					if (this.shard.id !== ${this.client.shard.id}) {
-						this.registry.${isCmd ? 'commands' : 'groups'}.get('${isCmd ? cmdOrGrp.name : cmdOrGrp.id}')
-						    .reload();
-					}
+                    if (this.shard.id !== ${this.client.shard.id}) {
+    					this.registry.${isCmd ? 'commands' : 'groups'}.get('${isCmd ? cmdOrGrp.name : cmdOrGrp.id}')
+    					    .reload();
+                    }
 				`);
             } catch (err) {
-                this.client.emit('warn', `Error when broadcasting command reload to other shards`);
+                this.client.emit('warn', 'Error when broadcasting command reload to other shards');
                 this.client.emit('error', err);
-                if (isCmd) {
-                    await msg.reply(`Reloaded \`${cmdOrGrp.name}\` command, but failed to reload on other shards.`);
-                } else {
-                    await msg.reply( // eslint-disable-next-line max-len
-                        `Reloaded all of the commands in the \`${cmdOrGrp.name}\` group, but failed to reload on other shards.`
-                    );
-                }
-                return null;
+                return msg.reply(l10n.tl(
+                    'commands',
+                    `reload.output-${isCmd ? 'command' : 'group'}-shards-failed`,
+                    { name: cmdOrGrp.name }
+                ));
             }
         }
 
-        if (isCmd) {
-            await msg.reply(`Reloaded \`${cmdOrGrp.name}\` command${this.client.shard ? ' on all shards' : ''}.`);
-        } else {
-            await msg.reply( // eslint-disable-next-line max-len
-                `Reloaded all of the commands in the \`${cmdOrGrp.name}\` group${this.client.shard ? ' on all shards' : ''}.`
-            );
-        }
-        return null;
+        return msg.reply(l10n.tl('commands', `reload.output-${isCmd ? 'command' : 'group'}`, { name: cmdOrGrp.name }));
     }
 };

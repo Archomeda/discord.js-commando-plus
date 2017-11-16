@@ -1,11 +1,9 @@
 /*
  Original author: Gawdl3y
  Modified by: Archomeda
- - Changed disambiguation() to formatDisambiguation()
  - Added support for localization
  */
 
-const { oneLine } = require('common-tags');
 const Command = require('../base');
 
 module.exports = class UnloadCommandCommand extends Command {
@@ -15,11 +13,8 @@ module.exports = class UnloadCommandCommand extends Command {
             aliases: ['unload-command'],
             group: 'commands',
             memberName: 'unload',
-            description: 'Unloads a command.',
-            details: oneLine`
-				The argument must be the name/ID (partial or whole) of a command.
-				Only the bot owner(s) may use this command.
-			`,
+            description: client.localeProvider.tl('help', 'commands.unload.description'),
+            details: client.localeProvider.tl('help', 'commands.unload.details'),
             examples: ['unload some-command'],
             ownerOnly: true,
             guarded: true,
@@ -27,7 +22,7 @@ module.exports = class UnloadCommandCommand extends Command {
             args: [
                 {
                     key: 'command',
-                    prompt: 'Which command would you like to unload?',
+                    prompt: client.localeProvider.tl('help', 'commands.unload.args.command-prompt'),
                     type: 'command'
                 }
             ]
@@ -35,24 +30,26 @@ module.exports = class UnloadCommandCommand extends Command {
     }
 
     async run(msg, args) {
-        args.command.unload();
+        await this.client.localeProvider.preloadNamespace('commands');
+        const l10n = this.client.localeProvider;
+
+        const { command } = args;
+        command.unload();
 
         if (this.client.shard) {
             try {
                 await this.client.shard.broadcastEval(`
-					if (this.shard.id !== ${this.client.shard.id}) {
-					    this.registry.commands.get('${args.command.name}').unload();
-					}
-				`);
+                    if (this.shard.id !== ${this.client.shard.id}) {
+                        this.registry.commands.get('${command.name}').unload();
+                    }
+                `);
             } catch (err) {
-                this.client.emit('warn', `Error when broadcasting command unload to other shards`);
+                this.client.emit('warn', 'Error when broadcasting command unload to other shards');
                 this.client.emit('error', err);
-                await msg.reply(`Unloaded \`${args.command.name}\` command, but failed to unload on other shards.`);
-                return null;
+                return msg.reply(l10n.tl('commands', 'unload.output-command-shards-failed', { name: command.name }));
             }
         }
 
-        await msg.reply(`Unloaded \`${args.command.name}\` command${this.client.shard ? ' on all shards' : ''}.`);
-        return null;
+        return msg.reply(l10n.tl('commands', 'unload.output-command', { name: command.name }));
     }
 };

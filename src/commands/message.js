@@ -316,11 +316,12 @@ class CommandMessage {
 
     /**
      * Responds to the command message.
-     * @param {string} [type='reply'] - The message type
-     * @param {string} content - The message content
-     * @param {Object} [options] - Options for the response
-     * @param {string} [lang] - The message language
-     * @param {boolean} [fromEdit=false] - Whether this response is an edit
+     * @param {Object} options - The message type
+     * @param {string} [options.type='reply'] - The message type
+     * @param {string} options.content - The message content
+     * @param {Object} [options.options] - Options for the response
+     * @param {string} [options.lang] - The message language
+     * @param {boolean} [options.fromEdit=false] - Whether this response is an edit
      * @return {Promise<Message|Message[]>} The response message.
      * @private
      */
@@ -384,9 +385,10 @@ class CommandMessage {
     /**
      * Edits a response to the command message.
      * @param {Message|Message[]} response - The response message(s) to edit
-     * @param {string} type - The message type
-     * @param {string} content - The message content
-     * @param {Object} [options] - Options for the response
+     * @param {Object} options - The message type
+     * @param {string} options.type - The message type
+     * @param {string} options.content - The message content
+     * @param {Object} [options.options] - Options for the response
      * @return {Promise<Message|Message[]>} The edited response message.
      * @private
      */
@@ -435,9 +437,10 @@ class CommandMessage {
     /**
      * Edits the current response.
      * @param {string} id - The ID of the channel the response is in ("DM" for direct messages)
-     * @param {string} type - The message type
-     * @param {string} content - The message content
-     * @param {Object} [options] - Options for the response
+     * @param {Object} options - The message type
+     * @param {string} options.type - The message type
+     * @param {string} options.content - The message content
+     * @param {Object} [options.options] - Options for the response
      * @return {Promise<Message|Message[]>} The edited response message.
      * @private
      */
@@ -468,7 +471,7 @@ class CommandMessage {
 
     /**
      * Responds with a reply message.
-     * @param {StringResolvable} content - Content for the message
+     * @param {StringResolvable} [content] - Content for the message
      * @param {MessageOptions} [options] - Options for the message
      * @return {Promise<Message|Message[]>} The response message.
      */
@@ -891,8 +894,8 @@ class CommandMessage {
 
     /**
      * Shortcut to `this.message.edit(content)`.
-     * @param {StringResolvable} content - New content for the message
-     * @param {MessageEditOptions} options - The options to provide
+     * @param {StringResolvable} [content] - New content for the message
+     * @param {MessageEditOptions} [options] - The options to provide
      * @return {Promise<Message>} The edited message.
      * @see {@link Message#edit}
      * @readonly

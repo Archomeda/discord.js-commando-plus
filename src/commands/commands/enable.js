@@ -4,7 +4,6 @@
  - Added support for localization
  */
 
-const { oneLine } = require('common-tags');
 const Command = require('../base');
 
 module.exports = class EnableCommandCommand extends Command {
@@ -14,11 +13,8 @@ module.exports = class EnableCommandCommand extends Command {
             aliases: ['enable-command', 'cmd-on', 'command-on'],
             group: 'commands',
             memberName: 'enable',
-            description: 'Enables a command or command group.',
-            details: oneLine`
-				The argument must be the name/ID (partial or whole) of a command or command group.
-				Only administrators may use this command.
-			`,
+            description: client.localeProvider.tl('help', 'commands.enable.description'),
+            details: client.localeProvider.tl('help', 'commands.enable.details'),
             examples: ['enable util', 'enable Utility', 'enable prefix'],
             guarded: true,
 
@@ -26,7 +22,7 @@ module.exports = class EnableCommandCommand extends Command {
                 {
                     key: 'cmdOrGrp',
                     label: 'command/group',
-                    prompt: 'Which command or group would you like to enable?',
+                    prompt: client.localeProvider.tl('help', 'commands.enable.args.command-or-group-prompt'),
                     type: 'command-or-group'
                 }
             ]
@@ -40,13 +36,25 @@ module.exports = class EnableCommandCommand extends Command {
         return msg.member.hasPermission('ADMINISTRATOR') || this.client.isOwner(msg.author);
     }
 
-    run(msg, args) {
-        if (args.cmdOrGrp.isEnabledIn(msg.guild)) {
-            return msg.reply(
-                `The \`${args.cmdOrGrp.name}\` ${args.cmdOrGrp.group ? 'command' : 'group'} is already enabled.`
-            );
+    async run(msg, args) {
+        await this.client.localeProvider.preloadNamespace('commands');
+        const l10n = this.client.localeProvider;
+
+        const { cmdOrGrp } = args;
+        const isCmd = Boolean(cmdOrGrp.groupID);
+
+        if (cmdOrGrp.isEnabledIn(msg.guild)) {
+            return msg.reply(l10n.tl(
+                'commands',
+                `enable.output-${isCmd ? 'command' : 'group'}-already-enabled`,
+                { name: cmdOrGrp.name }
+            ));
         }
-        args.cmdOrGrp.setEnabledIn(msg.guild, true);
-        return msg.reply(`Enabled the \`${args.cmdOrGrp.name}\` ${args.cmdOrGrp.group ? 'command' : 'group'}.`);
+        cmdOrGrp.setEnabledIn(msg.guild, true);
+        return msg.reply(l10n.tl(
+            'commands',
+            `enable.output-${isCmd ? 'command' : 'group'}-enabled`,
+            { name: cmdOrGrp.name }
+        ));
     }
 };

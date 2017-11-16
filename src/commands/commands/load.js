@@ -1,5 +1,10 @@
+/*
+ Original author: Gawdl3y
+ Modified by: Archomeda
+ - Added support for localization
+ */
+
 const fs = require('fs');
-const { oneLine } = require('common-tags');
 const Command = require('../base');
 
 module.exports = class LoadCommandCommand extends Command {
@@ -9,11 +14,8 @@ module.exports = class LoadCommandCommand extends Command {
             aliases: ['load-command'],
             group: 'commands',
             memberName: 'load',
-            description: 'Loads a new command.',
-            details: oneLine`
-				The argument must be full name of the command in the format of \`group:memberName\`.
-				Only the bot owner(s) may use this command.
-			`,
+            description: client.localeProvider.tl('help', 'commands.load.description'),
+            details: client.localeProvider.tl('help', 'commands.load.details'),
             examples: ['load some-command'],
             ownerOnly: true,
             guarded: true,
@@ -21,7 +23,7 @@ module.exports = class LoadCommandCommand extends Command {
             args: [
                 {
                     key: 'command',
-                    prompt: 'Which command would you like to load?',
+                    prompt: client.localeProvider.tl('help', 'commands.load.args.command-prompt'),
                     validate: val => new Promise(resolve => {
                         if (!val) {
                             return resolve(false);
@@ -49,27 +51,28 @@ module.exports = class LoadCommandCommand extends Command {
     }
 
     async run(msg, args) {
+        await this.client.localeProvider.preloadNamespace('commands');
+        const l10n = this.client.localeProvider;
+
         this.client.registry.registerCommand(args.command);
         const command = this.client.registry.commands.last();
 
         if (this.client.shard) {
             try {
                 await this.client.shard.broadcastEval(`
-					if (this.shard.id !== ${this.client.shard.id}) {
-						const cmdPath = this.registry.resolveCommandPath('${command.groupID}', '${command.name}');
-						delete require.cache[cmdPath];
-						this.registry.registerCommand(require(cmdPath));
-					}
+                    if (this.shard.id !== ${this.client.shard.id}) {
+                        const cmdPath = this.registry.resolveCommandPath('${command.groupID}', '${command.name}');
+                        delete require.cache[cmdPath];
+                        this.registry.registerCommand(require(cmdPath));
+                    }
 				`);
             } catch (err) {
-                this.client.emit('warn', `Error when broadcasting command load to other shards`);
+                this.client.emit('warn', 'Error when broadcasting command load to other shards');
                 this.client.emit('error', err);
-                await msg.reply(`Loaded \`${command.name}\` command, but failed to load on other shards.`);
-                return null;
+                return msg.reply(l10n.tl('commands', 'load.output-command-shards-failed', { name: command.name }));
             }
         }
 
-        await msg.reply(`Loaded \`${command.name}\` command${this.client.shard ? ' on all shards' : ''}.`);
-        return null;
+        return msg.reply(l10n.tl('commands', 'load.output-command', { name: command.name }));
     }
 };

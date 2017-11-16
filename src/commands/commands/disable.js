@@ -4,7 +4,6 @@
  - Added support for localization
  */
 
-const { oneLine } = require('common-tags');
 const Command = require('../base');
 
 module.exports = class DisableCommandCommand extends Command {
@@ -14,11 +13,8 @@ module.exports = class DisableCommandCommand extends Command {
             aliases: ['disable-command', 'cmd-off', 'command-off'],
             group: 'commands',
             memberName: 'disable',
-            description: 'Disables a command or command group.',
-            details: oneLine`
-				The argument must be the name/ID (partial or whole) of a command or command group.
-				Only administrators may use this command.
-			`,
+            description: client.localeProvider.tl('help', 'commands.disable.description'),
+            details: client.localeProvider.tl('help', 'commands.disable.details'),
             examples: ['disable util', 'disable Utility', 'disable prefix'],
             guarded: true,
 
@@ -26,7 +22,7 @@ module.exports = class DisableCommandCommand extends Command {
                 {
                     key: 'cmdOrGrp',
                     label: 'command/group',
-                    prompt: 'Which command or group would you like to disable?',
+                    prompt: client.localeProvider.tl('help', 'commands.disable.args.command-or-group-prompt'),
                     type: 'command-or-group'
                 }
             ]
@@ -40,18 +36,32 @@ module.exports = class DisableCommandCommand extends Command {
         return msg.member.hasPermission('ADMINISTRATOR') || this.client.isOwner(msg.author);
     }
 
-    run(msg, args) {
-        if (!args.cmdOrGrp.isEnabledIn(msg.guild)) {
-            return msg.reply(
-                `The \`${args.cmdOrGrp.name}\` ${args.cmdOrGrp.group ? 'command' : 'group'} is already disabled.`
-            );
+    async run(msg, args) {
+        await this.client.localeProvider.preloadNamespace('commands');
+        const l10n = this.client.localeProvider;
+
+        const { cmdOrGrp } = args;
+        const isCmd = Boolean(cmdOrGrp.groupID);
+
+        if (!cmdOrGrp.isEnabledIn(msg.guild)) {
+            return msg.reply(l10n.tl(
+                'commands',
+                `disable.output-${isCmd ? 'command' : 'group'}-already-disabled`,
+                { name: cmdOrGrp.name }
+            ));
         }
-        if (args.cmdOrGrp.guarded) {
-            return msg.reply(
-                `You cannot disable the \`${args.cmdOrGrp.name}\` ${args.cmdOrGrp.group ? 'command' : 'group'}.`
-            );
+        if (cmdOrGrp.guarded) {
+            return msg.reply(l10n.tl(
+                'commands',
+                `disable.output-${isCmd ? 'command' : 'group'}-guarded`,
+                { name: cmdOrGrp.name }
+            ));
         }
-        args.cmdOrGrp.setEnabledIn(msg.guild, false);
-        return msg.reply(`Disabled the \`${args.cmdOrGrp.name}\` ${args.cmdOrGrp.group ? 'command' : 'group'}.`);
+        cmdOrGrp.setEnabledIn(msg.guild, false);
+        return msg.reply(l10n.tl(
+            'commands',
+            `disable.output-${isCmd ? 'command' : 'group'}-disabled`,
+            { name: cmdOrGrp.name }
+        ));
     }
 };

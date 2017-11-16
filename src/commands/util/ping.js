@@ -1,5 +1,11 @@
-const { oneLine } = require('common-tags');
+/*
+ Original author: Gawdl3y
+ Modified by: Archomeda
+ - Added support for localization
+ */
+
 const Command = require('../base');
+const { formatFirstLetter } = require('../../util');
 
 module.exports = class PingCommand extends Command {
     constructor(client) {
@@ -7,7 +13,7 @@ module.exports = class PingCommand extends Command {
             name: 'ping',
             group: 'util',
             memberName: 'ping',
-            description: 'Checks the bot\'s ping to the Discord server.',
+            description: client.localeProvider.tl('help', 'utils.ping.description'),
             throttling: {
                 usages: 5,
                 duration: 10
@@ -16,19 +22,24 @@ module.exports = class PingCommand extends Command {
     }
 
     async run(msg) {
-        if (!msg.editable) {
-            const pingMsg = await msg.reply('Pinging...');
-            return pingMsg.edit(oneLine`
-				${msg.channel.type !== 'dm' ? `${msg.author},` : ''}
-				Pong! The message round-trip took ${pingMsg.createdTimestamp - msg.createdTimestamp}ms.
-				${this.client.ping ? `The heartbeat ping is ${Math.round(this.client.ping)}ms.` : ''}
-			`);
+        await this.client.localeProvider.preloadNamespace('utils');
+        const l10n = this.client.localeProvider;
+
+        let messageToEdit = msg;
+        const isMentioned = msg.channel.type !== 'dm' || messageToEdit.editable;
+
+        if (!messageToEdit.editable) {
+            messageToEdit = await msg.reply(l10n.tl('utils', 'ping.output-pinging'));
         } else {
-            await msg.edit('Pinging...');
-            return msg.edit(oneLine`
-				Pong! The message round-trip took ${msg.editedTimestamp - msg.createdTimestamp}ms.
-				${this.client.ping ? `The heartbeat ping is ${Math.round(this.client.ping)}ms.` : ''}
-			`);
+            await messageToEdit.edit(formatFirstLetter(l10n.tl('utils', 'ping.output-pinging'), false));
         }
+
+        let content = l10n.tl('utils', 'ping.output-pong',
+            { time: messageToEdit.createdTimestamp - msg.createdTimestamp });
+        if (this.client.ping) {
+            content += ` ${l10n.tl('utils', 'ping.heartbeat', { time: Math.round(this.client.ping) })}`;
+        }
+        content = (isMentioned ? `${msg.author}, ` : '') + formatFirstLetter(content, isMentioned);
+        return messageToEdit.edit(content);
     }
 };

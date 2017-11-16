@@ -1,4 +1,9 @@
-const { stripIndents } = require('common-tags');
+/*
+ Original author: Gawdl3y
+ Modified by: Archomeda
+ - Added support for localization
+ */
+
 const Command = require('../base');
 
 module.exports = class ListGroupsCommand extends Command {
@@ -8,25 +13,29 @@ module.exports = class ListGroupsCommand extends Command {
             aliases: ['list-groups', 'show-groups'],
             group: 'commands',
             memberName: 'groups',
-            description: 'Lists all command groups.',
-            details: 'Only administrators may use this command.',
+            description: client.localeProvider.tl('help', 'commands.list-groups.description'),
+            details: client.localeProvider.tl('help', 'commands.list-groups.details'),
             guarded: true
         });
     }
 
     hasPermission(msg) {
-        if (!msg.guild) { return this.client.isOwner(msg.author); }
+        if (!msg.guild) {
+            return this.client.isOwner(msg.author);
+        }
         return msg.member.hasPermission('ADMINISTRATOR') || this.client.isOwner(msg.author);
     }
 
-    run(msg) {
-        /* eslint-disable indent */
-		return msg.reply(stripIndents`
-			__**Groups**__
-			${this.client.registry.groups.map(grp =>
-				`**${grp.name}:** ${grp.isEnabledIn(msg.guild) ? 'Enabled' : 'Disabled'}`
-			).join('\n')}
-		`);
-		/* eslint-enable indent */
+    async run(msg) {
+        await this.client.localeProvider.preloadNamespace('commands');
+        const l10n = this.client.localeProvider;
+
+        let content = `\n__**${l10n.tl('commands', 'list-groups.output-header')}**__\n`;
+        content += this.client.registry.groups.map(grp =>
+            `**${grp.name}:** ${grp.isEnabledIn(msg.guild) ?
+                l10n.tl('commands', 'list-groups.enabled') :
+                l10n.tl('commands', 'list-groups.disabled')}`)
+            .join('\n');
+        return msg.reply(content);
     }
 };
