@@ -9,7 +9,7 @@ class CommandFormatError extends FriendlyError {
      * @param {CommandMessage} msg - The command message the error is for
      */
     constructor(msg) {
-        super(msg.client.localeProvider.tl('errors', 'invalid-command-format', {
+        super(msg.client.localization.tl('errors', 'invalid-command-format', msg.guild, {
             usage: msg.usage(
                 msg.command.format,
                 msg.guild ? undefined : null,

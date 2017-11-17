@@ -13,7 +13,7 @@ class GroupArgumentType extends ArgumentType {
         super(client, 'group');
     }
 
-    validate(value) {
+    validate(value, msg) {
         if (!value) {
             return false;
         }
@@ -26,7 +26,7 @@ class GroupArgumentType extends ArgumentType {
         }
 
         return formatDisambiguation(this.client, {
-            label: this.client.localeProvider.tl('common', 'groups'),
+            label: this.client.localization.tl('common', 'groups', msg.guild),
             list: groups.map(c => c.name)
         });
     }

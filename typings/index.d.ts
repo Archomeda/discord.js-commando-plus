@@ -109,6 +109,7 @@ declare module 'discord.js-commando' {
         public guarded: boolean;
         public guildOnly: boolean;
         public memberName: string;
+        public module: Module;
         public name: string;
         public patterns: RegExp[];
         public throttling: ThrottlingOptions;
@@ -314,11 +315,12 @@ declare module 'discord.js-commando' {
         public constructor(client?: CommandoClient);
 
         public readonly client: CommandoClient;
-        public commands: Collection<string, Command>
+        public commands: Collection<string, Command>;
         public commandsPath: string;
         public evalObjects: object;
-        public groups: Collection<string, CommandGroup>
-        public types: Collection<string, ArgumentType>
+        public groups: Collection<string, CommandGroup>;
+        public modules: Collection<string, Module>;
+        public types: Collection<string, ArgumentType>;
 
         public findCommands(searchString?: string, exact?: boolean, message?: Message): Command[];
         public findGroups(searchString?: string, exact?: boolean): CommandGroup[];
@@ -331,6 +333,8 @@ declare module 'discord.js-commando' {
         public registerDefaultTypes(): CommandRegistry;
         public registerEvalObject(key: string, obj: {}): CommandRegistry;
         public registerEvalObjects(obj: {}): CommandRegistry;
+        public registerModule(module: Module): CommandRegistry;
+        public registerModules(modules: Module[]): CommandRegistry;
         public registerGroup(group: CommandGroup | Function | string[] | string, name?: string): CommandRegistry;
         public registerGroups(groups: CommandGroup[] | Function[] | string[][]): CommandRegistry;
         public registerType(type: ArgumentType | Function): CommandRegistry;
@@ -355,6 +359,7 @@ declare module 'discord.js-commando' {
         private static applyToClass(target: Function): void;
 
         public commandPrefix: string;
+        public language: string;
         public readonly settings: GuildSettingsHelper;
 
         public commandUsage(command?: string, user?: User): string;
@@ -384,15 +389,25 @@ declare module 'discord.js-commando' {
         public readonly localizer: i18next;
     }
 
+    export class LocaleHelper {
+        public constructor(client: CommandoClient, module: Module);
+
+        public readonly client: CommandoClient;
+        public readonly module: Module;
+
+        public tl(namespace: string, key: string, lang: string, vars?: {}): string;
+        public translate(namespace: string, key: string, lang: string, vars?: {}): string;
+    }
+
     export class LocaleProvider {
         public readonly client: CommandClient;
 
         public destroy(): Promise<void>;
         public init(client: CommandoClient): Promise<void>;
-        public preloadNamespace(namespace: string): Promise<void>;
-        public preloadNamespaces(namespaces: string[]): Promise<void>;
-        public tl(namespace: string, key: string, vars?: {}): string;
-        public translate(namespace: string, key: string, vars?: {}): string;
+        public preloadNamespace(namespace: string, lang: string): Promise<void>;
+        public preloadNamespaces(namespaces: string[], lang: string): Promise<void>;
+        public tl(module: string, namespace: string, key: string, lang: string, vars?: {}): string;
+        public translate(module: string, namespace: string, key: string, lang: string, vars?: {}): string;
     }
 
     export class MemoryCacheProvider extends CacheProvider {
@@ -404,6 +419,15 @@ declare module 'discord.js-commando' {
         public get(table: string, key: string): Promise<any>;
         public set(table: string, key: string, ttl: number, value: any): Promise<boolean>;
         public remove(table: string, key: string): Promise<boolean>;
+    }
+
+    export class Module {
+        public readonly client: CommandoClient;
+        public commands: Command[];
+        public groups: CommandGroup[] | Function[] | string[][];
+        public localization: LocaleHelper;
+        public localizationDirectory: string;
+        public namespace: string;
     }
 
     export class MongoStorageProvider extends StorageProvider {

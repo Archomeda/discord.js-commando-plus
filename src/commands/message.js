@@ -152,18 +152,20 @@ class CommandMessage {
              * (built-in reasons are `guildOnly`, `permission`, and `throttling`)
              */
             this.client.emit('commandBlocked', this, 'guildOnly');
-            return this.reply(this.client.localeProvider.tl(
+            return this.reply(this.client.localization.tl(
                 'errors',
                 'command-server-channels-only',
+                this.guild,
                 { command: this.command.name }
             ));
         }
 
         if (this.command.nsfw && !this.message.channel.nsfw) {
             this.client.emit('commandBlocked', this, 'nsfw');
-            return this.reply(this.client.localeProvider.tl(
+            return this.reply(this.client.localization.tl(
                 'errors',
                 'command-nsfw-channels-only',
+                this.guild,
                 { command: this.command.name }
             ));
         }
@@ -175,9 +177,10 @@ class CommandMessage {
             if (typeof hasPermission === 'string') {
                 return this.reply(hasPermission);
             } else {
-                return this.reply(this.client.localeProvider.tl(
+                return this.reply(this.client.localization.tl(
                     'errors',
                     'command-missing-permissions-generic',
+                    this.guild,
                     { command: this.command.name }
                 ));
             }
@@ -190,15 +193,17 @@ class CommandMessage {
             if (missing.length > 0) {
                 this.client.emit('commandBlocked', this, 'clientPermissions');
                 if (missing.length === 1) {
-                    return this.reply(this.client.localeProvider.tl(
+                    return this.reply(this.client.localization.tl(
                         'errors',
                         'command-client-missing-permission',
+                        this.guild,
                         { command: this.command.name, permission: permissions[missing[0]] }
                     ));
                 }
-                return this.reply(this.client.localeProvider.tl(
+                return this.reply(this.client.localization.tl(
                     'errors',
                     'command-client-missing-permissions',
+                    this.guild,
                     { command: this.command.name, permissions: missing.map(p => permissions[p]).join(', ') }
                 ));
             }
@@ -209,9 +214,10 @@ class CommandMessage {
         if (throttle && throttle.usages + 1 > this.command.throttling.usages) {
             const remaining = (throttle.start + (this.command.throttling.duration * 1000) - Date.now()) / 1000;
             this.client.emit('commandBlocked', this, 'throttling');
-            return this.reply(this.client.localeProvider.tl(
+            return this.reply(this.client.localization.tl(
                 'errors',
                 'command-throttled',
+                this.guild,
                 { seconds: remaining.toFixed(0) }
             ));
         }
@@ -229,7 +235,7 @@ class CommandMessage {
                     const err = new CommandFormatError(this);
                     return this.reply(err.message);
                 }
-                return this.reply(this.client.localeProvider.tl('common', 'command-cancelled'));
+                return this.reply(this.client.localization.tl('common', 'command-cancelled', this.guild));
             }
             args = result.values;
         }
@@ -287,7 +293,7 @@ class CommandMessage {
             if (err instanceof FriendlyError) {
                 return this.reply(err.message);
             } else {
-                let reply = this.client.localeProvider.tl('errors', 'command-error', {
+                let reply = this.client.localization.tl('errors', 'command-error', this.guild, {
                     command: this.command.name,
                     error: `${err.name}: ${err.message}`
                 });
@@ -296,15 +302,17 @@ class CommandMessage {
                     const ownerList = owners.map(o => `${discord.escapeMarkdown(o.username)}#${o.discriminator}`);
                     const invite = this.client.options.invite;
                     if (ownerList.length === 1) {
-                        reply += ` ${this.client.localeProvider.tl(
+                        reply += ` ${this.client.localization.tl(
                             'errors',
                             `contact-owners${invite ? '-in-server' : ''}`,
+                            this.guild,
                             { owners: ownerList.join(', '), invite }
                         )}`;
                     } else {
-                        reply += ` ${this.client.localeProvider.tl(
+                        reply += ` ${this.client.localization.tl(
                             'errors',
                             `contact-owner${invite ? '-in-server' : ''}`,
+                            this.guild,
                             { owner: ownerList[0], invite }
                         )}`;
                     }

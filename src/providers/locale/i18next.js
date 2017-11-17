@@ -5,7 +5,7 @@
 const path = require('path');
 const { promisify } = require('util');
 const LocaleProvider = require('./base');
-const FileBackend = require('./i18next-file-backend');
+const Backend = require('./i18next-commando-plus-backend');
 
 /**
  * Handles localization via i18next.
@@ -19,15 +19,14 @@ class I18nextLocaleProvider extends LocaleProvider {
 
     /**
      * @param {i18next} i18next - The i18next instance
-     * @param {string} language - The language
-     * @param {string} directory - The path to the parent directory where the extra localizations are located
-     * that override the default localizations
+     * @param {string} [directory] - The path to the directory where the extra localizations are located that override
+     * the default localizations
      * @example
      * // Create and use a new i18next locale provider
      * const i18next = require('i18next');
-     * client.setLocaleProvider(new I18nextLocaleProvider(i18next, 'en-US', 'path/to/localization/directory'));
+     * client.setLocaleProvider(new I18nextLocaleProvider(i18next, 'path/to/localization/overrides'));
      */
-    constructor(i18next, language, directory) {
+    constructor(i18next, directory) {
         super();
 
         /**
@@ -40,13 +39,7 @@ class I18nextLocaleProvider extends LocaleProvider {
         this.localizer.loadNamespacesAsync = promisify(this.localizer.loadNamespaces);
 
         /**
-         * The active language.
-         * @type {string}
-         */
-        this.language = language;
-
-        /**
-         * The path to the parent directory where the extra localizations are located.
+         * The path to the directory where the override localizations are located.
          * @type {string}
          * @readonly
          */
@@ -61,19 +54,18 @@ class I18nextLocaleProvider extends LocaleProvider {
         this.localizer.on('onMissingKey', (lng, ns, key) =>
             this.client.emit('warn', `Missing translation for '${key}' in localization namespace '${ns}' for ${lng}`));
 
-        const paths = [];
-        if (this.directory) {
-            paths.push(path.resolve(path.join(this.directory, 'locales', '{{lng}}', '{{ns}}.json')));
-        }
-        paths.push(path.resolve(path.join(__dirname, '..', '..', 'locales', '{{lng}}', '{{ns}}.json')));
-
-        this.localizer.use(FileBackend).init({
-            lng: this.language,
-            fallbackLng: 'en-US',
+        this.localizer.use(Backend).init({
+            lng: client.language,
             ns: ['common', 'errors'],
             defaultNS: 'common',
-            load: 'currentOnly',
-            backend: { loadPath: paths },
+            backend: {
+                globalPath: path.resolve(path.join(__dirname, '../../locales//{{lng}}/{{ns}}.json')),
+                overridePath: path.resolve(path.join(this.directory, '{{lng}}/{{ns}}.json')),
+                getModulePath: namespace => {
+                    const module = client.registry.modules.get(namespace);
+                    return module ? path.resolve(path.join(module.localizationDirectory, '{{lng}}/{{ns}}.json')) : null;
+                }
+            },
             interpolation: { escape: s => s }
         });
     }
@@ -82,8 +74,11 @@ class I18nextLocaleProvider extends LocaleProvider {
         return this.localizer.loadNamespacesAsync(namespaces);
     }
 
-    translate(namespace, key, vars) {
-        return this.localizer.t(`${namespace ? `${namespace}:` : ''}${key}`, vars);
+    translate(module, namespace, key, lang, vars) {
+        return this.localizer.t(`${module ? `${module}#` : '#'}${namespace ? `${namespace}:` : ''}${key}`, {
+            ...vars,
+            lng: lang
+        });
     }
 }
 

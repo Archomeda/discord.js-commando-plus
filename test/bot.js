@@ -83,7 +83,7 @@ client
 		`);
     });
 
-client.setLocaleProvider(new commando.I18nextLocaleProvider(i18next, 'en-US'));
+client.setLocaleProvider(new commando.I18nextLocaleProvider(i18next));
 
 if (sqlite) {
     client.setSettingsProvider(

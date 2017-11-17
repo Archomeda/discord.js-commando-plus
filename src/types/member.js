@@ -39,9 +39,9 @@ class MemberArgumentType extends ArgumentType {
             members = exactMembers;
         }
         return members.length <= 15 ? `${formatDisambiguation(this.client, {
-            label: this.client.localeProvider.tl('common', 'members'),
+            label: this.client.localization.tl('common', 'members', msg.guild),
             list: members.map(mem => `${escapeMarkdown(mem.user.tag)}`)
-        })}\n` : this.client.localeProvider.tl('common', 'output-multiple-members');
+        })}\n` : this.client.localization.tl('common', 'output-multiple-members', msg.guild);
     }
 
     parse(value, msg) {

@@ -1,5 +1,14 @@
+/*
+ Original author: Gawdl3y
+ Modified by: Archomeda
+ - Added CommandRegistry.commands
+ - Added CommandRegistry.registerModule()
+ - Added CommandRegistry.registerModules()
+ */
+
 const path = require('path');
 const discord = require('discord.js');
+const Module = require('./module');
 const Command = require('./commands/base');
 const CommandGroup = require('./commands/group');
 const CommandMessage = require('./commands/message');
@@ -20,6 +29,12 @@ class CommandRegistry {
          * @readonly
          */
         Object.defineProperty(this, 'client', { value: client });
+
+        /**
+         * Registered modules.
+         * @type {Collection<string, Module>}
+         */
+        this.modules = new discord.Collection();
 
         /**
          * Registered commands.
@@ -50,6 +65,60 @@ class CommandRegistry {
          * @type {?string}
          */
         this.commandsPath = null;
+    }
+
+    /**
+     * Registers a single module.
+     * @param {Module|Function} module - The module instance or constructor
+     * @return {CommandRegistry} This.
+     * @see {@link CommandRegistry#registerModules}
+     */
+    registerModule(module) {
+        return this.registerModules([module]);
+    }
+
+    /**
+     * Registers multiple modules.
+     * @param {Module[]|Function[]} modules - An array of module instances or constructors
+     * @return {CommandRegistry} This.
+     */
+    registerModules(modules) {
+        if (!Array.isArray(modules)) {
+            throw new TypeError('Modules must be an Array.');
+        }
+
+        for (let module of modules) {
+            if (typeof module === 'function') {
+                module = new module(this.client); // eslint-disable-line new-cap
+            }
+
+            // Verify that it's an actual command
+            if (!(module instanceof Module)) {
+                this.client.emit('warn', `Attempting to register an invalid module object: ${module}; skipping.`);
+                continue;
+            }
+
+            if (this.modules.has(module.namespace)) {
+                throw new Error(`A module with the name "${module.namespace}" is already registered.`);
+            }
+
+            this.modules.set(module.namespace, module);
+            /**
+             * Emitted when a module is registered.
+             * @event CommandoClient#moduleRegister
+             * @param {Module} module - Module that was registered
+             * @param {CommandRegistry} registry - Registry that the module was registered to
+             */
+            this.client.emit('moduleRegister', module, this);
+            this.client.emit('debug', `Registered module ${module.namespace}.`);
+
+            this.registerGroups(module.groups);
+            this.registerCommands(module.commands);
+            for (const command of module.commands) {
+                command.module = module;
+            }
+        }
+        return this;
     }
 
     /**
@@ -93,7 +162,7 @@ class CommandRegistry {
             } else {
                 this.groups.set(group.id, group);
                 /**
-                 * Emitted when a group is registered
+                 * Emitted when a group is registered.
                  * @event CommandoClient#groupRegister
                  * @param {CommandGroup} group - Group that was registered
                  * @param {CommandRegistry} registry - Registry that the group was registered to
@@ -158,7 +227,7 @@ class CommandRegistry {
             group.commands.set(command.name, command);
             this.commands.set(command.name, command);
             /**
-             * Emitted when a command is registered
+             * Emitted when a command is registered.
              * @event CommandoClient#commandRegister
              * @param {Command} command - Command that was registered
              * @param {CommandRegistry} registry - Registry that the command was registered to
@@ -230,7 +299,7 @@ class CommandRegistry {
             // Add the type
             this.types.set(type.id, type);
             /**
-             * Emitted when an argument type is registered
+             * Emitted when an argument type is registered.
              * @event CommandoClient#typeRegister
              * @param {ArgumentType} type - Argument type that was registered
              * @param {CommandRegistry} registry - Registry that the type was registered to
@@ -372,7 +441,7 @@ class CommandRegistry {
         command.group.commands.set(command.name, command);
         this.commands.set(command.name, command);
         /**
-         * Emitted when a command is reregistered
+         * Emitted when a command is reregistered.
          * @event CommandoClient#commandReregister
          * @param {Command} newCommand - New command
          * @param {Command} oldCommand - Old command
@@ -390,7 +459,7 @@ class CommandRegistry {
         this.commands.delete(command.name);
         command.group.commands.delete(command.name);
         /**
-         * Emitted when a command is unregistered
+         * Emitted when a command is unregistered.
          * @event CommandoClient#commandUnregister
          * @param {Command} command - Command that was unregistered
          */

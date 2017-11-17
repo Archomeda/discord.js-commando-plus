@@ -61,7 +61,7 @@ Then, set the locale provider on the client:
 const i18next = require('i18next');
 
 client.setLocaleProvider(
-    new Commando.I18nextLocaleProvider(i18next, 'en-US')
+    new Commando.I18nextLocaleProvider(i18next)
 ).catch(console.error);
 ```
 

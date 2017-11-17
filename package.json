@@ -21,6 +21,7 @@
   "types": "./typings/index.d.ts",
   "dependencies": {
     "common-tags": "^1.0.0",
+    "deepmerge": "^2.0.1",
     "escape-string-regexp": "^1.0.0",
     "require-all": "^2.0.0"
   },
@@ -30,7 +31,6 @@
     "discord.js-docgen": "hydrabolt/discord.js-docgen",
     "eslint": "^4.0.0",
     "i18next": "^10.0.7",
-    "i18next-node-fs-backend": "^1.0.0",
     "js-yaml": "^3.10.0",
     "jsdoc-strip-async-await": "^0.1.0",
     "mongoose": "^4.13.2",
@@ -42,7 +42,6 @@
   "peerDependencies": {
     "discord.js": "^11.2.0",
     "i18next": "^10.0.7",
-    "i18next-node-fs-backend": "^1.0.0",
     "js-yaml": "^3.10.0",
     "mongoose": "^4.13.2",
     "node-cache": "^4.1.1",

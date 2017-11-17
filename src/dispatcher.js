@@ -140,8 +140,8 @@ class CommandDispatcher {
             if (!inhibited) {
                 if (cmdMsg.command) {
                     if (!cmdMsg.command.isEnabledIn(message.guild)) {
-                        responses = await cmdMsg.reply(this.client.localeProvider.tl(
-                            'errors', 'command-disabled', { command: cmdMsg.command.name }));
+                        responses = await cmdMsg.reply(this.client.localization.tl(
+                            'errors', 'command-disabled', message.guild, { command: cmdMsg.command.name }));
                     } else if (!oldMessage || typeof oldCmdMsg !== 'undefined') {
                         responses = await cmdMsg.run();
                         if (typeof responses === 'undefined') { // eslint-disable-line max-depth
@@ -156,8 +156,8 @@ class CommandDispatcher {
                      */
                     this.client.emit('unknownCommand', cmdMsg);
                     if (this.client.options.unknownCommandResponse) {
-                        responses = await cmdMsg.reply(this.client.localeProvider.tl(
-                            'errors', 'command-unknown', {
+                        responses = await cmdMsg.reply(this.client.localization.tl(
+                            'errors', 'command-unknown', message.guild, {
                                 usage: cmdMsg.anyUsage('help',
                                     message.guild ? undefined : null, message.guild ? undefined : null)
                             }));

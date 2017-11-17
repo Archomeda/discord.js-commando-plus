@@ -1,3 +1,9 @@
+/*
+ Original author: Gawdl3y
+ Modified by: Archomeda
+ - Added GuildExtension.language
+ */
+
 const Command = require('../commands/base');
 const GuildSettingsHelper = require('../providers/settings/helper');
 
@@ -28,16 +34,47 @@ class GuildExtension {
         this._commandPrefix = prefix;
 
         /**
-         * Emitted whenever a guild's command prefix is changed
+         * Emitted whenever a guild's command prefix is changed.
          * @event CommandoClient#commandPrefixChange
-         * @param {?Guild} guild - Guild that the prefix was changed in (null for global)
-         * @param {?string} prefix - New command prefix (null for default)
+         * @param {?Guild} guild - The guild that the prefix was changed of (null for global)
+         * @param {?string} prefix - The new command prefix (null for default)
          */
         this.client.emit('commandPrefixChange', this, this._commandPrefix);
     }
 
     /**
-     * Shortcut to use setting provider methods for this guild.
+     * The language in the guild. Setting to `null` means that the language from {@link CommandoClient#language} will
+     * be used instead.
+     * @type {?string}
+     * @emits {@link CommandoClient#languageChange}
+     */
+    get language() {
+        if (typeof this._language === 'undefined' || this._language === null) {
+            return this.client.language;
+        }
+        return this._language;
+    }
+
+    set language(language) {
+        /**
+         * Internal language for the guild, controlled by the {@link GuildExtension#language) getter/setter.
+         * @name GuildExtension#_language
+         * @type {?string}
+         * @private
+         */
+        this._language = language;
+
+        /**
+         * Emitted whenever a guild's language is changed.
+         * @event CommandoClient#languageChange
+         * @param {?Guild} guild - The guild that the language was changed of (null for global)
+         * @param {?string} language - The new language (null for default)
+         */
+        this.client.emit('languageChange', this, this._language);
+    }
+
+    /**
+     * Shortcut to use settings provider methods for this guild.
      * @type {GuildSettingsHelper}
      * @readonly
      */
@@ -174,6 +211,7 @@ class GuildExtension {
     static applyToClass(target) {
         for (const prop of [
             'commandPrefix',
+            'language',
             'settings',
             'setCommandEnabled',
             'isCommandEnabled',

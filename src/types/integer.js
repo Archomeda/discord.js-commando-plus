@@ -17,10 +17,10 @@ class IntegerArgumentType extends ArgumentType {
             return false;
         }
         if (arg.min !== null && typeof arg.min !== 'undefined' && int < arg.min) {
-            return this.client.localeProvider.tl('common', 'validate-number-above', { min: arg.min });
+            return this.client.localization.tl('common', 'validate-number-above', msg.guild, { min: arg.min });
         }
         if (arg.max !== null && typeof arg.max !== 'undefined' && int > arg.max) {
-            return this.client.localeProvider.tl('common', 'validate-number-above', { max: arg.max });
+            return this.client.localization.tl('common', 'validate-number-above', msg.guild, { max: arg.max });
         }
         return true;
     }

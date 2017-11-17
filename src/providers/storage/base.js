@@ -28,7 +28,7 @@ class StorageProvider {
      * @param {CommandoClient} client - The client
      * @return {Promise<void>} The promise.
      */
-    init(client) { // eslint-disable-line no-unused-vars
+    init(client) {
         this.client = client;
     }
 

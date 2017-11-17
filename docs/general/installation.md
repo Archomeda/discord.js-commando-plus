@@ -1,5 +1,7 @@
 # Installation
-**Node 8.0.0 or newer is required.**  
+**Node 8.0 or higher is required.**  
+If you are using Node 8.2 or lower, you might have to run node with the harmony flag.
+
 Commando-Plus supports additional features that have peer dependencies that need to be installed separately.
 
 Install Commando-Plus by running: `npm install archomeda/discord.js-commando-plus --save`
@@ -13,7 +15,7 @@ or use:
 ## Localization (required)
 Create your own [LocaleProvider](https://archomeda.github.io/discord.js-commando-plus/#/docs/commando-plus/master/class/LocaleProvider),
 or use:
- - [I18nextLocaleProvider](https://archomeda.github.io/discord.js-commando-plus/#/docs/commando-plus/master/class/I18nextLocaleProvider): `npm install i18next i18next-node-fs-backend --save`
+ - [I18nextLocaleProvider](https://archomeda.github.io/discord.js-commando-plus/#/docs/commando-plus/master/class/I18nextLocaleProvider): `npm install i18next --save`
 
 ## Caching (optional)
 Create your own [CacheProvider](https://archomeda.github.io/discord.js-commando-plus/#/docs/commando-plus/master/class/CacheProvider),

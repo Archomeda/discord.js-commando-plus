@@ -14,6 +14,7 @@ const discord = require('discord.js');
 const CommandRegistry = require('./registry');
 const CommandDispatcher = require('./dispatcher');
 const GuildSettingsHelper = require('./providers/settings/helper');
+const LocaleHelper = require('./providers/locale/helper');
 
 /**
  * Discord.js Client with a command framework
@@ -24,6 +25,7 @@ class CommandoClient extends discord.Client {
      * Options for a CommandoClient
      * @typedef {ClientOptions} CommandoClientOptions
      * @property {boolean} [selfbot=false] - Whether the command dispatcher should be in selfbot mode
+     * @property {string} [language=en-US] - Default language for all localizations
      * @property {string} [commandPrefix=!] - Default command prefix
      * @property {number} [commandEditableDuration=30] - Time in seconds that command messages should be editable
      * @property {boolean} [nonCommandEditable=true] - Whether messages without commands can be edited to a command
@@ -38,6 +40,9 @@ class CommandoClient extends discord.Client {
     constructor(options = {}) {
         if (typeof options.selfbot === 'undefined') {
             options.selfbot = false;
+        }
+        if (typeof options.language === 'undefined') {
+            options.language = 'en-US';
         }
         if (typeof options.commandPrefix === 'undefined') {
             options.commandPrefix = '!';
@@ -55,6 +60,12 @@ class CommandoClient extends discord.Client {
             options.unknownCommandResponse = true;
         }
         super(options);
+
+        /**
+         * The client's language.
+         * @type {string}
+         */
+        this._language = options.language;
 
         /**
          * The client's command registry.
@@ -93,7 +104,13 @@ class CommandoClient extends discord.Client {
         this.storageProvider = null;
 
         /**
-         * Shortcut to use setting provider methods for the global settings.
+         * Shortcut to use locale provider methods for the global locales.
+         * @type {LocaleHelper}
+         */
+        this.localization = new LocaleHelper(this, null);
+
+        /**
+         * Shortcut to use settings provider methods for the global settings.
          * @type {GuildSettingsHelper}
          */
         this.settings = new GuildSettingsHelper(this, null);
@@ -152,6 +169,24 @@ class CommandoClient extends discord.Client {
     set commandPrefix(prefix) {
         this._commandPrefix = prefix;
         this.emit('commandPrefixChange', null, this._commandPrefix);
+    }
+
+    /**
+     * Global language. Setting to `null` means that the language from {@link CommandoClient#options} will be used
+     * instead.
+     * @type {?string}
+     * @emits {@link CommandoClient#languageChange}
+     */
+    get language() {
+        if (typeof this._language === 'undefined' || this._language === null) {
+            return this.options.language;
+        }
+        return this._language;
+    }
+
+    set language(language) {
+        this._language = language;
+        this.emit('languageChange', null, this._language);
     }
 
     /**

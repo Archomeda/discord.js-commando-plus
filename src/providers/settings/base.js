@@ -4,6 +4,8 @@
  - Moved from ./src/providers/base.js to ./src/providers/settings/base.js
  - Renamed SettingProvider to SettingsProvider
  - Moved some code from SQLiteProvider to SettingsProvider to decrease code duplication
+ - Changed SettingsProvider.initListeners()
+ - Changed SettingsProvider.setupGuild()
  */
 
 const { Guild } = require('discord.js');
@@ -61,6 +63,7 @@ class SettingsProvider {
     initListeners() {
         this.listeners
             .set('commandPrefixChange', (guild, prefix) => this.set(guild, 'prefix', prefix))
+            .set('languageChange', (guild, language) => this.set(guild, 'language', language))
             .set('commandStatusChange', (guild, command, enabled) => this.set(guild, `cmd-${command.name}`, enabled))
             .set('groupStatusChange', (guild, group, enabled) => this.set(guild, `grp-${group.id}`, enabled))
             .set('guildCreate', guild => {
@@ -189,6 +192,15 @@ class SettingsProvider {
                 guild._commandPrefix = settings.prefix;
             } else {
                 this.client._commandPrefix = settings.prefix;
+            }
+        }
+
+        // Load the language
+        if (typeof settings.language !== 'undefined') {
+            if (guild) {
+                guild._language = settings.language;
+            } else {
+                this.client._language = settings.language;
             }
         }
 

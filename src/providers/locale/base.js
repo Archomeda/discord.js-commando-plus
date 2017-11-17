@@ -28,7 +28,7 @@ class LocaleProvider {
      * @param {CommandoClient} client - The client
      * @return {Promise<void>} The promise.
      */
-    init(client) { // eslint-disable-line no-unused-vars
+    init(client) {
         this.client = client;
     }
 
@@ -44,43 +44,49 @@ class LocaleProvider {
     /**
      * Preloads a namespace.
      * @param {string} namespace - The namespace to preload
+     * @param {string} lang - The language
      * @return {Promise<void>} The promise.
      */
-    preloadNamespace(namespace) {
-        return this.preloadNamespaces([namespace]);
+    preloadNamespace(namespace, lang) {
+        return this.preloadNamespaces([namespace], lang);
     }
 
     /**
      * Preloads multiple namespaces.
      * @param {string[]} namespaces - The namespaces to preload
+     * @param {string} lang - The language
      * @return {Promise<void>} The promise.
      * @abstract
      */
-    preloadNamespaces(namespaces) { // eslint-disable-line no-unused-vars
+    preloadNamespaces(namespaces, lang) { // eslint-disable-line no-unused-vars
         throw new Error(`${this.constructor.name} doesn't implement the preload namespace function`);
     }
 
     /**
      * Gets the translation of a key.
+     * @param {string} module - The module
      * @param {string} namespace - The namespace
      * @param {string} key - The key
+     * @param {string} lang - The language
      * @param {Object} [vars] - Extra variables for the translator
      * @return {string} The translation.
      * @abstract
      */
-    translate(namespace, key, vars) { // eslint-disable-line no-unused-vars
+    translate(module, namespace, key, lang, vars) { // eslint-disable-line no-unused-vars
         throw new Error(`${this.constructor.name} doesn't implement the translate function`);
     }
 
     /**
      * Alias of {@link LocaleProvider#translate}.
+     * @param {string} module - The module
      * @param {string} namespace - The namespace
      * @param {string} key - The key
+     * @param {string} lang - The language
      * @param {Object} [vars] - Extra variables for the translator
      * @return {string} The translation.
      */
-    tl(namespace, key, vars) {
-        return this.translate(namespace, key, vars);
+    tl(module, namespace, key, lang, vars) {
+        return this.translate(module, namespace, key, lang, vars);
     }
 }
 

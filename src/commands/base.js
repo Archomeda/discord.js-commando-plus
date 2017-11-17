@@ -1,7 +1,6 @@
 /*
  Original author: Gawdl3y
  Modified by: Archomeda
- - Changed Command.hasPermission()
  - Added support for localization
  */
 
@@ -103,6 +102,12 @@ class Command {
          * @type {?CommandGroup}
          */
         this.group = null;
+
+        /**
+         * The module the command belongs to, assigned upon registration through a module.
+         * @type {?Module}
+         */
+        this.module = null;
 
         /**
          * Name of the command within the group.
@@ -248,15 +253,15 @@ class Command {
             return true;
         }
         if (this.ownerOnly && (ownerOverride || !this.client.isOwner(message.author))) {
-            return this.client.localeProvider.tl('errors', 'command-owner-only', { command: this.name });
+            return this.client.localization.tl('errors', 'command-owner-only', message.guild, { command: this.name });
         }
 
         if (message.channel.type === 'text' && this.userPermissions) {
             const missing = message.channel.permissionsFor(message.author).missing(this.userPermissions);
             return missing.length === 1 ?
-                this.client.localeProvider.tl('errors', 'command-missing-permission',
+                this.client.localization.tl('errors', 'command-missing-permission', message.guild,
                     { permission: permissions[missing[0]] }) :
-                this.client.localeProvider.tl('errors', 'command-missing-permissions',
+                this.client.localization.tl('errors', 'command-missing-permissions', message.guild,
                     { permissions: missing.map(p => permissions[p]).join(', ') });
         }
 

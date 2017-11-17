@@ -13,7 +13,7 @@ class CommandArgumentType extends ArgumentType {
         super(client, 'command');
     }
 
-    validate(value) {
+    validate(value, msg) {
         if (!value) {
             return false;
         }
@@ -26,7 +26,7 @@ class CommandArgumentType extends ArgumentType {
         }
 
         return formatDisambiguation(this.client, {
-            label: this.client.localeProvider.tl('common', 'commands'),
+            label: this.client.localization.tl('common', 'commands', msg.guild),
             list: commands.map(c => c.name)
         });
     }

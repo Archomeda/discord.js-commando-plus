@@ -13,7 +13,7 @@ class CommandOrGroupArgumentType extends ArgumentType {
         super(client, 'command-or-group');
     }
 
-    validate(value) {
+    validate(value, msg) {
         if (!value) {
             return false;
         }
@@ -32,13 +32,13 @@ class CommandOrGroupArgumentType extends ArgumentType {
         const list = [];
         if (commands.length > 0) {
             list.push({
-                label: this.client.localeProvider.tl('common', 'commands'),
+                label: this.client.localization.tl('common', 'commands', msg.guild),
                 list: commands.map(c => c.name)
             });
         }
         if (groups.length > 0) {
             list.push({
-                label: this.client.localeProvider.tl('common', 'groups'),
+                label: this.client.localization.tl('common', 'groups', msg.guild),
                 list: groups.map(g => g.name)
             });
         }
