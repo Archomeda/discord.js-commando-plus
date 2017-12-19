@@ -3,6 +3,7 @@
  Modified by: Archomeda
  - Renamed CommandoClient.provider to CommandoClient.settingsProvider
  - Renamed CommandoClient.setProvider() to CommandoClient.setSettingsProvider()
+ - Added CommandoClientOptions.commandReactableDuration
  - Added CommandoClient.initProvider()
  - Added CommandoClient.cacheProvider, CommandoClient.setCacheProvider()
  - Added CommandoClient.localeProvider, CommandoClient.setLocaleProvider()
@@ -28,6 +29,7 @@ class CommandoClient extends discord.Client {
      * @property {string} [language=en-US] - Default language for all localizations
      * @property {string} [commandPrefix=!] - Default command prefix
      * @property {number} [commandEditableDuration=30] - Time in seconds that command messages should be editable
+     * @property {number} [commandReactableDuration=300] - Time in seconds that command messages should be reactable
      * @property {boolean} [nonCommandEditable=true] - Whether messages without commands can be edited to a command
      * @property {boolean} [unknownCommandResponse=true] - Whether the bot should respond to an unknown command
      * @property {string|string[]|Set<string>} [owner] - ID of the bot owner's Discord user, or multiple IDs
@@ -52,6 +54,9 @@ class CommandoClient extends discord.Client {
         }
         if (typeof options.commandEditableDuration === 'undefined') {
             options.commandEditableDuration = 30;
+        }
+        if (typeof options.commandReactableDuration === 'undefined') {
+            options.commandReactableDuration = 300;
         }
         if (typeof options.nonCommandEditable === 'undefined') {
             options.nonCommandEditable = true;
@@ -123,15 +128,15 @@ class CommandoClient extends discord.Client {
         this._commandPrefix = null;
 
         // Set up command handling
-        const msgErr = err => {
-            this.emit('error', err);
-        };
-        this.on('message', message => {
-            this.dispatcher.handleMessage(message).catch(msgErr);
-        });
-        this.on('messageUpdate', (oldMessage, newMessage) => {
-            this.dispatcher.handleMessage(newMessage, oldMessage).catch(msgErr);
-        });
+        const msgErr = err => this.emit('error', err);
+        this.on('message', message =>
+            this.dispatcher.handleMessage(message).catch(msgErr));
+        this.on('messageUpdate', (oldMessage, newMessage) =>
+            this.dispatcher.handleMessage(newMessage, oldMessage).catch(msgErr));
+        this.on('messageReactionAdd', (reaction, user) =>
+            this.dispatcher.handleReaction(reaction, user).catch(msgErr));
+        this.on('messageReactionRemove', (reaction, user) =>
+            this.dispatcher.handleReaction(reaction, user).catch(msgErr));
 
         // Fetch the owner(s)
         if (options.owner) {

@@ -4,6 +4,11 @@
  - Added support for localization
  - Added Command.module
  - Added Command.moduleID
+ - Added Command.editTimeout()
+ - Added Command.preloadLocalization()
+ - Added Command.reactTimeout()
+ - Added Command.runReact()
+ - Added Command.shouldHandleReaction()
  - Changed Command.reload()
  */
 
@@ -268,6 +273,16 @@ class Command {
     }
 
     /**
+     * This is called automatically whenever the ability to edit a command message has timed out.
+     * @param {CommandMessage} message - The message
+     * @param {Message} response - The response to the command
+     * @return {Promise<CommandMessage>} The promise to the message.
+     */
+    editTimeout(message, response) { // eslint-disable-line no-unused-vars
+        return message;
+    }
+
+    /**
      * Checks if the user has permission to use the command.
      * @param {CommandMessage} message - The triggering command message
      * @param {boolean} [ownerOverride=true] - Whether the bot owner(s) will always have permission
@@ -300,10 +315,21 @@ class Command {
      * Preloads the localizer for this command.
      * @param {CommandMessage} message - The message
      * @return {Promise<void>} The promise.
+     * @private
      */
     preloadLocalization(message) {
         return this.client.localeProvider.preloadNamespace(`${this.moduleID}#${this.groupID}`,
             message && message.guild ? message.guild.language : this.client.language);
+    }
+    /**
+     * This is called automatically whenever the ability to react to a message has timed out.
+     * The existing reactions are still available.
+     * @param {CommandMessage} message - The message
+     * @param {Message} response - The response to the command
+     * @return {Promise<CommandMessage>} The promise to the message.
+     */
+    reactTimeout(message, response) { // eslint-disable-line no-unused-vars
+        return message;
     }
 
     /**
@@ -320,6 +346,28 @@ class Command {
      */
     run(message, args, fromPattern) { // eslint-disable-line no-unused-vars
         throw new Error(`${this.constructor.name} doesn't have a run() method.`);
+    }
+
+    /**
+     * Runs the command with a reaction (optional).
+     * @param {CommandMessage} message - The message the command is being run for
+     * @param {MessageReaction} reaction - The message reaction
+     * @return {Promise<?Message>} The promise to a message.
+     * @abstract
+     */
+    runReact(message, reaction) { // eslint-disable-line no-unused-vars
+
+    }
+
+    /**
+     * Determines whether or not the reaction should be handled. If false, the reaction will be removed.
+     * @param {CommandMessage} message - The message that is being reacted on
+     * @param {MessageReaction} reaction - The message reaction
+     * @param {User} user - The user
+     * @return {boolean} True if the reaction should be handled; false otherwise.
+     */
+    shouldHandleReaction(message, reaction, user) { // eslint-disable-line no-unused-vars
+        return true;
     }
 
     /**

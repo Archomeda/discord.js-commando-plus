@@ -29,7 +29,7 @@ class CommandChannel extends commando.Command {
 
     async run(msg, args) {
         const channel = args.channel;
-        return msg.reply(channel);
+        return msg.reply(channel.toString());
     }
 }
 

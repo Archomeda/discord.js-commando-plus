@@ -2,6 +2,13 @@
  Original author: Gawdl3y
  Modified by: Archomeda
  - Added support for localization
+ - Added support for reactable commands
+ - Added CommandDispatcher._commandResponses to support reactable commands
+ - Chagned CommandDispatcher._results to support reactable commands
+ - Changed CommandDispatcher.cacheCommandMessage() to support reactable commands
+ - Changed CommandDispatcher.handleMessage() to support additional changes for supporting reactable commands
+ - Changed CommandDispatcher.handleReaction() to support reactable commands
+ - Changed CommandDispatcher.shouldHandleReaction() to support reactable commands
  */
 
 const escapeRegex = require('escape-string-regexp');
@@ -45,10 +52,17 @@ class CommandDispatcher {
 
         /**
          * Old command message results, mapped by original message ID.
-         * @type {Map<string, CommandMessage>}
+         * @type {Map<string, { message: CommandMessage, timeoutIds: { edit: Object, react: Object } }>}
          * @private
          */
         this._results = new Map();
+
+        /**
+         * Mapping of bot command response message ids to their triggering command message ids.
+         * @type {Map<string, string>}
+         * @private
+         */
+        this._commandResponses = new Map();
 
         /**
          * Tuples in string form of user ID and channel ID that are currently awaiting messages from a user in a
@@ -117,9 +131,11 @@ class CommandDispatcher {
         }
 
         // Parse the message, and get the old result if it exists
-        let cmdMsg, oldCmdMsg;
+        let cmdMsg, cmdResult, oldCmdMsg, timeoutIds;
         if (oldMessage) {
-            oldCmdMsg = this._results.get(oldMessage.id);
+            cmdResult = this._results.get(oldMessage.id);
+            oldCmdMsg = cmdResult.message;
+            timeoutIds = cmdResult.timeoutIds;
             if (!oldCmdMsg && !this.client.options.nonCommandEditable) {
                 return;
             }
@@ -175,7 +191,37 @@ class CommandDispatcher {
             }
         }
 
-        this.cacheCommandMessage(message, oldMessage, cmdMsg, responses);
+        this.cacheCommandMessage(message, oldMessage, cmdMsg, responses, timeoutIds);
+    }
+
+    /**
+     * Handle a new reaction or a removal of a reaction.
+     * @param {MessageReaction} reaction - The message reaction to handle
+     * @param {User} user - The Discord user that reacted
+     * @return {Promise<void>} The promise that handles the reaction.
+     * @private
+     */
+    async handleReaction(reaction, user) {
+        const cmdMsgId = this._commandResponses.get(reaction.message.id);
+        if (typeof cmdMsgId === 'undefined') {
+            return;
+        }
+
+        const { message, timeoutIds } = this._results.get(cmdMsgId);
+        if (typeof message === 'undefined' || typeof message.command === 'undefined') {
+            return;
+        }
+
+        if (!this.shouldHandleReaction(message, reaction, user)) {
+            return;
+        }
+
+        let responses = await message.command.runReact(message, reaction);
+        if (typeof responses === 'undefined') {
+            responses = message.responses;
+        }
+
+        this.cacheCommandMessage(message.message, message.message, message, responses, timeoutIds);
     }
 
     /**
@@ -208,6 +254,22 @@ class CommandDispatcher {
     }
 
     /**
+     * Check whether a reaction should be handled.
+     * @param {CommandMessage} cmdMsg - The command message
+     * @param {MessageReaction} reaction - The message reaction to handle
+     * @param {User} user - The Discord user that reacted
+     * @return {boolean} True if the reaction should be handled; false otherwise.
+     * @private
+     */
+    shouldHandleReaction(cmdMsg, reaction, user) {
+        if (this.client.user.id === user.id) {
+            // Ignore our own reactions
+            return false;
+        }
+        return cmdMsg.command.shouldHandleReaction(cmdMsg, reaction, user);
+    }
+
+    /**
      * Inhibits a command message.
      * @param {CommandMessage} cmdMsg - Command message to inhibit
      * @return {?Array} [reason, ?response]
@@ -230,23 +292,47 @@ class CommandDispatcher {
      * @param {Message} oldMessage - Triggering message's old version
      * @param {CommandMessage} cmdMsg - Command message to cache
      * @param {Message|Message[]} responses - Responses to the message
+     * @param {Object} [timeoutIds] - The timeout ids
+     * @param {Object} [timeoutIds.edit] - The timeout id that was used to schedule the command edit timeout
+     * @param {Object} [timeoutIds.react] - The timeout id that was used to schedule the command reaction timeout
      * @return {void}
      * @private
      */
-    cacheCommandMessage(message, oldMessage, cmdMsg, responses) {
-        if (this.client.options.commandEditableDuration <= 0) {
+    cacheCommandMessage(message, oldMessage, cmdMsg, responses, timeoutIds = {}) {
+        if (this.client.options.commandEditableDuration <= 0 && this.client.options.commandReactableDuration <= 0) {
             return;
         }
         if (!cmdMsg && !this.client.options.nonCommandEditable) {
             return;
         }
         if (responses !== null) {
-            this._results.set(message.id, cmdMsg);
-            if (!oldMessage) {
-                setTimeout(() => {
-                    this._results.delete(message.id);
-                }, this.client.options.commandEditableDuration * 1000);
+            if (timeoutIds.edit) {
+                clearTimeout(timeoutIds.edit);
             }
+            if (timeoutIds.react) {
+                clearTimeout(timeoutIds.react);
+            }
+            // Only get the last response to listen for reactions
+            const reactResponse = Array.isArray(responses) ? responses[responses.length - 1] : responses;
+
+            timeoutIds.edit = setTimeout(async() => {
+                await cmdMsg.command.editTimeout(cmdMsg, responses);
+                if (this.client.options.commandEditableDuration > this.client.options.commandReactableDuration) {
+                    return this._results.delete(message.id);
+                }
+                return undefined;
+            }, this.client.options.commandEditableDuration * 1000);
+            timeoutIds.react = setTimeout(async() => {
+                await cmdMsg.command.reactTimeout(cmdMsg, responses);
+                this._commandResponses.delete(reactResponse.id);
+                if (this.client.options.commandReactableDuration > this.client.options.commandEditableDuration) {
+                    return this._results.delete(message.id);
+                }
+                return undefined;
+            }, this.client.options.commandReactableDuration * 1000);
+
+            this._results.set(message.id, { message: cmdMsg, timeoutIds });
+            this._commandResponses.set(reactResponse.id, message.id);
         } else {
             this._results.delete(message.id);
         }

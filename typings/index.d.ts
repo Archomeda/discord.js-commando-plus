@@ -116,14 +116,17 @@ declare module 'discord.js-commando' {
         public patterns: RegExp[];
         public throttling: ThrottlingOptions;
 
+        public editTimeout(message: CommandMessage, response: Message): Promise<CommandMessage>;
         public getMissingPermissions(message: CommandMessage): PermissionResolvable[];
         public hasPermission(message: CommandMessage): boolean;
         public isEnabledIn(guild: GuildResolvable): boolean;
         public isUsable(message: Message): boolean;
-        public preloadLocalization(message: CommandMessage): Promise<void>;
+        public reactTimeout(message: CommandMessage, response: Message): Promise<CommandMessage>;
         public reload(): void;
-        public run(message: CommandMessage, args: object | string | string[], fromPattern: boolean): Promise<Message | Message[]>
+        public run(message: CommandMessage, args: object | string | string[], fromPattern: boolean): Promise<Message | Message[]>;
+        public runReact(message: CommandMessage, prevResponse: Message, reaction: MessageReaction): Promise<Message>;
         public setEnabledIn(guild: GuildResolvable, enabled: boolean): void;
+        public shouldHandleReaction(message: CommandMessage, reaction: MessageReaction, user: User): boolean;
         public unload(): void;
         public usage(argString?: string, prefix?: string, user?: User): string;
 
@@ -138,7 +141,7 @@ declare module 'discord.js-commando' {
         private _results: Map<string, CommandMessage>;
         
         private buildCommandPattern(prefix: string): RegExp;
-        private cacheCommandMessage(message: Message, oldMessage: Message, cmdMsg: CommandMessage, responses: Message | Message[]): void;
+        private cacheCommandMessage(message: Message, oldMessage: Message, cmdMsg: CommandMessage, responses: Message | Message[], timeoutIds?: Object): void;
         private handleMessage(messge: Message, oldMessage?: Message): Promise<void>;
         private inhibit(cmdMsg: CommandMessage): [Inhibitor, undefined];
         private matchDefault(message: Message, pattern: RegExp, commandNameIndex: number): CommandMessage;
@@ -569,6 +572,7 @@ declare module 'discord.js-commando' {
         selfbot?: boolean;
         commandPrefix?: string;
         commandEditableDuration?: number;
+        commandReactableDuration?: number;
         nonCommandEditable?: boolean;
         unknownCommandResponse?: boolean;
         owner?: string | string[] | Set<string>;
