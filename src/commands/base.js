@@ -71,7 +71,7 @@ class Command {
         /**
          * Client that this command is for.
          * @name Command#client
-         * @type {CommandoClient}
+         * @type {Command}
          * @readonly
          */
         Object.defineProperty(this, 'client', { value: client });
