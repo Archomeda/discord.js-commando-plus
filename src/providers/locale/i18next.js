@@ -56,11 +56,12 @@ class I18nextLocaleProvider extends LocaleProvider {
 
         this.localizer.use(Backend).init({
             lng: client.language,
-            ns: ['common', 'errors'],
+            fallbackLng: 'en-US',
+            ns: ['common', 'errors', 'validation', 'glossary'],
             defaultNS: 'common',
             backend: {
                 globalPath: path.resolve(path.join(__dirname, '../../locales//{{lng}}/{{ns}}.json')),
-                overridePath: path.resolve(path.join(this.directory, '{{lng}}/{{ns}}.json')),
+                overridePath: this.directory ? path.resolve(path.join(this.directory, '{{lng}}/{{ns}}.json')) : null,
                 getModulePath: namespace => {
                     const module = client.registry.modules.get(namespace);
                     return module ? path.resolve(path.join(module.localizationDirectory, '{{lng}}/{{ns}}.json')) : null;
@@ -70,12 +71,17 @@ class I18nextLocaleProvider extends LocaleProvider {
         });
     }
 
-    preloadNamespaces(namespaces) {
-        return this.localizer.loadNamespacesAsync(namespaces);
+    async preloadNamespaces(namespaces) {
+        try {
+            return await this.localizer.loadNamespacesAsync(namespaces);
+        } catch (err) {
+            // Consume error
+        }
+        return undefined;
     }
 
     translate(module, namespace, key, lang, vars) {
-        return this.localizer.t(`${module ? `${module}#` : '#'}${namespace ? `${namespace}:` : ''}${key}`, {
+        return this.localizer.t(`${module ? `${module}#` : ''}${namespace ? `${namespace}:` : ''}${key}`, {
             ...vars,
             lng: lang
         });

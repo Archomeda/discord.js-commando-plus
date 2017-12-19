@@ -34,10 +34,10 @@ class ChannelArgumentType extends ArgumentType {
         if (exactChannels.length > 0) {
             channels = exactChannels;
         }
-        return channels.length <= 15 ? `${formatDisambiguation(this.client, {
-            label: this.client.localization.tl('common', 'channels', msg.guild),
+        return channels.length <= 15 ? `${formatDisambiguation(msg.guild, {
+            label: this.client.localization.tl('glossary', 'channels', msg.guild),
             list: channels.map(chan => escapeMarkdown(chan.name))
-        })}\n` : this.client.localization.tl('common', 'output-multiple-channels', msg.guild);
+        })}\n` : this.client.localization.tl('common', 'disambiguation-channels', msg.guild);
     }
 
     parse(value, msg) {

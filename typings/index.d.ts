@@ -108,8 +108,10 @@ declare module 'discord.js-commando' {
         public groupID: string;
         public guarded: boolean;
         public guildOnly: boolean;
+        public localization: CommandLocaleHelper;
         public memberName: string;
         public module: Module;
+        public moduleID: string;
         public name: string;
         public patterns: RegExp[];
         public throttling: ThrottlingOptions;
@@ -118,6 +120,7 @@ declare module 'discord.js-commando' {
         public hasPermission(message: CommandMessage): boolean;
         public isEnabledIn(guild: GuildResolvable): boolean;
         public isUsable(message: Message): boolean;
+        public preloadLocalization(message: CommandMessage): Promise<void>;
         public reload(): void;
         public run(message: CommandMessage, args: object | string | string[], fromPattern: boolean): Promise<Message | Message[]>
         public setEnabledIn(guild: GuildResolvable, enabled: boolean): void;
@@ -158,7 +161,7 @@ declare module 'discord.js-commando' {
         public constructor(client: CommandoClient, id: string, name?: string, guarded?: boolean, commands?: Command[]);
 
         public readonly client: CommandoClient;
-        public commands: Collection<string, Command>
+        public commands: Collection<string, Command>;
         public guarded: boolean;
         public id: string;
         public name: string;
@@ -166,6 +169,16 @@ declare module 'discord.js-commando' {
         public isEnabledIn(guild: GuildResolvable): boolean;
         public reload(): void;
         public setEnabledIn(guild: GuildResolvable, enabled: boolean): void;
+    }
+
+    export class CommandLocaleHelper {
+        public constructor(client: CommandoClient, command: Command);
+
+        public readonly client: CommandoClient;
+        public readonly command: Command;
+
+        public tl(key: string, guild: GuildResolvable, vars?: {}): string;
+        public translate(key: string, guild: GuildResolvable, vars?: {}): string;
     }
 
     export class CommandMessage {
@@ -316,7 +329,6 @@ declare module 'discord.js-commando' {
 
         public readonly client: CommandoClient;
         public commands: Collection<string, Command>;
-        public commandsPath: string;
         public evalObjects: object;
         public groups: Collection<string, CommandGroup>;
         public modules: Collection<string, Module>;
@@ -324,11 +336,10 @@ declare module 'discord.js-commando' {
 
         public findCommands(searchString?: string, exact?: boolean, message?: Message): Command[];
         public findGroups(searchString?: string, exact?: boolean): CommandGroup[];
+        public findModules(searchString?: string, exact?: boolean): Module[];
+        public registerBuiltInModule() : CommandRegistry;
         public registerCommand(command: Command | Function): CommandRegistry;
         public registerCommands(commands: Command[] | Function[]): CommandRegistry;
-        public registerCommandsIn(options: string | {}): CommandRegistry;
-        public registerDefaultCommands(options?: { help?: boolean, prefix?: boolean, eval_?: boolean, ping?: boolean, commandState?: boolean }): CommandRegistry;
-        public registerDefaultGroups(): CommandRegistry;
         public registerDefaults(): CommandRegistry;
         public registerDefaultTypes(): CommandRegistry;
         public registerEvalObject(key: string, obj: {}): CommandRegistry;
@@ -342,8 +353,9 @@ declare module 'discord.js-commando' {
         public registerTypesIn(options: string | {}): CommandRegistry;
         public reregisterCommand(command: Command | Function, oldCommand: Command): void;
         public resolveCommand(command: CommandResolvable): Command;
-        public resolveCommandPath(groups: string, memberName: string): string;
+        public resolveCommandPath(module: ModuleResolvable, groups: string, memberName: string): string;
         public resolveGroup(group: CommandGroupResolvable): CommandGroup;
+        public resolveModule(module: ModuleResolvable): Module;
         public unregisterCommand(command: Command): void;
     }
 
@@ -395,8 +407,8 @@ declare module 'discord.js-commando' {
         public readonly client: CommandoClient;
         public readonly module: Module;
 
-        public tl(namespace: string, key: string, lang: string, vars?: {}): string;
-        public translate(namespace: string, key: string, lang: string, vars?: {}): string;
+        public tl(namespace: string, key: string, guild: GuildResolvable, vars?: {}): string;
+        public translate(namespace: string, key: string, guild: GuildResolvable, vars?: {}): string;
     }
 
     export class LocaleProvider {
@@ -423,11 +435,11 @@ declare module 'discord.js-commando' {
 
     export class Module {
         public readonly client: CommandoClient;
-        public commands: Command[];
+        public commands: Collection<string, Command>;
         public groups: CommandGroup[] | Function[] | string[][];
+        public id: string;
         public localization: LocaleHelper;
         public localizationDirectory: string;
-        public namespace: string;
     }
 
     export class MongoStorageProvider extends StorageProvider {
@@ -566,6 +578,8 @@ declare module 'discord.js-commando' {
     type CommandResolvable = Command | string;
 
     type Inhibitor = (msg: Message) => string | [string, Promise<any>];
+
+    type ModuleResolvable = Module | string;
 
     type ThrottlingOptions = {
         usages: number;

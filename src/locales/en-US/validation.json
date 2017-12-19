@@ -1,0 +1,6 @@
+{
+  "number-above": "[P|p]lease enter a number that is {{min}} or above.",
+  "number-below": "[P|p]lease enter a number that is {{max}} or below.",
+  "string-count-above": "[P|p]lease give a minimum of {{min}} characters for the argument {{argument}}.",
+  "string-count-below": "[P|p]lease give a maximum of {{max}} characters for the argument {{argument}}."
+}

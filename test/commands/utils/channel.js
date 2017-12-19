@@ -1,13 +1,19 @@
+/*
+ Original author: Gawdl3y
+ Modified by: Archomeda
+ - Changed to comply with the Command class changes
+ */
+
 const commando = require('../../../src');
 
-module.exports = class ChannelCommand extends commando.Command {
+class CommandChannel extends commando.Command {
     constructor(client) {
         super(client, {
             name: 'channel',
             aliases: ['chan'],
-            group: 'util',
+            group: 'utils',
+            module: 'test',
             memberName: 'channel',
-            description: 'Gets information about a user.',
             examples: ['channel #test', 'channel test'],
             guildOnly: true,
 
@@ -15,7 +21,6 @@ module.exports = class ChannelCommand extends commando.Command {
                 {
                     key: 'channel',
                     label: 'textchannel',
-                    prompt: 'What channel would you like to snoop on?',
                     type: 'channel'
                 }
             ]
@@ -26,4 +31,6 @@ module.exports = class ChannelCommand extends commando.Command {
         const channel = args.channel;
         return msg.reply(channel);
     }
-};
+}
+
+module.exports = CommandChannel;

@@ -5,17 +5,16 @@
  */
 
 const fs = require('fs');
-const Command = require('../base');
+const Command = require('../../base');
 
-module.exports = class LoadCommandCommand extends Command {
+class CommandLoad extends Command {
     constructor(client) {
         super(client, {
             name: 'load',
             aliases: ['load-command'],
             group: 'commands',
+            module: 'builtin',
             memberName: 'load',
-            description: client.localeProvider.tl('help', 'commands.load.description'),
-            details: client.localeProvider.tl('help', 'commands.load.details'),
             examples: ['load some-command'],
             ownerOnly: true,
             guarded: true,
@@ -23,25 +22,26 @@ module.exports = class LoadCommandCommand extends Command {
             args: [
                 {
                     key: 'command',
-                    prompt: client.localeProvider.tl('help', 'commands.load.args.command-prompt'),
-                    validate: val => new Promise(resolve => {
+                    validate: (val, msg) => new Promise(resolve => {
                         if (!val) {
                             return resolve(false);
                         }
                         const split = val.split(':');
-                        if (split.length !== 2) {
+                        if (split.length !== 3) {
                             return resolve(false);
                         }
                         if (this.client.registry.findCommands(val).length > 0) {
-                            return resolve('That command is already registered.');
+                            const args = { command: this.client.registry.resolveCommand(val) };
+                            return resolve(this.localization.tl(
+                                'output.already-registered', msg.guild, { args, cmd: this }));
                         }
-                        const cmdPath = this.client.registry.resolveCommandPath(split[0], split[1]);
+                        const cmdPath = this.client.registry.resolveCommandPath(split[0], split[1], split[2]);
                         fs.access(cmdPath, fs.constants.R_OK, err => err ? resolve(false) : resolve(true));
                         return null;
                     }),
                     parse: val => {
                         const split = val.split(':');
-                        const cmdPath = this.client.registry.resolveCommandPath(split[0], split[1]);
+                        const cmdPath = this.client.registry.resolveCommandPath(split[0], split[1], split[2]);
                         delete require.cache[cmdPath];
                         return require(cmdPath);
                     }
@@ -51,17 +51,15 @@ module.exports = class LoadCommandCommand extends Command {
     }
 
     async run(msg, args) {
-        await this.client.localeProvider.preloadNamespace('commands');
-        const l10n = this.client.localeProvider;
-
         this.client.registry.registerCommand(args.command);
-        const command = this.client.registry.commands.last();
+        args.command = this.client.registry.commands.last();
 
         if (this.client.shard) {
             try {
                 await this.client.shard.broadcastEval(`
                     if (this.shard.id !== ${this.client.shard.id}) {
-                        const cmdPath = this.registry.resolveCommandPath('${command.groupID}', '${command.name}');
+                        const cmdPath = this.registry.resolveCommandPath(
+                            '${args.command.moduleID}', '${args.command.groupID}', '${args.command.name}');
                         delete require.cache[cmdPath];
                         this.registry.registerCommand(require(cmdPath));
                     }
@@ -69,10 +67,12 @@ module.exports = class LoadCommandCommand extends Command {
             } catch (err) {
                 this.client.emit('warn', 'Error when broadcasting command load to other shards');
                 this.client.emit('error', err);
-                return msg.reply(l10n.tl('commands', 'load.output-command-shards-failed', { name: command.name }));
+                return msg.reply(this.localization.tl('output.command-shards-failed', msg.guild, { args, cmd: this }));
             }
         }
 
-        return msg.reply(l10n.tl('commands', 'load.output-command', { name: command.name }));
+        return msg.reply(this.localization.tl('output.command', msg.guild, { args, cmd: this }));
     }
-};
+}
+
+module.exports = CommandLoad;

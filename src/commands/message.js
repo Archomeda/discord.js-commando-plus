@@ -222,6 +222,9 @@ class CommandMessage {
             ));
         }
 
+        // Preload command localization
+        await this.command.preloadLocalization(this.message);
+
         // Figure out the command arguments
         let args = this.patternMatches;
         if (!args && this.command.argsCollector) {
@@ -250,7 +253,8 @@ class CommandMessage {
         }
         const typingCount = this.message.channel.typingCount;
         try {
-            this.client.emit('debug', `Running command ${this.command.groupID}:${this.command.memberName}.`);
+            this.client.emit('debug',
+                `Running command ${this.command.moduleID}:${this.command.groupID}:${this.command.memberName}.`);
             const promise = this.command.run(this, args, fromPattern);
             /**
              * Emitted when running a command.

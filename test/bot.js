@@ -58,7 +58,7 @@ client
     })
     .on('commandBlocked', (msg, reason) => {
         console.log(oneLine`
-			Command ${msg.command ? `${msg.command.groupID}:${msg.command.memberName}` : ''}
+			Command ${msg.command ? `${msg.command.moduleID}:${msg.command.groupID}:${msg.command.memberName}` : ''}
 			blocked; ${reason}
 		`);
     })
@@ -70,7 +70,7 @@ client
     })
     .on('commandStatusChange', (guild, command, enabled) => {
         console.log(oneLine`
-			Command ${command.groupID}:${command.memberName}
+			Command ${command.moduleID}:${command.groupID}:${command.memberName}
 			${enabled ? 'enabled' : 'disabled'}
 			${guild ? `in guild ${guild.name} (${guild.id})` : 'globally'}.
 		`);
@@ -97,6 +97,6 @@ if (sqlite) {
 client.registry
     .registerGroup('math', 'Math')
     .registerDefaults()
-    .registerCommandsIn(path.join(__dirname, 'commands'));
+    .registerModule(new (require('./module'))(client));
 
 client.login(auth.token);

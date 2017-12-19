@@ -4,17 +4,16 @@
  - Added support for localization
  */
 
-const Command = require('../base');
+const Command = require('../../base');
 
-module.exports = class ReloadCommandCommand extends Command {
+class CommandReload extends Command {
     constructor(client) {
         super(client, {
             name: 'reload',
             aliases: ['reload-command'],
             group: 'commands',
+            module: 'builtin',
             memberName: 'reload',
-            description: client.localeProvider.tl('help', 'commands.reload.description'),
-            details: client.localeProvider.tl('help', 'commands.reload.details'),
             examples: ['reload some-command'],
             ownerOnly: true,
             guarded: true,
@@ -23,7 +22,6 @@ module.exports = class ReloadCommandCommand extends Command {
                 {
                     key: 'cmdOrGrp',
                     label: 'command/group',
-                    prompt: client.localeProvider.tl('help', 'commands.reload.args.command-or-group-prompt'),
                     type: 'command-or-group'
                 }
             ]
@@ -31,9 +29,6 @@ module.exports = class ReloadCommandCommand extends Command {
     }
 
     async run(msg, args) {
-        await this.client.localeProvider.preloadNamespace('commands');
-        const l10n = this.client.localeProvider;
-
         const { cmdOrGrp } = args;
         const isCmd = Boolean(cmdOrGrp.groupID);
         cmdOrGrp.reload();
@@ -49,14 +44,13 @@ module.exports = class ReloadCommandCommand extends Command {
             } catch (err) {
                 this.client.emit('warn', 'Error when broadcasting command reload to other shards');
                 this.client.emit('error', err);
-                return msg.reply(l10n.tl(
-                    'commands',
-                    `reload.output-${isCmd ? 'command' : 'group'}-shards-failed`,
-                    { name: cmdOrGrp.name }
-                ));
+                return msg.reply(this.localization.tl(
+                    `output.${isCmd ? 'command' : 'group'}-shards-failed`, msg.guild, { args, cmd: this }));
             }
         }
 
-        return msg.reply(l10n.tl('commands', `reload.output-${isCmd ? 'command' : 'group'}`, { name: cmdOrGrp.name }));
+        return msg.reply(this.localization.tl(`output.${isCmd ? 'command' : 'group'}`, msg.guild, { args, cmd: this }));
     }
-};
+}
+
+module.exports = CommandReload;

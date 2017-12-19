@@ -42,8 +42,8 @@ class LocaleProvider {
     }
 
     /**
-     * Preloads a namespace.
-     * @param {string} namespace - The namespace to preload
+     * Preloads an id.
+     * @param {string} namespace - The id to preload
      * @param {string} lang - The language
      * @return {Promise<void>} The promise.
      */
@@ -65,7 +65,7 @@ class LocaleProvider {
     /**
      * Gets the translation of a key.
      * @param {string} module - The module
-     * @param {string} namespace - The namespace
+     * @param {string} namespace - The id
      * @param {string} key - The key
      * @param {string} lang - The language
      * @param {Object} [vars] - Extra variables for the translator
@@ -79,7 +79,7 @@ class LocaleProvider {
     /**
      * Alias of {@link LocaleProvider#translate}.
      * @param {string} module - The module
-     * @param {string} namespace - The namespace
+     * @param {string} namespace - The id
      * @param {string} key - The key
      * @param {string} lang - The language
      * @param {Object} [vars] - Extra variables for the translator

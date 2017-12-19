@@ -38,10 +38,10 @@ class MemberArgumentType extends ArgumentType {
         if (exactMembers.length > 0) {
             members = exactMembers;
         }
-        return members.length <= 15 ? `${formatDisambiguation(this.client, {
-            label: this.client.localization.tl('common', 'members', msg.guild),
+        return members.length <= 15 ? `${formatDisambiguation(msg.guild, {
+            label: this.client.localization.tl('glossary', 'members', msg.guild),
             list: members.map(mem => `${escapeMarkdown(mem.user.tag)}`)
-        })}\n` : this.client.localization.tl('common', 'output-multiple-members', msg.guild);
+        })}\n` : this.client.localization.tl('common', 'disambiguation-members', msg.guild);
     }
 
     parse(value, msg) {

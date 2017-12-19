@@ -32,17 +32,17 @@ class CommandOrGroupArgumentType extends ArgumentType {
         const list = [];
         if (commands.length > 0) {
             list.push({
-                label: this.client.localization.tl('common', 'commands', msg.guild),
+                label: this.client.localization.tl('glossary', 'commands', msg.guild),
                 list: commands.map(c => c.name)
             });
         }
         if (groups.length > 0) {
             list.push({
-                label: this.client.localization.tl('common', 'groups', msg.guild),
+                label: this.client.localization.tl('glossary', 'groups', msg.guild),
                 list: groups.map(g => g.name)
             });
         }
-        return formatDisambiguation(this.client, list);
+        return formatDisambiguation(msg.guild, list);
     }
 
     parse(value) {

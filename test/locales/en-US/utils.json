@@ -1,0 +1,21 @@
+{
+  "channel": {
+    "description": "Gets information about a user",
+    "args": {
+      "channel-prompt": "[W|w]hat channel would you like to snoop on?"
+    }
+  },
+  "split": {
+    "description": "Sends split messages with a specific total length",
+    "details": "This command is for testing split messages. The length must be at least 1.",
+    "args": {
+      "length-prompt": "[H|h]ow many characters long would you like the message to be?"
+    }
+  },
+  "user-info": {
+    "description": "Gets information about a user",
+    "args": {
+      "member-prompt": "[W|w]hat user would you like to snoop on?"
+    }
+  }
+}

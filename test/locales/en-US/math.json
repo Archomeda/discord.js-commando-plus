@@ -1,0 +1,9 @@
+{
+  "add-numbers": {
+    "description": "Adds numbers together",
+    "details": "This is an incredibly useful command that finds the sum of numbers.\nThis command is the envy of all other commands.",
+    "args": {
+      "numbers-prompt": "[W|w]hat numbers would you like to add? Every message you send will be interpreted as a single number."
+    }
+  }
+}

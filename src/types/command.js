@@ -25,8 +25,8 @@ class CommandArgumentType extends ArgumentType {
             return false;
         }
 
-        return formatDisambiguation(this.client, {
-            label: this.client.localization.tl('common', 'commands', msg.guild),
+        return formatDisambiguation(msg.guild, {
+            label: this.client.localization.tl('glossary', 'commands', msg.guild),
             list: commands.map(c => c.name)
         });
     }

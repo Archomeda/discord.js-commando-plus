@@ -9,25 +9,23 @@ const util = require('util');
 const { stripIndents } = require('common-tags');
 const discord = require('discord.js');
 const escapeRegex = require('escape-string-regexp');
-const Command = require('../base');
+const Command = require('../../base');
 
 const nl = '!!NL!!';
 const nlPattern = new RegExp(nl, 'g');
 
-module.exports = class EvalCommand extends Command {
+class CommandEval extends Command {
     constructor(client) {
         super(client, {
             name: 'eval',
-            group: 'util',
+            group: 'utils',
+            module: 'builtin',
             memberName: 'eval',
-            description: client.localeProvider.tl('help', 'utils.eval.description'),
-            details: client.localeProvider.tl('help', 'utils.eval.details'),
             ownerOnly: true,
 
             args: [
                 {
                     key: 'script',
-                    prompt: client.localeProvider.tl('help', 'utils.eval.args.script-prompt'),
                     type: 'string'
                 }
             ]
@@ -36,10 +34,7 @@ module.exports = class EvalCommand extends Command {
         this.lastResult = null;
     }
 
-    async run(msg, args) {
-        await this.client.localeProvider.preloadNamespace('utils');
-        const l10n = this.client.localeProvider;
-
+    run(msg, args) {
         const { script } = args;
 
         // Run the code and measure its execution time
@@ -49,11 +44,11 @@ module.exports = class EvalCommand extends Command {
             this.lastResult = eval(script); // eslint-disable-line no-eval
             hrDiff = process.hrtime(hrStart);
         } catch (err) {
-            return msg.reply(l10n.tl('utils', 'eval.output-evaluation-error', { err }));
+            return msg.reply(this.localization.tl('output.evaluation-error', msg.guild, { args, err, cmd: this }));
         }
 
         // Prepare for callback time and respond
-        let response = this.makeResultMessages(this.lastResult, hrDiff, script, msg.editable);
+        let response = this.makeResultMessages(this.lastResult, hrDiff, msg, script);
         if (msg.editable) {
             if (Array.isArray(response)) {
                 if (response.length > 0) {
@@ -69,12 +64,10 @@ module.exports = class EvalCommand extends Command {
         return msg.reply(response);
     }
 
-    makeResultMessages(result, hrDiff, input = null, editable = false) {
-        const l10n = this.client.localeProvider;
-
+    makeResultMessages(result, hrDiff, msg, input = null) {
         const inspected = util.inspect(result, { depth: 0 })
             .replace(nlPattern, '\n')
-            .replace(this.sensitivePattern, l10n.tl('utils', 'eval.sensitive-censor'));
+            .replace(this.sensitivePattern, this.localization.tl('partial.sensitive-censor', msg.guild, { cmd: this }));
         const split = inspected.split('\n');
         const last = inspected.length - 1;
         const prependPart = inspected[0] !== '{' && inspected[0] !== '[' && inspected[0] !== '\'' ?
@@ -85,20 +78,28 @@ module.exports = class EvalCommand extends Command {
         const append = `\n${appendPart}\n\`\`\``;
 
         if (input) {
-            return discord.splitMessage(stripIndents`${editable ? `
-                    ${l10n.tl('utils', 'eval.input')}
+            /* eslint-disable indent */
+            return discord.splitMessage(stripIndents`${msg.editable ? `
+                    ${this.localization.tl('partial.input', msg.guild, { cmd: this })}
                     \`\`\`js
                     ${input}
                     \`\`\`` :
                 ''}
-                ${l10n.tl('utils', 'eval.output-execution-time', { time: (hrDiff[0] * 1000) + (hrDiff[1] / 1000000) })}
+                ${this.localization.tl(
+                    'output.execution-time',
+                    msg.guild,
+                    { cmd: this, time: (hrDiff[0] * 1000) + (hrDiff[1] / 1000000) }
+                )}
 				\`\`\`js
 				${inspected}
 				\`\`\`
             `, 1900, '\n', prepend, append);
+            /* eslint-enable indent */
         }
-        return discord.splitMessage(stripIndents`${l10n.tl('utils', 'eval.output-callback-execution-time',
-            { time: (hrDiff[0] * 1000) + (hrDiff[1] / 1000000) })}
+        return discord.splitMessage(stripIndents`${this.localization.tl(
+            'output.callback-execution-time',
+            msg.guild,
+            { cmd: this, time: (hrDiff[0] * 1000) + (hrDiff[1] / 1000000) })}
                 \`\`\`js
                 ${inspected}
                 \`\`\`
@@ -116,4 +117,6 @@ module.exports = class EvalCommand extends Command {
         }
         return this._sensitivePattern;
     }
-};
+}
+
+module.exports = CommandEval;

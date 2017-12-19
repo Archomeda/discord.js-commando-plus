@@ -14,11 +14,11 @@
 
 /**
  * Formats a disambiguation message.
- * @param {CommandoClient} client - The client
+ * @param {Guild} guild - The guild for which this message will be formatted
  * @param {DisambiguationList|DisambiguationList[]} items - The item(s)
  * @return {string} The formatted disambiguation message.
  */
-function formatDisambiguation(client, items) {
+function formatDisambiguation(guild, items) {
     if (!items || (Array.isArray(items) && items.length === 0)) {
         return '';
     }
@@ -27,7 +27,7 @@ function formatDisambiguation(client, items) {
     }
     if (items.length === 1) {
         const itemList = items[0].list.map(i => i.replace(/ /g, '\xa0')).join(', ');
-        return client.localeProvider.tl('common', 'output-disambiguation-single', {
+        return guild.client.localization.tl('common', 'disambiguation-single', guild, {
             label: formatFirstLetter(items[0].label, true),
             items: itemList
         });
@@ -36,12 +36,12 @@ function formatDisambiguation(client, items) {
     const resultList = [];
     for (const subItems of items) {
         const itemList = subItems.list.map(i => i.replace(/ /g, '\xa0')).join(', ');
-        resultList.push(client.localeProvider.tl('common', 'disambiguation-list', {
+        resultList.push(guild.client.localization.tl('common', 'disambiguation-list', guild, {
             label: formatFirstLetter(subItems.label, false),
             items: itemList
         }));
     }
-    return client.localeProvider.tl('common', 'output-disambiguation-multiple', { items: resultList.join('\n') });
+    return guild.client.localization.tl('common', 'disambiguation-multiple', guild, { items: resultList.join('\n') });
 }
 
 /**

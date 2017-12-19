@@ -1,43 +1,76 @@
 {
   "eval": {
-    "sensitive-censor": "--snip--",
-    "input": "Input",
-    "output-execution-time": "[*E|*e]xecuted in {{time}}ms.*",
-    "output-callback-execution-time": "[*C|*c]allback executed after {{time}}ms.*",
-    "output-evaluation-error": "[E|e]rror while evaluating: {{err}}"
+    "description": "Executes Javascript code",
+    "details": "Only the bot owner(s) may use this command.",
+    "args": {
+      "script-prompt": "[W|w]hat code would you like to execute?"
+    },
+    "partial": {
+      "inpit": "Input",
+      "sensitive-censor": "--snip--"
+    },
+    "output": {
+      "callback-execution-time": "[*C|*c]allback executed after {{time}}ms.*",
+      "evaluation-error": "[E|e]rror while evaluating: {{err.message}}",
+      "execution-time": "[*E|*e]xecuted in {{time}}ms.*"
+    }
   },
   "help": {
-    "command-header": "__Command **{{name}}**:__ {{description}}",
-    "command-format": "**Format:** {{usage}}",
-    "command-aliases": "**Aliases:** {{aliases}}",
-    "command-group": "**Group:** {{group}} ({{id}})",
-    "command-details": "**Details:** {{details}}",
-    "command-examples": "**Examples:** {{examples}}",
-    "guild-only": "(servers only)",
-    "nsfw": "(NSFW)",
-    "output-sent-dm": "[S|s]ent you a DM with information.",
-    "output-sending-dm-failed": "[U|u]nable to send you a DM. Check if you have DMs disabled and try again.",
-    "output-no-command": "[U|u]nable to identify command. Use {{usage}} to view the list of all commands.",
-    "output-heading-dm": "[T|t]o run a command in any server, use {{guild_usage}}. For example, {{example}}. To run a command in this DM, simply use {{dm_usage}} without a prefix.\n\nUse {{detailed_help}} to view detailed information about a specific command.\nUse {{all_help}} to view a list of *all* commands, not just available ones.",
-    "output-heading-text": "[T|t]o run a command in {{guild}}, use {{guild_usage}}. For example, {{example}}.\n\nUse {{detailed_help}} to view detailed information about a specific command.\nUse {{all_help}} to view a list of *all* commands, not just available ones.",
-    "output-description-dm": "__**Available commands in this DM**__",
-    "output-description-text": "__**Available commands in {{guild}}**__",
-    "output-description-all": "__**All commands**__"
+    "description": "Displays a list of available commands, or detailed information for a specified command",
+    "details": "The command may be part of a command name or a whole command name. If it isn't specified, all available commands will be listed.",
+    "args": {
+      "command-prompt": "Which command would you like to view the help for?"
+    },
+    "partial": {
+      "command-header": "__Command **{{name}}**:__ {{description}}",
+      "command-format": "**Format:** {{usage}}",
+      "command-aliases": "**Aliases:** {{aliases}}",
+      "command-group": "**Group:** {{group}} ({{id}})",
+      "command-details": "**Details:** {{details}}",
+      "command-examples": "**Examples:** {{examples}}",
+      "description-all": "__**All commands**__",
+      "description-dm": "__**Available commands in this DM**__",
+      "description-text": "__**Available commands in {{guild}}**__",
+      "guild-only": "(servers only)",
+      "heading-dm": "[T|t]o run a command in any server, use {{guild_usage}}. For example, {{example}}. To run a command in this DM, simply use {{dm_usage}} without a prefix.\n\nUse {{detailed_help}} to view detailed information about a specific command.\nUse {{all_help}} to view a list of *all* commands, not just available ones.",
+      "heading-text": "[T|t]o run a command in {{guild}}, use {{guild_usage}}. For example, {{example}}.\n\nUse {{detailed_help}} to view detailed information about a specific command.\nUse {{all_help}} to view a list of *all* commands, not just available ones.",
+      "nsfw": "(NSFW)"
+    },
+    "output": {
+      "no-command": "[U|u]nable to identify command. Use {{usage}} to view the list of all commands.",
+      "sending-dm-failed": "[U|u]nable to send you a DM. Check if you have DMs disabled and try again.",
+      "sent-dm": "[S|s]ent you a DM with information."
+    }
   },
   "ping": {
-    "heartbeat": "The heartbeat ping is {{time}}ms.",
-    "output-pinging": "[P|p]inging...",
-    "output-pong": "[P|p]ong! The message round-trip took {{time}}ms."
+    "description": "Gets the bot's ping to the Discord server",
+    "details": "",
+    "partial": {
+      "heartbeat": "The heartbeat ping is {{time}}ms."
+    },
+    "output": {
+      "output-pinging": "[P|p]inging...",
+      "output-pong": "[P|p]ong! The message round-trip took {{time}}ms."
+    }
   },
   "prefix": {
-    "no-prefix": "no prefix",
-    "run-commands": "To run commands, use {{anyUsage}}.",
-    "output-prefix": "[T|t]he command prefix is `{{prefix}}`. $t(utils:prefix.run-commands)",
-    "output-no-prefix": "[T|t]here is no command prefix. $t(utils:prefix.run-commands)",
-    "output-admin-only": "[O|o]nly administrators may change the command prefix.",
-    "output-owner-only": "[O|o]nly the bot owner(s) may change the global command prefix.",
-    "output-reset-default": "[T|t]he command prefix has been reset to the default prefix (currently {{default}}). $t(utils:prefix.run-commands)",
-    "output-set-prefix": "[T|t]he command prefix has been set to `{{prefix}}`. $t(utils:prefix.run-commands)",
-    "output-removed-prefix": "[T|t]he command prefix has been removed. $t(utils:prefix.run-commands)"
+    "description": "Shows or sets the command prefix",
+    "details": "If no prefix is provided, the current prefix will be shown. If the prefix is \"default\", the prefix will be reset to the bot's default prefix. If the prefix is \"none\", the prefix will be removed entirely, only allowing mentions to run commands. Only the administrators and bot owner(s) may change the prefix.",
+    "args": {
+      "prefix-prompt": "[W|w]hat would you like to set the bot's prefix to?"
+    },
+    "partial": {
+      "no-prefix": "no prefix",
+      "run-commands": "To run commands, use {{anyUsage}}."
+    },
+    "output": {
+      "admin-only": "[O|o]nly the administrators and bot owner(s) may change the command prefix.",
+      "output-owner-only": "[O|o]nly the bot owner(s) may change the global command prefix.",
+      "no-prefix": "[T|t]here is no command prefix. $t(utils:prefix.partial.run-commands)",
+      "prefix": "[T|t]he command prefix is `{{prefix}}`. $t(utils:prefix.partial.run-commands)",
+      "removed-prefix": "[T|t]he command prefix has been removed. $t(utils:prefix.partial.run-commands)",
+      "reset-default": "[T|t]he command prefix has been reset to the default prefix (currently {{default}}). $t(utils:prefix.partial.run-commands)",
+      "set-prefix": "[T|t]he command prefix has been set to `{{prefix}}`. $t(utils:prefix.partial.run-commands)"
+    }
   }
 }

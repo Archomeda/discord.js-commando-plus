@@ -15,5 +15,6 @@
   "contact-owner-in-server": "Please contact the bot owner ({{owner}}) in this server: {{invite}}.",
   "contact-owners": "Please contact a bot owner ({{owners}}).",
   "contact-owners-in-server": "Please contact a bot owner ({{owners}}) in this server: {{invite}}.",
+  "invalid-argument": "[Y|y]ou have provided an invalid {{label}}. Please try again.",
   "invalid-command-format": "[I|i]nvalid command format. The accepted format is {{usage}}. Use {{help_usage}} for more information."
 }

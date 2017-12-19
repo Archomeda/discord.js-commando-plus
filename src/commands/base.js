@@ -2,10 +2,13 @@
  Original author: Gawdl3y
  Modified by: Archomeda
  - Added support for localization
+ - Added Command.module
+ - Added Command.moduleID
+ - Changed Command.reload()
  */
 
-const path = require('path');
 const ArgumentCollector = require('./collector');
+const CommandLocaleHelper = require('../providers/locale/command-helper');
 const { permissions } = require('../util');
 
 /**
@@ -24,11 +27,14 @@ class Command {
      * @property {string[]} [aliases] - Alternative names for the command (all must be lowercase)
      * @property {boolean} [autoAliases=true] - Whether automatic aliases should be added
      * @property {string} group - The ID of the group the command belongs to (must be lowercase)
+     * @property {string} module - The ID of the module the command belongs to (must be lowercase)
      * @property {string} memberName - The member name of the command in the group (must be lowercase)
-     * @property {string} description - A short description of the command
+     * @property {string} [description] - The localization key that will be used to get the short description of the
+     * command. Defaults to `description`.
      * @property {string} [format] - The command usage format string - will be automatically generated if not specified,
      * and `args` is specified
-     * @property {string} [details] - A detailed description of the command and its functionality
+     * @property {string} [details] - The localization key that will be used to get the detailed description of the
+     * command and its functionality. Defaults to `details`. Set to `null` to disable.
      * @property {string[]} [examples] - Usage examples of the command
      * @property {boolean} [guildOnly=false] - Whether or not the command should only function in a guild channel
      * @property {boolean} [ownerOnly=false] - Whether or not the command is usable only by an owner
@@ -38,7 +44,8 @@ class Command {
      * @property {ThrottlingOptions} [throttling] - Options for throttling usages of the command
      * @property {boolean} [defaultHandling=true] - Whether or not the default command handling should be used.
      * If false, then only patterns will trigger the command.
-     * @property {ArgumentInfo[]} [args] - Arguments for the command
+     * @property {ArgumentInfo[]} [args] - Arguments for the command. The prompt is a localization key that defaults to
+     * `args.<arg_key>-prompt`.
      * @property {number} [argsPromptLimit=Infinity] - Maximum number of times to prompt a user for a single argument.
      * Only applicable if `args` is specified.
      * @property {string} [argsType=single] - One of 'single' or 'multiple'. Only applicable if `args` is not specified.
@@ -58,7 +65,7 @@ class Command {
      * @param {CommandoClient} client - The client the command is for
      * @param {CommandInfo} info - The command information
      */
-    constructor(client, info) {
+    constructor(client, info) { // eslint-disable-line complexity
         this.constructor.validateInfo(client, info);
 
         /**
@@ -104,6 +111,12 @@ class Command {
         this.group = null;
 
         /**
+         * ID of the module the command belongs to.
+         * @type {string}
+         */
+        this.moduleID = info.module;
+
+        /**
          * The module the command belongs to, assigned upon registration through a module.
          * @type {?Module}
          */
@@ -116,10 +129,10 @@ class Command {
         this.memberName = info.memberName;
 
         /**
-         * Short description of the command.
+         * Locale key for the short description of the command.
          * @type {string}
          */
-        this.description = info.description;
+        this.description = typeof info.description === 'undefined' ? 'description' : info.description;
 
         /**
          * Usage format string of the command.
@@ -128,10 +141,10 @@ class Command {
         this.format = info.format || null;
 
         /**
-         * Long description of the command.
+         * Locale key for the long description of the command.
          * @type {?string}
          */
-        this.details = info.details || null;
+        this.details = typeof info.details === 'undefined' ? 'details' : info.details;
 
         /**
          * Example usage strings.
@@ -180,6 +193,15 @@ class Command {
          * @type {?ThrottlingOptions}
          */
         this.throttling = info.throttling || null;
+
+        // Assign arg prompts localization keys
+        if (info.args) {
+            for (const arg of info.args) {
+                if (typeof arg.prompt === 'undefined') {
+                    arg.prompt = `args.${arg.key}-prompt`;
+                }
+            }
+        }
 
         /**
          * The argument collector for the command.
@@ -237,6 +259,12 @@ class Command {
          * @private
          */
         this._throttles = new Map();
+
+        /**
+         * Shortcut to use locale provider methods for the command locales.
+         * @type {CommandLocaleHelper}
+         */
+        this.localization = new CommandLocaleHelper(client, this);
     }
 
     /**
@@ -266,6 +294,16 @@ class Command {
         }
 
         return true;
+    }
+
+    /**
+     * Preloads the localizer for this command.
+     * @param {CommandMessage} message - The message
+     * @return {Promise<void>} The promise.
+     */
+    preloadLocalization(message) {
+        return this.client.localeProvider.preloadNamespace(`${this.moduleID}#${this.groupID}`,
+            message && message.guild ? message.guild.language : this.client.language);
     }
 
     /**
@@ -385,7 +423,7 @@ class Command {
     reload() {
         let cmdPath, cached, newCmd;
         try {
-            cmdPath = this.client.registry.resolveCommandPath(this.groupID, this.memberName);
+            cmdPath = this.client.registry.resolveCommandPath(this.moduleID, this.groupID, this.memberName);
             cached = require.cache[cmdPath];
             delete require.cache[cmdPath];
             newCmd = require(cmdPath);
@@ -393,21 +431,7 @@ class Command {
             if (cached) {
                 require.cache[cmdPath] = cached;
             }
-            try {
-                cmdPath = path.join(__dirname, this.groupID, `${this.memberName}.js`);
-                cached = require.cache[cmdPath];
-                delete require.cache[cmdPath];
-                newCmd = require(cmdPath);
-            } catch (err2) {
-                if (cached) {
-                    require.cache[cmdPath] = cached;
-                }
-                if (err2.message.includes('Cannot find module')) {
-                    throw err;
-                } else {
-                    throw err2;
-                }
-            }
+            throw err;
         }
 
         this.client.registry.reregisterCommand(newCmd, this);
@@ -418,7 +442,7 @@ class Command {
      * @return {void}
      */
     unload() {
-        const cmdPath = this.client.registry.resolveCommandPath(this.groupID, this.memberName);
+        const cmdPath = this.client.registry.resolveCommandPath(this.moduleID, this.groupID, this.memberName);
         if (!require.cache[cmdPath]) {
             throw new Error('Command cannot be unloaded.');
         }
@@ -488,13 +512,19 @@ class Command {
         if (info.group !== info.group.toLowerCase()) {
             throw new Error('Command group must be lowercase.');
         }
+        if (typeof info.module !== 'string') {
+            throw new TypeError('Command module must be a string.');
+        }
+        if (info.module !== info.module.toLowerCase()) {
+            throw new Error('Command module must be lowercase.');
+        }
         if (typeof info.memberName !== 'string') {
             throw new TypeError('Command memberName must be a string.');
         }
         if (info.memberName !== info.memberName.toLowerCase()) {
             throw new Error('Command memberName must be lowercase.');
         }
-        if (typeof info.description !== 'string') {
+        if ('description' in info && typeof info.description !== 'string') {
             throw new TypeError('Command description must be a string.');
         }
         if ('format' in info && typeof info.format !== 'string') {

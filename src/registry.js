@@ -1,9 +1,18 @@
 /*
  Original author: Gawdl3y
  Modified by: Archomeda
- - Added CommandRegistry.commands
+ - Added ModuleResolvable
+ - Added CommandRegistry.modules
+ - Added CommandRegistry.findModules()
+ - Added CommandRegistry.registerBuiltInModule()
  - Added CommandRegistry.registerModule()
  - Added CommandRegistry.registerModules()
+ - Added CommandRegistry.resolveModule()
+ - Changed signature of CommandRegistry.resolveCommandPath()
+ - Removed CommandRegistry.commandsPath
+ - Removed CommandRegistry.registerCommandsIn()
+ - Removed CommandRegistry.registerDefaultCommands()
+ - Removed CommandRegistry.registerDefaultGroups()
  */
 
 const path = require('path');
@@ -59,27 +68,26 @@ class CommandRegistry {
          * @type {Object}
          */
         this.evalObjects = {};
-
-        /**
-         * Fully resolved path to the bot's commands directory.
-         * @type {?string}
-         */
-        this.commandsPath = null;
     }
 
     /**
      * Registers a single module.
      * @param {Module|Function} module - The module instance or constructor
+     * @param {...*} [args] - The arguments for the constructor
      * @return {CommandRegistry} This.
      * @see {@link CommandRegistry#registerModules}
      */
-    registerModule(module) {
+    registerModule(module, ...args) {
+        if (Array.isArray(args) && args.length > 0) {
+            return this.registerModules([[module, args]]);
+        }
         return this.registerModules([module]);
     }
 
     /**
      * Registers multiple modules.
-     * @param {Module[]|Function[]} modules - An array of module instances or constructors
+     * @param {Module[]|Function[]|Array[]} modules - An array of module instances or constructors,
+     * or an array of [constructor, argsArray].
      * @return {CommandRegistry} This.
      */
     registerModules(modules) {
@@ -88,8 +96,18 @@ class CommandRegistry {
         }
 
         for (let module of modules) {
+            let args;
+            if (Array.isArray(module)) {
+                args = module[1];
+                module = module[0];
+            }
+
             if (typeof module === 'function') {
-                module = new module(this.client); // eslint-disable-line new-cap
+                if (Array.isArray(args)) {
+                    module = new module(this.client, ...args); // eslint-disable-line new-cap
+                } else {
+                    module = new module(this.client); // eslint-disable-line new-cap
+                }
             }
 
             // Verify that it's an actual command
@@ -98,11 +116,11 @@ class CommandRegistry {
                 continue;
             }
 
-            if (this.modules.has(module.namespace)) {
-                throw new Error(`A module with the name "${module.namespace}" is already registered.`);
+            if (this.modules.has(module.id)) {
+                throw new Error(`A module with id "${module.id}" is already registered.`);
             }
 
-            this.modules.set(module.namespace, module);
+            this.modules.set(module.id, module);
             /**
              * Emitted when a module is registered.
              * @event CommandoClient#moduleRegister
@@ -110,10 +128,10 @@ class CommandRegistry {
              * @param {CommandRegistry} registry - Registry that the module was registered to
              */
             this.client.emit('moduleRegister', module, this);
-            this.client.emit('debug', `Registered module ${module.namespace}.`);
+            this.client.emit('debug', `Registered module ${module.id}.`);
 
             this.registerGroups(module.groups);
-            this.registerCommands(module.commands);
+            this.registerCommands(module.commands.array());
             for (const command of module.commands) {
                 command.module = module;
             }
@@ -240,28 +258,6 @@ class CommandRegistry {
     }
 
     /**
-     * Registers all commands in a directory. The files must export a Command class constructor or instance.
-     * @param {string|RequireAllOptions} options - The path to the directory, or a require-all options object
-     * @return {CommandRegistry} This.
-     */
-    registerCommandsIn(options) {
-        const obj = require('require-all')(options);
-        const commands = [];
-        for (const group of Object.values(obj)) {
-            for (let command of Object.values(group)) {
-                if (typeof command.default === 'function') {
-                    command = command.default;
-                }
-                commands.push(command);
-            }
-        }
-        if (typeof options === 'string' && !this.commandsPath) {
-            this.commandsPath = options;
-        }
-        return this.registerCommands(commands);
-    }
-
-    /**
      * Registers a single argument type.
      * @param {ArgumentType|Function} type - Either an ArgumentType instance, or a constructor for one
      * @return {CommandRegistry} This.
@@ -331,57 +327,27 @@ class CommandRegistry {
      */
     registerDefaults() {
         this.registerDefaultTypes();
-        this.registerDefaultGroups();
-        this.registerDefaultCommands();
+        this.registerBuiltInModule();
         return this;
     }
 
     /**
-     * Registers the default groups.
+     * Registers the default built-in module with its groups and commands to the registry.
+     * @param {Object} [commandsToLoad] - Describes which commands to load
+     * @param {boolean} commandsToLoad.disable - The commands:disable command
+     * @param {boolean} commandsToLoad.enable - The commands:enable command
+     * @param {boolean} commandsToLoad.groups - The commands:groups command
+     * @param {boolean} commandsToLoad.load - The commands:load command
+     * @param {boolean} commandsToLoad.reload - The commands:reload command
+     * @param {boolean} commandsToLoad.unload - The commands:unload command
+     * @param {boolean} commandsToLoad.eval - The utils:eval command
+     * @param {boolean} commandsToLoad.help - The utils:help command
+     * @param {boolean} commandsToLoad.ping - The utils:ping command
+     * @param {boolean} commandsToLoad.prefix - The utils:prefix command
      * @return {CommandRegistry} This.
      */
-    registerDefaultGroups() {
-        return this.registerGroups([
-            ['commands', 'Commands', true],
-            ['util', 'Utility']
-        ]);
-    }
-
-    /**
-     * Registers the default commands to the registry.
-     * @param {Object} [options] - Object specifying what commands to register
-     * @param {boolean} [options.help=true] - Whether or not to register the built-in help command
-     * @param {boolean} [options.prefix=true] - Whether or not to register the built-in prefix command
-     * @param {boolean} [options.eval_=true] - Whether or not to register the built-in eval command
-     * @param {boolean} [options.ping=true] - Whether or not to register the built-in ping command
-     * @param {boolean} [options.commandState=true] - Whether or not to register the built-in command state commands
-     * (enable, disable, reload, list groups)
-     * @return {CommandRegistry} This.
-     */
-    registerDefaultCommands({ help = true, prefix = true, ping = true, eval_ = true, commandState = true } = {}) {
-        if (help) {
-            this.registerCommand(require('./commands/util/help'));
-        }
-        if (prefix) {
-            this.registerCommand(require('./commands/util/prefix'));
-        }
-        if (ping) {
-            this.registerCommand(require('./commands/util/ping'));
-        }
-        if (eval_) {
-            this.registerCommand(require('./commands/util/eval'));
-        }
-        if (commandState) {
-            this.registerCommands([
-                require('./commands/commands/groups'),
-                require('./commands/commands/enable'),
-                require('./commands/commands/disable'),
-                require('./commands/commands/reload'),
-                require('./commands/commands/load'),
-                require('./commands/commands/unload')
-            ]);
-        }
-        return this;
+    registerBuiltInModule(commandsToLoad) {
+        return this.registerModule(require('./commands/builtin/module'), commandsToLoad);
     }
 
     /**
@@ -419,7 +385,7 @@ class CommandRegistry {
     }
 
     /**
-     * Reregisters a command (does not support changing name, group, or memberName).
+     * Reregisters a command (does not support changing name, group, module or memberName).
      * @param {Command|Function} command - New command
      * @param {Command} oldCommand - Old command
      * @return {void}
@@ -434,11 +400,16 @@ class CommandRegistry {
         if (command.groupID !== oldCommand.groupID) {
             throw new Error('Command group cannot change.');
         }
+        if (command.moduleID !== oldCommand.moduleID) {
+            throw new Error('Command module cannot change.');
+        }
         if (command.memberName !== oldCommand.memberName) {
             throw new Error('Command memberName cannot change.');
         }
         command.group = this.resolveGroup(command.groupID);
         command.group.commands.set(command.name, command);
+        command.module = this.resolveModule(command.moduleID);
+        command.module.commands.set(command.name, command);
         this.commands.set(command.name, command);
         /**
          * Emitted when a command is reregistered.
@@ -447,7 +418,7 @@ class CommandRegistry {
          * @param {Command} oldCommand - Old command
          */
         this.client.emit('commandReregister', command, oldCommand);
-        this.client.emit('debug', `Reregistered command ${command.groupID}:${command.memberName}.`);
+        this.client.emit('debug', `Reregistered command ${command.moduleID}:${command.groupID}:${command.memberName}.`);
     }
 
     /**
@@ -458,13 +429,14 @@ class CommandRegistry {
     unregisterCommand(command) {
         this.commands.delete(command.name);
         command.group.commands.delete(command.name);
+        command.module.commands.delete(command.name);
         /**
          * Emitted when a command is unregistered.
          * @event CommandoClient#commandUnregister
          * @param {Command} command - Command that was unregistered
          */
         this.client.emit('commandUnregister', command);
-        this.client.emit('debug', `Unregistered command ${command.groupID}:${command.memberName}.`);
+        this.client.emit('debug', `Unregistered command ${command.moduleID}:${command.groupID}:${command.memberName}.`);
     }
 
     /**
@@ -488,6 +460,60 @@ class CommandRegistry {
     registerEvalObjects(obj) {
         Object.assign(this.evalObjects, obj);
         return this;
+    }
+
+    /**
+     * Finds all modules that match the search string.
+     * @param {string} [searchString] - The string to search for
+     * @param {boolean} [exact=false] - Whether the search should be exact
+     * @return {Module[]} All modules that are found.
+     */
+    findModules(searchString = null, exact = false) {
+        if (!searchString) {
+            return this.modules;
+        }
+
+        // Find all matches
+        const lcSearch = searchString.toLowerCase();
+        const matchedGroups = this.modules.filterArray(
+            exact ? moduleFilterExact(lcSearch) : moduleFilterInexact(lcSearch)
+        );
+        if (exact) {
+            return matchedGroups;
+        }
+
+        // See if there's an exact match
+        for (const module of matchedGroups) {
+            if (module.id === lcSearch) {
+                return [module];
+            }
+        }
+        return matchedGroups;
+    }
+
+    /**
+     * A ModuleResolvable can be:
+     * * A Module
+     * * A module ID
+     * @typedef {Module|string} ModuleResolvable
+     */
+
+    /**
+     * Resolves a ModuleResolvable to a Module object.
+     * @param {ModuleResolvable} module - The module to resolve
+     * @return {Module} The resolved Module.
+     */
+    resolveModule(module) {
+        if (module instanceof Module) {
+            return module;
+        }
+        if (typeof module === 'string') {
+            const modules = this.findModules(module, true);
+            if (modules.length === 1) {
+                return modules[0];
+            }
+        }
+        throw new Error('Unable to resolve module.');
     }
 
     /**
@@ -606,13 +632,23 @@ class CommandRegistry {
 
     /**
      * Resolves a command file path from a command's group ID and memberName.
+     * @param {ModuleResolvable} module - The module
      * @param {string} group - ID of the command's group
      * @param {string} memberName - Member name of the command
      * @return {string} Fully-resolved path to the corresponding command file.
      */
-    resolveCommandPath(group, memberName) {
-        return path.join(this.commandsPath, group, `${memberName}.js`);
+    resolveCommandPath(module, group, memberName) {
+        module = this.resolveModule(module);
+        return path.join(module.commandsDirectory, group, `${memberName}.js`);
     }
+}
+
+function moduleFilterExact(search) {
+    return m => m.id === search;
+}
+
+function moduleFilterInexact(search) {
+    return m => m.id.includes(search);
 }
 
 function groupFilterExact(search) {

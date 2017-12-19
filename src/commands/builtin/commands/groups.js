@@ -4,17 +4,16 @@
  - Added support for localization
  */
 
-const Command = require('../base');
+const Command = require('../../base');
 
-module.exports = class ListGroupsCommand extends Command {
+class CommandGroups extends Command {
     constructor(client) {
         super(client, {
             name: 'groups',
             aliases: ['list-groups', 'show-groups'],
             group: 'commands',
+            module: 'builtin',
             memberName: 'groups',
-            description: client.localeProvider.tl('help', 'commands.list-groups.description'),
-            details: client.localeProvider.tl('help', 'commands.list-groups.details'),
             guarded: true
         });
     }
@@ -26,16 +25,15 @@ module.exports = class ListGroupsCommand extends Command {
         return msg.member.hasPermission('ADMINISTRATOR') || this.client.isOwner(msg.author);
     }
 
-    async run(msg) {
-        await this.client.localeProvider.preloadNamespace('commands');
-        const l10n = this.client.localeProvider;
-
-        let content = `\n__**${l10n.tl('commands', 'list-groups.output-header')}**__\n`;
+    run(msg) {
+        let content = `\n__**${this.localization.tl('output.header', msg.guild, { cmd: this })}**__\n`;
         content += this.client.registry.groups.map(grp =>
             `**${grp.name}:** ${grp.isEnabledIn(msg.guild) ?
-                l10n.tl('commands', 'list-groups.enabled') :
-                l10n.tl('commands', 'list-groups.disabled')}`)
+                this.localization.tl('partial.enabled', msg.guild, { cmd: this }) :
+                this.localization.tl('partial.disabled', msg.guild, { cmd: this })}`)
             .join('\n');
         return msg.reply(content);
     }
-};
+}
+
+module.exports = CommandGroups;

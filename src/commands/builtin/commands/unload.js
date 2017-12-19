@@ -4,17 +4,16 @@
  - Added support for localization
  */
 
-const Command = require('../base');
+const Command = require('../../base');
 
-module.exports = class UnloadCommandCommand extends Command {
+class CommandUnload extends Command {
     constructor(client) {
         super(client, {
             name: 'unload',
             aliases: ['unload-command'],
             group: 'commands',
+            module: 'builtin',
             memberName: 'unload',
-            description: client.localeProvider.tl('help', 'commands.unload.description'),
-            details: client.localeProvider.tl('help', 'commands.unload.details'),
             examples: ['unload some-command'],
             ownerOnly: true,
             guarded: true,
@@ -22,7 +21,6 @@ module.exports = class UnloadCommandCommand extends Command {
             args: [
                 {
                     key: 'command',
-                    prompt: client.localeProvider.tl('help', 'commands.unload.args.command-prompt'),
                     type: 'command'
                 }
             ]
@@ -30,9 +28,6 @@ module.exports = class UnloadCommandCommand extends Command {
     }
 
     async run(msg, args) {
-        await this.client.localeProvider.preloadNamespace('commands');
-        const l10n = this.client.localeProvider;
-
         const { command } = args;
         command.unload();
 
@@ -46,10 +41,12 @@ module.exports = class UnloadCommandCommand extends Command {
             } catch (err) {
                 this.client.emit('warn', 'Error when broadcasting command unload to other shards');
                 this.client.emit('error', err);
-                return msg.reply(l10n.tl('commands', 'unload.output-command-shards-failed', { name: command.name }));
+                return msg.reply(this.localization.tl('output.command-shards-failed', msg.guild, { args, cmd: this }));
             }
         }
 
-        return msg.reply(l10n.tl('commands', 'unload.output-command', { name: command.name }));
+        return msg.reply(this.localization.tl('output.command', msg.guild, { args, cmd: this }));
     }
-};
+}
+
+module.exports = CommandUnload;

@@ -25,8 +25,8 @@ class GroupArgumentType extends ArgumentType {
             return false;
         }
 
-        return formatDisambiguation(this.client, {
-            label: this.client.localization.tl('common', 'groups', msg.guild),
+        return formatDisambiguation(msg.guild, {
+            label: this.client.localization.tl('glossary', 'groups', msg.guild),
             list: groups.map(c => c.name)
         });
     }

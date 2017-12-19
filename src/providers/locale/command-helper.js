@@ -3,49 +3,48 @@
  */
 
 /**
- * Helper class to use {@link LocaleProvider} methods for a specific module (or client).
+ * Helper class to use {@link LocaleProvider} methods for a specific command or worker.
  */
-class LocaleHelper {
+class CommandLocaleHelper {
     /**
      * @param {CommandoClient} client - The client that is used for this helper
-     * @param {?Module} module - The module that is used for this helper
+     * @param {?Command} command - The command that is used for this helper
      * @private
      */
-    constructor(client, module) {
+    constructor(client, command) {
         /**
          * The client that is used for this helper.
-         * @name LocaleHelper#client
+         * @name CommandLocaleHelper#client
          * @type {CommandoClient}
          * @readonly
          */
         Object.defineProperty(this, 'client', { value: client });
 
         /**
-         * The module that is used for this helper, if associated with one.
-         * @name LocaleHelper#module
-         * @type {Module}
+         * The command that is used for this helper, if associated with one.
+         * @name CommandLocaleHelper#command
+         * @type {Command}
          * @readonly
          */
-        Object.defineProperty(this, 'module', { value: module });
+        Object.defineProperty(this, 'command', { value: command });
     }
 
     /**
      * Gets the translation of a key.
-     * @param {string} namespace - The namespace
      * @param {string} key - The key
      * @param {GuildResolvable} [guild] - The guild
      * @param {Object} [vars] - Extra variables for the translator
      * @return {string} The translation.
      * @abstract
      */
-    translate(namespace, key, guild, vars) {
+    translate(key, guild, vars) {
         if (guild) {
             guild = this.client.resolver.resolveGuild(guild);
         }
         return this.client.localeProvider.translate(
-            this.module ? this.module.id : null,
-            namespace,
-            key,
+            this.command.moduleID,
+            this.command.groupID,
+            `${this.command.name}.${key}`,
             guild && guild.language ? guild.language : this.client.language,
             vars
         );
@@ -53,15 +52,14 @@ class LocaleHelper {
 
     /**
      * Alias of {@link LocaleProvider#translate}.
-     * @param {string} namespace - The namespace
      * @param {string} key - The key
      * @param {GuildResolvable} [guild] - The guild
      * @param {Object} [vars] - Extra variables for the translator
      * @return {string} The translation.
      */
-    tl(namespace, key, guild, vars) {
-        return this.translate(namespace, key, guild, vars);
+    tl(key, guild, vars) {
+        return this.translate(key, guild, vars);
     }
 }
 
-module.exports = LocaleHelper;
+module.exports = CommandLocaleHelper;

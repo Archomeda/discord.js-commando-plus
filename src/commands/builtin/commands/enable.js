@@ -4,17 +4,16 @@
  - Added support for localization
  */
 
-const Command = require('../base');
+const Command = require('../../base');
 
-module.exports = class EnableCommandCommand extends Command {
+class CommandEnable extends Command {
     constructor(client) {
         super(client, {
             name: 'enable',
             aliases: ['enable-command', 'cmd-on', 'command-on'],
             group: 'commands',
+            module: 'builtin',
             memberName: 'enable',
-            description: client.localeProvider.tl('help', 'commands.enable.description'),
-            details: client.localeProvider.tl('help', 'commands.enable.details'),
             examples: ['enable util', 'enable Utility', 'enable prefix'],
             guarded: true,
 
@@ -22,7 +21,6 @@ module.exports = class EnableCommandCommand extends Command {
                 {
                     key: 'cmdOrGrp',
                     label: 'command/group',
-                    prompt: client.localeProvider.tl('help', 'commands.enable.args.command-or-group-prompt'),
                     type: 'command-or-group'
                 }
             ]
@@ -36,25 +34,18 @@ module.exports = class EnableCommandCommand extends Command {
         return msg.member.hasPermission('ADMINISTRATOR') || this.client.isOwner(msg.author);
     }
 
-    async run(msg, args) {
-        await this.client.localeProvider.preloadNamespace('commands');
-        const l10n = this.client.localeProvider;
-
+    run(msg, args) {
         const { cmdOrGrp } = args;
         const isCmd = Boolean(cmdOrGrp.groupID);
 
         if (cmdOrGrp.isEnabledIn(msg.guild)) {
-            return msg.reply(l10n.tl(
-                'commands',
-                `enable.output-${isCmd ? 'command' : 'group'}-already-enabled`,
-                { name: cmdOrGrp.name }
-            ));
+            return msg.reply(this.localization.tl(
+                `output.${isCmd ? 'command' : 'group'}-already-enabled`, msg.guild, { args, cmd: this }));
         }
         cmdOrGrp.setEnabledIn(msg.guild, true);
-        return msg.reply(l10n.tl(
-            'commands',
-            `enable.output-${isCmd ? 'command' : 'group'}-enabled`,
-            { name: cmdOrGrp.name }
-        ));
+        return msg.reply(this.localization.tl(
+            `output.${isCmd ? 'command' : 'group'}-enabled`, msg.guild, { args, cmd: this }));
     }
-};
+}
+
+module.exports = CommandEnable;

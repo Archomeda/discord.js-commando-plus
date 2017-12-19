@@ -1,0 +1,8 @@
+{
+  "channels": "[C|c]hannels",
+  "commands": "[C|c]ommands",
+  "groups": "[G|g]roups",
+  "members": "[M|m]embers",
+  "roles": "[R|r]oles",
+  "users": "[U|u]sers"
+}

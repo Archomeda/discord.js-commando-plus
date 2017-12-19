@@ -17,11 +17,16 @@ function getDefaults() {
 function readLocaleFile(fileName, callback) {
     fs.readFile(fileName, 'utf-8', (err, data) => {
         if (err) {
-            err.message = `error parsing ${fileName}: ${err.message}`;
             return callback(err);
         }
-        data = data.replace(/^\uFEFF/, '');
-        return callback(null, JSON.parse(data));
+        try {
+            data = data.replace(/^\uFEFF/, '');
+            data = JSON.parse(data);
+        } catch (err2) {
+            err2.message = `error parsing ${fileName}: ${err2.message}`;
+            return callback(err2);
+        }
+        return callback(null, data);
     });
 }
 
@@ -113,5 +118,7 @@ class I18nextBackend {
         // Unsupported at this time
     }
 }
+
+I18nextBackend.type = 'backend';
 
 module.exports = I18nextBackend;

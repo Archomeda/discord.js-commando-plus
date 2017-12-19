@@ -1,5 +1,12 @@
+/*
+ Original author: Gawdl3y
+ Modified by: Archomeda
+ - Added support for localization
+ */
+
 const { escapeMarkdown } = require('discord.js');
-const { oneLine, stripIndents } = require('common-tags');
+const { stripIndents } = require('common-tags');
+const { MESSAGE_CHARACTER_LENGTH } = require('../constants');
 
 /**
  * A fancy argument
@@ -9,7 +16,8 @@ class Argument {
      * @typedef {Object} ArgumentInfo
      * @property {string} key - Key for the argument
      * @property {string} [label=key] - Label for the argument
-     * @property {string} prompt - First prompt for the argument when it wasn't specified
+     * @property {string} prompt - The localization key that will be used for the first prompt for the argument when it
+     * wasn't specified
      * @property {string} [type] - Type of the argument (must be the ID of one of the registered argument types -
      * see {@link CommandRegistry#registerDefaultTypes} for the built-in types)
      * @property {number} [max] - If type is `integer` or `float`, this is the maximum value of the number.
@@ -43,7 +51,7 @@ class Argument {
         this.label = info.label || info.key;
 
         /**
-         * Question prompt for the argument.
+         * Locale key for the question prompt for the argument.
          * @type {string}
          */
         this.prompt = info.prompt;
@@ -150,13 +158,14 @@ class Argument {
             }
 
             // Prompt the user for a new value
+            /* eslint-disable indent */
             prompts.push(await msg.reply(stripIndents`
-				${!value ? this.prompt : valid ? valid : `You provided an invalid ${this.label}. Please try again.`}
-				${oneLine`
-					Respond with \`cancel\` to cancel the command.
-					${wait ? `The command will automatically be cancelled in ${this.wait} seconds.` : ''}
-				`}
+                ${!value ? msg.command.localization.tl(this.prompt, msg.guild) :
+                    valid ? valid : msg.client.localization.tl('common', 'argument-invalid', msg.guild,
+                        { label: this.label })}
+                ${wait ? msg.client.localization.tl('common', 'argument-wait', msg.guild, { seconds: this.wait }) : ''}
 			`));
+            /* eslint-enable indent */
 
             // Get the user's response
             const responses = await msg.channel.awaitMessages(msg2 => msg2.author.id === msg.author.id, {
@@ -232,29 +241,38 @@ class Argument {
                 }
 
                 // Prompt the user for a new value
+                /* eslint-disable indent */
                 if (value) {
-                    const escaped = escapeMarkdown(value).replace(/@/g, '@\u200b');
-                    prompts.push(await msg.reply(stripIndents`
-						${valid ? valid : oneLine`
-							You provided an invalid ${this.label},
-							"${escaped.length < 1850 ? escaped : '[too long to show]'}".
-							Please try again.
-						`}
-						${oneLine`Respond with \`cancel\` to cancel the command,
-						    or \`finish\` to finish entry up to this point.
-							${wait ? `The command will automatically be cancelled in ${this.wait} seconds.` : ''}
-						`}
-					`));
+                    let contents = escapeMarkdown(value).replace(/@/g, '@\u200b');
+                    contents = stripIndents`
+                        ${msg.client.localization.tl('common', 'argument-invalid-infinite', msg.guild, {
+                            label: this.label,
+                            content: contents
+                        })}
+                        ${wait ? msg.client.localization.tl(
+                            'common', 'argument-wait', msg.guild, { seconds: this.wait }) : ''}`;
+
+                    const tlTooLong = msg.guild.localization.tl('common', 'argument-preview-too-long', msg.guild);
+                    if (contents.length > MESSAGE_CHARACTER_LENGTH + 25 + tlTooLong.length) {
+                        contents = stripIndents`
+                        ${msg.client.localization.tl('common', 'argument-invalid-infinite', msg.guild, {
+                            label: this.label,
+                            content: tlTooLong
+                        })}
+                        ${wait ? msg.client.localization.tl(
+                            'common', 'argument-wait', msg.guild, { seconds: this.wait }) : ''}`;
+                    }
+
+                    prompts.push(await msg.reply(contents));
                 } else if (results.length === 0) {
                     prompts.push(await msg.reply(stripIndents`
-						${this.prompt}
-						${oneLine`Respond with \`cancel\` to cancel the command,
-						    or \`finish\` to finish entry.
-							${wait ? `The command will automatically be cancelled in ${this.wait} seconds,
-							unless you respond.` : ''}
-						`}
+						${msg.command.localization.tl(this.prompt, msg.guild)}
+						${msg.client.localization.tl('common', 'argument-retry-infinite', msg.guild)}
+						${wait ? msg.client.localization.tl(
+                            'common', 'argument-wait', msg.guild, { seconds: this.wait }) : ''}
 					`));
                 }
+                /* eslint-enable indent */
 
                 // Get the user's response
                 const responses = await msg.channel.awaitMessages(msg2 => msg2.author.id === msg.author.id, {

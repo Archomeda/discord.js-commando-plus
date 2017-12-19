@@ -6,7 +6,7 @@ A CommandoClient is just an extension of the base Client, so all options, proper
 You should provide the `owner` option to the constructor, which is an option specific to CommandoClient, and should be set to the ID of your Discord user.
 This will give you full access to control everything about the bot, in any guild.
 
-```javascript
+```js
 const Commando = require('discord.js-commando-plus');
 
 const client = new Commando.Client({
@@ -14,25 +14,36 @@ const client = new Commando.Client({
 });
 ```
 
-Then, to make use of the command framework, you need to register your command groups, commands, and argument types,
-in addition to any of the built-in stuff that you want make use of. This will look something like this:
+Then, to make use of the command framework, you need to create a module that will contain your commands and command groups.
+Refer to the source of the [built-in module](https://github.com/Archomeda/discord.js-commando-plus/tree/master/src/commands/builtin/module.js) as a working example, or see below for a simplified example: 
 
-```javascript
+```js
 const path = require('path');
 
-client.registry
-    // Registers your custom command groups
-    .registerGroups([
-        ['fun', 'Fun commands'],
-        ['some', 'Some group'],
-        ['other', 'Some other group']
-    ])
+class YourModule extends Commando.Module {
+    constructor(client) {
+        super(client, {
+            id: 'module-id',
+            commands: [
+                require('a/path/to/a/command'),
+                require('a/second/path/to/a/command'),
+                require('etc/etc/command')
+            ],
+            groups: [
+                'a-group',
+                'a-second-group'
+            ],
+            commandsDirectory: __dirname,
+            localizationDirectory: path.join(__dirname, 'locales')
+        });
+    }
+}
 
-    // Registers all built-in groups, commands, and argument types
-    .registerDefaults()
+// Now register it with the client
+client.registerModule(YourModule);
 
-    // Registers all of your commands in the ./commands/ directory
-    .registerCommandsIn(path.join(__dirname, 'commands'));
+// You can register additional argument types here if needed, along with the defaults
+client.registerDefaults();
 ```
 
 Commando-Plus has built-in command prefix configuration per-guild, as well as enabling and disabling commands per-guild.
@@ -44,7 +55,7 @@ There are two built-in settings providers:
 As an example for the SQLiteSettingsProvider, in order to use it, install the `sqlite` package with NPM (`npm install sqlite --save`).
 Then, set the settings provider on the client:
 
-```javascript
+```js
 const sqlite = require('sqlite');
 
 client.setSettingsProvider(
@@ -54,10 +65,10 @@ client.setSettingsProvider(
 
 Commando-Plus requires you to use a localization backend.
 It comes with a built-in I18nextLocaleProvider that uses i18next as localization backend.
-Install the `i18next` and `i18next-node-fs-backend` packages with NPM (`npm install i18next i18next-node-fs-backend`).
+Install the `i18next` package with NPM (`npm install i18next --save`).
 Then, set the locale provider on the client:
 
-```javascript
+```js
 const i18next = require('i18next');
 
 client.setLocaleProvider(
@@ -67,7 +78,7 @@ client.setLocaleProvider(
 
 Finally, you must log in, just as if you were using a regular Client.
 
-```javascript
+```js
 client.login('token goes here');
 ```
 

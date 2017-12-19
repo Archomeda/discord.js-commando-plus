@@ -1,14 +1,20 @@
+/*
+ Original author: Gawdl3y
+ Modified by: Archomeda
+ - Changed to comply with the Command class changes
+ */
+
 const stripIndents = require('common-tags').stripIndents;
 const commando = require('../../../src');
 
-module.exports = class UserInfoCommand extends commando.Command {
+class CommandUserInfo extends commando.Command {
     constructor(client) {
         super(client, {
             name: 'user-info',
             aliases: ['user', '🗒'],
-            group: 'util',
+            group: 'utils',
+            module: 'test',
             memberName: 'user-info',
-            description: 'Gets information about a user.',
             examples: ['user-info @Crawl#3208', 'user-info Crawl'],
             guildOnly: true,
 
@@ -16,7 +22,6 @@ module.exports = class UserInfoCommand extends commando.Command {
                 {
                     key: 'member',
                     label: 'user',
-                    prompt: 'What user would you like to snoop on?',
                     type: 'member'
                 }
             ]
@@ -26,6 +31,8 @@ module.exports = class UserInfoCommand extends commando.Command {
     async run(msg, args) {
         const member = args.member;
         const user = member.user;
+
+        // Ideally we want to have this localized too, but for the sake of being lazy, we don't do that right now
         return msg.reply(stripIndents`
 			Info on **${user.username}#${user.discriminator}** (ID: ${user.id})
 
@@ -40,4 +47,6 @@ module.exports = class UserInfoCommand extends commando.Command {
 			 • Game: ${user.presence.game ? user.presence.game.name : 'None'}
 		`);
     }
-};
+}
+
+module.exports = CommandUserInfo;

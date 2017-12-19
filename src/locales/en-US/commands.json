@@ -1,38 +1,77 @@
 {
   "disable": {
-    "output-command-already-disabled": "[T|t]he command '{{name}}' is already disabled.",
-    "output-group-already-disabled": "[T|t]he group '{{name}}' is already disabled.",
-    "output-command-guarded": "[T|t]he command '{{name}}' cannot be disabled.",
-    "output-group-guarded": "[T|t]he group '{{name}}' cannot be disabled.",
-    "output-command-disabled": "[T|t]he command '{{name}}' has been disabled.",
-    "output-group-disabled": "[T|t]he group '{{name}}' has been disabled."
+    "description": "Disables a command or command group",
+    "details": "The argument must be the name or ID (partial or whole) of a command or a command group. Only administrators may use this command.",
+    "args": {
+      "cmdOrGrp-prompt": "[W|w]hich command or command group would you like to disable?"
+    },
+    "output": {
+      "command-already-disabled": "[T|t]he command '{{args.cmdOrGrp.name}}' is already disabled.",
+      "command-disabled": "[T|t]he command '{{args.cmdOrGrp.name}}' has been disabled.",
+      "command-guarded": "[T|t]he command '{{args.cmdOrGrp.name}}' cannot be disabled.",
+      "group-already-disabled": "[T|t]he group '{{args.cmdOrGrp.name}}' is already disabled.",
+      "group-disabled": "[T|t]he group '{{args.cmdOrGrp.name}}' has been disabled.",
+      "group-guarded": "[T|t]he group '{{args.cmdOrGrp.name}}' cannot be disabled."
+    }
   },
   "enable": {
-    "output-command-already-enabled": "[T|t]he command '{{name}}' is already enabled.",
-    "output-group-already-enabled": "[T|t]he group '{{name}}' is already enabled.",
-    "output-command-enabled": "[T|t]he command '{{name}}' has been enabled.",
-    "output-group-enabled": "[T|t]he group '{{name}}' has been enabled."
+    "description": "Enables a command or command group",
+    "details": "The argument must be the name or ID (partial or whole) of a command or a command group. Only administrators may use this command.",
+    "args": {
+      "cmdOrGrp-prompt": "[W|w]hich command or command group would you like to enable?"
+    },
+    "output": {
+      "command-already-enabled": "[T|t]he command '{{args.cmdOrGrp.name}}' is already enabled.",
+      "command-enabled": "[T|t]he command '{{args.cmdOrGrp.name}}' has been enabled.",
+      "group-already-enabled": "[T|t]he group '{{args.cmdOrGrp.name}}' is already enabled.",
+      "group-enabled": "[T|t]he group '{{args.cmdOrGrp.name}}' has been enabled."
+    }
   },
-  "list-groups": {
-    "enabled": "enabled",
-    "disabled": "disabled",
-    "output-header": "Groups",
-    "output-callback-execution-time": "[C|c]allback executed after {{time}}ms.",
-    "output-evaluation-error": "[E|e]rror while evaluating: {{err}}"
+  "groups": {
+    "description": "Lists all command groups",
+    "details": "Only administrators may use this command.",
+    "partial": {
+      "disabled": "disabled",
+      "enabled": "enabled"
+    },
+    "output": {
+      "header": "Groups"
+    }
   },
   "load": {
-    "output-already-registered": "[T|t]hat command has already been registered.",
-    "output-command": "[T|t]he command '{{name}}' has been loaded across all shards.",
-    "output-command-shards-failed": "[A|a]ttempted to load the command '{{name}}', but loading it on other shards has failed."
+    "description": "Loads a new command",
+    "details": "The argument must be the full name of the command, formatted as `module:group:memberName`. Only the bot owner(s) may use this command.",
+    "args": {
+      "command-prompt": "[W|w]hich command would you like to load?"
+    },
+    "output": {
+      "already-registered": "[T|t]he command '{{args.command.name}}' has already been registered.",
+      "command": "[T|t]he command '{{args.command.name}}' has been loaded across all shards.",
+      "command-shards-failed": "[A|a]ttempted to load the command '{{args.command.name}}', but loading it on other shards has failed."
+    }
   },
   "reload": {
-    "output-command": "[T|t]he command '{{name}}' has been reloaded across all shards.",
-    "output-command-shards-failed": "[A|a]ttempted to reload the command '{{name}}', but reloading it on other shards has failed.",
-    "output-group": "[A|a]ll commands in the group '{{name}}' have been reloaded across all shards.",
-    "output-group-shards-failed": "[A|a]ttempted to reload all the commands in the group '{{name}}', but reloading it on other shards has failed."
+    "description": "Reloads a command or command group",
+    "details": "The argument must be the name or ID (partial or whole) of a command or a command group. Providing a command group will reload all the commands in that group. Only the bot owner(s) may use this command.",
+    "args": {
+      "cmdOrGrp-prompt": "[W|w]hich command or command group would you like to reload?"
+    },
+    "output": {
+      "command": "[T|t]he command '{{args.command.name}}' has been reloaded across all shards.",
+      "command-shards-failed": "[A|a]ttempted to reload the command '{{args.command.name}}', but reloading it on other shards has failed.",
+      "group": "[A|a]ll commands in the group '{{args.command.name}}' have been reloaded across all shards.",
+      "group-shards-failed": "[A|a]ttempted to reload all the commands in the group '{{args.command.name}}', but reloading it on other shards has failed."
+    }
   },
   "unload": {
-    "output-command": "[T|t]he command '{{name}}' has been loaded across all shards.",
-    "output-command-shards-failed": "[A|a]ttempted to load the command '{{name}}', but loading it on other shards has failed."
+    "description": "Unloads a command",
+    "details": "The argument must be the name or ID (partial or whole) of a command. Only the bot owner(s) may use this command.",
+    "args": {
+      "command-prompt": "[W|w]hich command would you like to unload?"
+    },
+    "output": {
+      "command": "[T|t]he command '{{args.command.name}}' has been unloaded across all shards.",
+      "command-shards-failed": "[A|a]ttempted to unload the command '{{args.command.name}}', but unloading it on other shards has failed."
+    }
   }
 }

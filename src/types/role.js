@@ -34,10 +34,10 @@ class RoleArgumentType extends ArgumentType {
         if (exactRoles.length > 0) {
             roles = exactRoles;
         }
-        return roles.length <= 15 ? `${formatDisambiguation(this.client, {
-            label: this.client.localization.tl('common', 'roles', msg.guild),
+        return roles.length <= 15 ? `${formatDisambiguation(msg.guild, {
+            label: this.client.localization.tl('glossary', 'roles', msg.guild),
             list: roles.map(role => `${escapeMarkdown(role.name)}`)
-        })}\n` : this.client.localization.tl('common', 'output-multiple-roles', msg.guild);
+        })}\n` : this.client.localization.tl('common', 'disambiguation-roles', msg.guild);
     }
 
     parse(value, msg) {
