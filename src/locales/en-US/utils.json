@@ -66,10 +66,10 @@
     "output": {
       "admin-only": "[O|o]nly the administrators and bot owner(s) may change the command prefix.",
       "output-owner-only": "[O|o]nly the bot owner(s) may change the global command prefix.",
-      "no-prefix": "[T|t]here is no command prefix. $t(utils:prefix.partial.run-commands)",
-      "prefix": "[T|t]he command prefix is `{{prefix}}`. $t(utils:prefix.partial.run-commands)",
-      "removed-prefix": "[T|t]he command prefix has been removed. $t(utils:prefix.partial.run-commands)",
-      "reset-default": "[T|t]he command prefix has been reset to the default prefix (currently {{default}}). $t(utils:prefix.partial.run-commands)",
+      "no-prefix": "[T|t]here is no command prefix. $t(builtin#utils:prefix.partial.run-commands)",
+      "prefix": "[T|t]he command prefix is `{{prefix}}`. $t(builtin#utils:prefix.partial.run-commands)",
+      "removed-prefix": "[T|t]he command prefix has been removed. $t(builtin#utils:prefix.partial.run-commands)",
+      "reset-default": "[T|t]he command prefix has been reset to the default prefix (currently {{default}}). $t(builtin#utils:prefix.partial.run-commands)",
       "set-prefix": "[T|t]he command prefix has been set to `{{prefix}}`. $t(utils:prefix.partial.run-commands)"
     }
   }

@@ -35,7 +35,7 @@ class CommandPrefix extends Command {
             prefix = msg.guild ? msg.guild.commandPrefix : this.client.commandPrefix;
             return msg.reply(prefix ?
                 this.localization.tl(
-                    'output.prefix', msg.guild, { args, cmd: this, anyUsage: msg.anyUsage('command') }) :
+                    'output.prefix', msg.guild, { args, prefix, cmd: this, anyUsage: msg.anyUsage('command') }) :
                 this.localization.tl(
                     'output.no-prefix', msg.guild, { args, cmd: this, anyUsage: msg.anyUsage('command') })
             );
