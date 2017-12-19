@@ -31,7 +31,7 @@ class Module {
 
         /**
          * The client that this module is for.
-         * @name Command#client
+         * @name Module#client
          * @type {CommandoClient}
          * @readonly
          */
