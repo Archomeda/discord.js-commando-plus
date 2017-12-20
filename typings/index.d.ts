@@ -124,7 +124,7 @@ declare module 'discord.js-commando' {
         public reactTimeout(message: CommandMessage, response: Message): Promise<CommandMessage>;
         public reload(): void;
         public run(message: CommandMessage, args: object | string | string[], fromPattern: boolean): Promise<Message | Message[]>;
-        public runReact(message: CommandMessage, prevResponse: Message, reaction: MessageReaction): Promise<Message>;
+        public runReact(message: CommandMessage, reaction: MessageReaction): Promise<Message>;
         public setEnabledIn(guild: GuildResolvable, enabled: boolean): void;
         public shouldHandleReaction(message: CommandMessage, reaction: MessageReaction, user: User): boolean;
         public unload(): void;
