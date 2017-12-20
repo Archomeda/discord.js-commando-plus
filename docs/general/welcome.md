@@ -13,15 +13,12 @@ If you are looking for better support, and do not plan to use any of the feature
 This repository is mostly here to support my own Discord bots in order to share common used code between them without having to manually duplicate them in every repository.
 
 ## Features on top of Commando
-- Caching:
-  - Memory and Redis providers
-- Database storage:
-  - MongoDB provider
-- Localization:
-  - i18next provider
-  - Default locale is en-US
-- Settings:
-  - YAML provider (besides the already existing SQLite provider)
+- Easily extendable commands through third-party modules
+- Command responses can handle reactions
+- Supports caching with the Memory and Redis providers
+- Supports database storage with the MongoDB provider
+- Supports localization with the i18next provider (default locale is en-US)
+- Supports an additional settings provider: YAML
 
 ## Installation
 See [installation](https://archomeda.github.io/discord.js-commando-plus/#/docs/commando-plus/master/general/installation).
