@@ -8,39 +8,40 @@ const Module = require('../../module');
 class BuiltInModule extends Module {
     constructor(client, commandsToLoad) { // eslint-disable-line complexity
         const toLoad = [];
-        /* eslint-disable max-len */
-        if (typeof commandsToLoad === 'undefined' || typeof commandsToLoad.disable === 'undefined' || commandsToLoad.disable) {
+        const check = id =>
+            typeof commandsToLoad === 'undefined' || typeof commandsToLoad[id] === 'undefined' || commandsToLoad[id];
+
+        if (check('disable')) {
             toLoad.push(new (require('./commands/disable'))(client));
         }
-        if (typeof commandsToLoad === 'undefined' || typeof commandsToLoad.enable === 'undefined' || commandsToLoad.enable) {
+        if (check('enable')) {
             toLoad.push(new (require('./commands/enable'))(client));
         }
-        if (typeof commandsToLoad === 'undefined' || typeof commandsToLoad.groups === 'undefined' || commandsToLoad.groups) {
+        if (check('groups')) {
             toLoad.push(new (require('./commands/groups'))(client));
         }
-        if (typeof commandsToLoad === 'undefined' || typeof commandsToLoad.load === 'undefined' || commandsToLoad.load) {
+        if (check('load')) {
             toLoad.push(new (require('./commands/load'))(client));
         }
-        if (typeof commandsToLoad === 'undefined' || typeof commandsToLoad.reload === 'undefined' || commandsToLoad.reload) {
+        if (check('reload')) {
             toLoad.push(new (require('./commands/reload'))(client));
         }
-        if (typeof commandsToLoad === 'undefined' || typeof commandsToLoad.unload === 'undefined' || commandsToLoad.unload) {
+        if (check('unload')) {
             toLoad.push(new (require('./commands/unload'))(client));
         }
 
-        if (typeof commandsToLoad === 'undefined' || typeof commandsToLoad.eval === 'undefined' || commandsToLoad.eval) {
+        if (check('eval')) {
             toLoad.push(new (require('./utils/eval'))(client));
         }
-        if (typeof commandsToLoad === 'undefined' || typeof commandsToLoad.help === 'undefined' || commandsToLoad.help) {
+        if (check('help')) {
             toLoad.push(new (require('./utils/help'))(client));
         }
-        if (typeof commandsToLoad === 'undefined' || typeof commandsToLoad.ping === 'undefined' || commandsToLoad.ping) {
+        if (check('ping')) {
             toLoad.push(new (require('./utils/ping'))(client));
         }
-        if (typeof commandsToLoad === 'undefined' || typeof commandsToLoad.prefix === 'undefined' || commandsToLoad.prefix) {
+        if (check('prefix')) {
             toLoad.push(new (require('./utils/prefix'))(client));
         }
-        /* eslint-enable max-len */
 
         super(client, {
             id: 'builtin',
