@@ -1,64 +1,30 @@
 <template>
   <div id="docs-search" class="docs-page">
+    <em id="show-scores" :class="`fa fa-bar-chart ${!showScores ? 'disabled' : ''}`" :title="toggleScoresLabel" @click="toggleScores"></em>
+
     <h1>Search</h1>
     <input v-model.trim="search" type="search" />
 
+    <div id="toggles">
+      <label><input type="checkbox" v-model="toggles['classes']" /> Classes</label>
+      <label><input type="checkbox" v-model="toggles['props']" /> Properties</label>
+      <label><input type="checkbox" v-model="toggles['methods']" /> Methods</label>
+      <label><input type="checkbox" v-model="toggles['events']" /> Events</label>
+      <label><input type="checkbox" v-model="toggles['typedefs']" /> Typedefs</label>
+    </div>
 
     <transition name="fade" mode="out-in">
-      <div v-if="search && search.length > 1">
-        <h2 v-if="search && search.length > 1">Results for "{{ search }}"</h2>
+      <div v-if="search && search.length >= 2">
+        <h2 v-if="search && search.length >= 2">Results for "{{ search }}"</h2>
 
         <transition name="fade" mode="out-in">
-          <transition-group name="animated-list" tag="ul" v-if="results.count > 0" key="results">
-            <li v-if="results.classes.length > 0" key="classes" class="animated-list-item">
-              Classes
-              <ul>
-                <li v-for="clarse in results.classes" :key="clarse">
-                  <router-link :to="{ name: 'docs-class', params: { class: clarse } }">{{ clarse }}</router-link>
-                </li>
-              </ul>
-            </li>
-
-            <li v-if="results.typedefs.length > 0" key="typedefs" class="animated-list-item">
-              Typedefs
-              <ul>
-                <li v-for="typedef in results.typedefs">
-                  <router-link :to="{ name: 'docs-typedef', params: { typedef } }">{{ typedef }}</router-link>
-                </li>
-              </ul>
-            </li>
-
-            <li v-if="results.methods.length > 0"  key="methods" class="animated-list-item">
-              Methods
-              <ul>
-                <li v-for="method in results.methods">
-                  <router-link :to="{ name: 'docs-class', params: { class: method.class }, query: { scrollTo: scopedScrollTo(method) } }">
-                    {{ method.class }}{{ method.scope === 'static' ? '.' : '#' }}{{ method.name }}
-                  </router-link>
-                </li>
-              </ul>
-            </li>
-
-            <li v-if="results.props.length > 0" key="properties" class="animated-list-item">
-              Properties
-              <ul>
-                <li v-for="prop in results.props">
-                  <router-link :to="{ name: 'docs-class', params: { class: prop.class }, query: { scrollTo: scopedScrollTo(prop) } }">
-                    {{ prop.class }}{{ prop.scope === 'static' ? '.' : '#' }}{{ prop.name }}
-                  </router-link>
-                </li>
-              </ul>
-            </li>
-
-            <li v-if="results.events.length > 0" key="events" class="animated-list-item">
-              Events
-              <ul>
-                <li v-for="event in results.events">
-                  <router-link :to="{ name: 'docs-class', params: { class: event.class }, query: { scrollTo: event.name } }">
-                    {{ event.class }}#{{ event.name }}
-                  </router-link>
-                </li>
-              </ul>
+          <transition-group name="animated-list" tag="ul" v-if="results.length > 0" key="results">
+            <li v-for="result in results" :key="result.item.key || result.item.fullName || result.item.name" class="animated-list-item">
+              <span v-if="showScores" class="score">{{ Math.round((1 - result.score) * 100) }}%</span>
+              <router-link :to="result.item.route">
+                <span class="badge" :title="result.item.type">{{ result.item.type[0] }}</span>
+                {{ result.item.fullName || result.item.name }}{{ result.item.type === 'Method' ? '()' : '' }}
+              </router-link>
             </li>
           </transition-group>
 
@@ -66,98 +32,195 @@
         </transition>
       </div>
 
-      <p v-else key="short">Your search query must be at least two characters.</p>
+      <p v-else key="short">Your search query must be at least three characters.</p>
     </transition>
   </div>
 </template>
 
 <script>
+  import Fuse from 'fuse.js';
+  import { scopedName } from '../../util';
+
   export default {
     name: 'docs-search',
     props: ['docs', 'showPrivate'],
 
     data() {
+      const toggles = { classes: true, props: true, methods: true, events: true, typedefs: true };
       return {
+        toggles,
         search: this.$route.query.q,
+        showScores: false,
+        fuse: this.buildFuse(toggles),
       };
     },
 
     computed: {
       results() {
-        const q = this.search.toLowerCase();
-        const results = {
-          classes: [],
-          typedefs: [],
-          methods: [],
-          props: [],
-          events: [],
-          count: 0,
-        };
+        const results = this.fuse.search(this.search);
 
-        this.docs.classes.forEach(c => {
-          if (!this.showPrivate && c.access === 'private') return;
-
-          if (c.name.toLowerCase().includes(q)) {
-            results.classes.push(c.name);
-            results.count++;
+        // Add routes and other necessary info to all results
+        for (const result of results) {
+          if (result.item.type === 'Class') {
+            result.item.route = {
+              name: 'docs-class',
+              params: { class: result.item.name },
+            };
+            continue;
           }
-
-          if (c.methods) {
-            c.methods.forEach(m => {
-              if (!this.showPrivate && m.access === 'private') return;
-              if (m.name.toLowerCase().includes(q)) {
-                results.methods.push({
-                  name: m.name,
-                  scope: m.scope,
-                  class: c.name,
-                });
-                results.count++;
-              }
-            });
+          if (result.item.type === 'Property' || result.item.type === 'Method') {
+            result.item.fullName = fullName(result.item, result.item.parent);
+            result.item.route = {
+              name: 'docs-class',
+              params: { class: result.item.parent },
+              query: { scrollTo: scopedName(result.item) },
+            };
+            continue;
           }
-
-          if (c.props) {
-            c.props.forEach(p => {
-              if (!this.showPrivate && p.access === 'private') return;
-              if (p.name.toLowerCase().includes(q)) {
-                results.props.push({
-                  name: p.name,
-                  scope: p.scope,
-                  class: c.name,
-                });
-                results.count++;
-              }
-            });
+          if (result.item.type === 'Event') {
+            result.item.key = `e-${result.item.parent}#${result.item.name}`;
+            result.item.fullName = fullName(result.item, result.item.parent);
+            result.item.route = {
+              name: 'docs-class',
+              params: { class: result.item.parent },
+              query: { scrollTo: `e-${result.item.name}` },
+            };
+            continue;
           }
-
-          if (c.events) {
-            c.events.forEach(e => {
-              if (!this.showPrivate && e.access === 'private') return;
-              if (e.name.toLowerCase().includes(q)) {
-                results.events.push({
-                  name: e.name,
-                  class: c.name,
-                });
-                results.count++;
-              }
-            });
+          if (result.item.type === 'Typedef') {
+            result.item.route = {
+              name: 'docs-typedef',
+              params: { typedef: result.item.name },
+            };
+            continue;
           }
-        });
+        }
 
-        this.docs.typedefs.forEach(t => {
-          if (t.name.toLowerCase().includes(q)) {
-            results.typedefs.push(t.name);
-            results.count++;
+        // Remove class members where the class name is the only place a match is found
+        // This avoids listing every member of a class just because the class name matched
+        let r = 0;
+        while (r < results.length) {
+          const result = results[r];
+          if (result.item.type === 'Property' || result.item.type === 'Method' || result.item.type === 'Event') {
+            // Get a list of the keys that matched
+            const keys = [];
+            for (const match of result.matches) keys.push(match.key);
+
+            // Remove the item if only the class name matched
+            if (keys.length === 2 && keys.includes('parent') && keys.includes('fullName')) {
+              results.splice(r, 1);
+              continue;
+            }
           }
-        });
+          r++;
+        }
 
         return results;
+      },
+
+      toggleScoresLabel() {
+        return `Scores are ${this.showScores ? 'shown' : 'hidden'}. Click to toggle.`;
       },
     },
 
     methods: {
-      scopedScrollTo(item) {
-        return `${item.scope === 'static' ? 's-' : ''}${item.name}`;
+      toggleScores() {
+        this.showScores = !this.showScores;
+      },
+
+      // Build an array of all doc items with minimal data
+      buildFuse(toggles) {
+        const items = [];
+
+        for (const c of this.docs.classes) {
+          if (!this.showPrivate && c.access === 'private') continue;
+
+          if (toggles.classes) {
+            items.push({
+              type: 'Class',
+              parent: c.name,
+              name: c.name,
+              fullName: c.name,
+              scope: c.scope,
+              access: c.access,
+              route: null,
+            });
+          }
+
+          if (c.props && toggles.props) {
+            for (const p of c.props) {
+              if (!this.showPrivate && p.access === 'private') continue;
+              items.push({
+                type: 'Property',
+                parent: c.name,
+                name: p.name,
+                fullName: fullName(p, c.name),
+                scope: p.scope,
+                access: p.access,
+                route: null,
+              });
+            }
+          }
+
+          if (c.methods && toggles.methods) {
+            for (const m of c.methods) {
+              if (!this.showPrivate && m.access === 'private') continue;
+              items.push({
+                type: 'Method',
+                parent: c.name,
+                name: m.name,
+                fullName: fullName(m, c.name),
+                scope: m.scope,
+                access: m.access,
+                route: null,
+              });
+            }
+          }
+
+          if (c.events && toggles.events) {
+            for (const e of c.events) {
+              if (!this.showPrivate && e.access === 'private') continue;
+              items.push({
+                type: 'Event',
+                parent: c.name,
+                name: e.name,
+                fullName: `${c.name}#${e.name}`,
+                scope: e.scope,
+                access: e.access,
+                key: null,
+                route: null,
+              });
+            }
+          }
+        }
+
+        if (toggles.typedefs) {
+          for (const t of this.docs.typedefs) {
+            if (!this.showPrivate && t.access === 'private') continue;
+            items.push({
+              type: 'Typedef',
+              parent: t.name,
+              name: t.name,
+              fullName: t.name,
+              scope: t.scope,
+              access: t.access,
+              route: null,
+            });
+          }
+        }
+
+        return new Fuse(items, {
+          keys: [
+            { name: 'name', weight: 0.5 },
+            { name: 'parent', weight: 0.2 },
+            { name: 'fullName', weight: 0.3 },
+          ],
+          shouldSort: true,
+          includeScore: true,
+          includeMatches: true,
+          threshold: 0.4,
+          minMatchCharLength: 3,
+        });
       },
     },
 
@@ -171,17 +234,33 @@
         if (this.$route.query.q) this.$router.replace({ name: 'docs-search', query: { q } });
         else this.$router.push({ name: 'docs-search', query: { q } });
       },
+
+      toggles: {
+        deep: true,
+        handler() {
+          this.fuse = this.buildFuse(this.toggles);
+        },
+      },
+
+      showPrivate() {
+        this.fuse = this.buildFuse(this.toggles);
+      },
     },
   };
+
+  function fullName(child, parentName) {
+    return `${parentName + (child.scope === 'static' ? '.' : '#')}${child.name}`;
+  }
 </script>
 
 <style lang="scss">
+  @import '../../styles/theming';
   @import '../../styles/mq';
 
   #docs-search {
     padding: 16px 32px;
 
-    input {
+    input[type="search"] {
       margin: 4px 2px;
       width: 16rem;
       max-width: 100%;
@@ -191,8 +270,107 @@
       }
     }
 
+    #show-scores {
+      display: block;
+      float: right;
+      cursor: pointer;
+      color: $color-primary;
+      transition: color 0.3s;
+
+      &.disabled {
+        color: $color-content-text;
+
+        &:hover {
+          color: lighten($color-content-text, 50%);
+        }
+      }
+
+      &:hover {
+        color: lighten($color-primary, 20%);
+      }
+    }
+
+    #toggles {
+      display: flex;
+      flex-direction: row;
+      align-items: stretch;
+      margin-top: 4px;
+
+      label {
+        flex: 1;
+        margin: 4px;
+      }
+
+      input {
+        position: relative;
+        top: 2px;
+        margin-right: 2px;
+      }
+
+      @include mq($until: desktop) {
+        flex-direction: column;
+      }
+    }
+
     ul {
-      margin-bottom: 24px;
+      padding-left: 24px;
+      list-style: none;
+    }
+
+    li {
+      margin-bottom: 4px;
+    }
+
+    .badge {
+      display: inline-block;
+      width: 0.8rem;
+      margin-left: 0;
+      margin-right: 8px;
+      padding: 3px 4px;
+      text-align: center;
+      font-size: 0.9rem;
+      opacity: 1;
+      transition: background-color 0.3s;
+    }
+
+    .score {
+      display: inline-block;
+      position: relative;
+      right: 1.7rem;
+      width: 0;
+      margin: 0;
+      font-size: 0.7rem;
+      overflow: visible;
+      color: lighten($color-content-text, 40%);
+    }
+
+    a {
+      display: inline-block;
+      height: 100%;
+
+      &:hover .badge {
+        background: lighten($color-primary, 20%);
+      }
+    }
+  }
+
+  #app.dark #docs-search {
+    #show-scores {
+      &.disabled {
+        color: darken($color-content-text-dark, 5%);
+
+        &:hover {
+          color: lighten($color-content-text-dark, 20%);
+        }
+      }
+
+      &:hover {
+        color: lighten($color-primary, 20%);
+      }
+    }
+
+    .score {
+      color: darken($color-content-text-dark, 40%);
     }
   }
 </style>

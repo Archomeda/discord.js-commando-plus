@@ -34,11 +34,11 @@ export function parseLink(link, docs) {
   if (docs.links[split[0]]) {
     return {
       text: text || link,
-      link: {
+      link: typeof docs.links[split[0]] === 'object' ? {
         name: docs.links[split[0]].name,
         params: docs.links[split[0]].params,
         query: { scrollTo: split[1] ? `${split[1] === '.' ? 's-' : ''}${split[2]}` : undefined },
-      },
+      } : docs.links[split[0]],
     };
   }
 
@@ -92,3 +92,16 @@ export function convertLinks(text, docs, router, route) {
 
   return text;
 }
+
+// Prefixes a doc item's name with "s-" if static
+export function scopedName(item) {
+  return `${item.scope === 'static' ? 's-' : ''}${item.name}`;
+}
+
+// Makes a key for a types array/string
+export function typeKey(type) {
+  return typeof type === 'string' ? type : type.join('-');
+}
+
+// Stupid Holder to Improve Tag Switching
+export const SHITS = { switching: false };

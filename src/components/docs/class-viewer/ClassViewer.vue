@@ -23,13 +23,13 @@
     <overview :properties="properties" :methods="methods" :events="clarse.events" />
 
     <h2 v-if="properties && properties.length > 0">Properties</h2>
-    <property v-for="prop in properties" :prop="prop" :docs="docs" :key="prop" />
+    <property v-for="prop in properties" :prop="prop" :docs="docs" :key="scopedName(prop)" />
 
     <h2 v-if="methods && methods.length > 0">Methods</h2>
-    <method v-for="method in methods" :method="method" :docs="docs" :key="method" />
+    <method v-for="method in methods" :method="method" :docs="docs" :key="scopedName(method)" />
 
     <h2 v-if="clarse.events && clarse.events.length > 0">Events</h2>
-    <event v-for="event in clarse.events" :event="event" :docs="docs" :key="event" />
+    <event v-for="event in clarse.events" :event="event" :docs="docs" :key="`e-${event.name}`" />
   </div>
   <unknown-page v-else class="docs-page" />
 </template>
@@ -44,7 +44,7 @@
   import Event from './Event';
   import SourceButton from '../SourceButton.vue';
   import See from '../See';
-  import { hljs, convertLinks } from '../../../util';
+  import { hljs, convertLinks, scopedName } from '../../../util';
 
   export default {
     name: 'class-viewer',
@@ -97,6 +97,10 @@
       },
     },
 
+    methods: {
+      scopedName,
+    },
+
     mounted() {
       this.$nextTick(() => {
         for (const el of this.$el.querySelectorAll('pre code')) hljs(el);
@@ -115,7 +119,7 @@
     }
 
     h1 {
-      color: #333;
+      color: lighten($color-content-text, 13%);
     }
 
     h2 {
@@ -175,15 +179,38 @@
         }
       }
 
-      &:hover .source-button {
-        opacity: 1;
+      &:hover {
+        .class-item-details {
+          border-left-color: $color-primary !important;
+        }
+
+        .source-button, .badge {
+          opacity: 1;
+        }
+      }
+
+      &[data-scrolled] .class-item-details {
+        transition: border-color 0.6s, border-width 0.6s, left 0.6s;
+      }
+
+      &[data-scrolled=true] {
+        background: none;
+
+        .class-item-details {
+          border-left-color: $color-primary !important;
+          border-left-width: 8px;
+          left: -6px;
+        }
       }
     }
 
     .class-item-details {
+      position: relative;
+      left: 0;
       margin-top: 8px;
       padding: 6px 0 6px 8px;
       border-left: 2px solid darken($color-content-bg, 15%);
+      transition: border-left-color 0.3s;
     }
 
     code {
@@ -194,6 +221,24 @@
     :not(pre) > code {
       background: darken($color-content-bg, 3.5%);
       border-radius: 2px;
+    }
+  }
+
+  #app.dark #class-viewer {
+    h1 {
+      color: darken($color-content-text-dark, 13%);
+    }
+
+    .class-name-extra {
+      color: darken($color-content-text-dark, 40%);
+    }
+
+    .class-item-details {
+      border-left-color: lighten($color-content-bg-dark, 15%);
+    }
+
+    :not(pre):not(.info):not(.warn) > code {
+      background: lighten($color-content-bg-dark, 3.5%);
     }
   }
 </style>

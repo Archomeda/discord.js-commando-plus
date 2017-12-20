@@ -33,8 +33,8 @@
     <div class="col" v-if="events && events.length > 0">
       <div class="title">Events</div>
       <ul>
-        <li v-for="event in events" @click="scroll(event.name)">
-          <router-link :to="{ name: 'docs-class', query: { scrollTo: event.name } }">
+        <li v-for="event in events" @click="scroll(`e-${event.name}`)">
+          <router-link :to="{ name: 'docs-class', query: { scrollTo: `e-${event.name}` } }">
             {{ event.name }}
             <span v-if="event.deprecated" class="small-badge warn">D</span>
           </router-link>
@@ -45,20 +45,21 @@
 </template>
 
 <script>
+  import { scopedName } from '../../../util';
+
   export default {
     name: 'class-overview',
     props: ['properties', 'methods', 'events'],
 
     methods: {
-      scopedName(item) {
-        return `${item.scope === 'static' ? 's-' : ''}${item.name}`;
-      },
+      scopedName,
 
       scroll(to) {
         const el = document.getElementById(`doc-for-${to}`);
         el.setAttribute('data-scrolled', true);
         setTimeout(() => el.setAttribute('data-scrolled', false), 1000);
-        el.scrollIntoView(true);
+        setTimeout(() => el.removeAttribute('data-scrolled'), 2000);
+        el.scrollIntoView();
         window.scrollBy(0, -50);
       },
     },
@@ -108,15 +109,11 @@
             background: darken($color-content-bg, 2%);
 
             .small-badge {
-              background: lighten($color-primary, 10%);
-
-              &.warn {
-                background: lighten($color-warn, 5%);
-              }
+              opacity: 1;
             }
 
             @include mq($from: tablet) {
-              border-left: 2px solid;
+              border-left: 2px solid !important;
             }
           }
         }
@@ -139,6 +136,28 @@
         margin: 1rem 0;
         padding: 1rem;
         border: 1px solid $color-inactive-border;
+      }
+    }
+  }
+
+  #app.dark #class-overview {
+    .title {
+      color: darken($color-content-text-dark, 25%);
+    }
+
+    ul {
+      color: darken($color-content-text-dark, 35%);
+
+      li {
+        a {
+          @include mq($from: tablet) {
+            border-left-color: $color-inactive-border-dark;
+          }
+
+          &:hover {
+            background: lighten($color-content-bg-dark, 2%);
+          }
+        }
       }
     }
   }

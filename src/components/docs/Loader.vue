@@ -1,7 +1,7 @@
 <template>
   <div id="docs-body">
     <transition name="fade-resize" mode="out-in">
-      <router-view v-if="docs" :docs="docs" />
+      <router-view v-if="docs" :docs="docs" :darkMode="darkMode" @toggleDarkMode="toggleDarkMode" />
       <slide v-else>
         <loading v-if="!error" />
         <p v-else id="docs-error">
@@ -14,9 +14,11 @@
 </template>
 
 <script>
+  import { SHITS } from '../../util';
+
   export default {
     name: 'docs-loader',
-    props: ['source', 'tag'],
+    props: ['source', 'tag', 'darkMode'],
 
     data() {
       return {
@@ -36,7 +38,7 @@
         const startTag = this.tag;
         this.loadingTag = this.tag;
 
-        this.source.fetchDocs(this.tag).then(docs => {
+        this.source.fetchDocs(this.tag).then(docs => { // eslint-disable-line complexity
           if (this.source !== startSource || this.tag !== startTag) return;
           console.log('Loading', startSource, startTag);
 
@@ -92,6 +94,21 @@
           this.docs = docs;
           this.loadingTag = null;
           console.log('Finished loading', startSource, startTag);
+
+          // Verify the destination item exists when switching tags
+          if (SHITS.switching) {
+            const route = this.$route;
+            SHITS.switching = false;
+            if (route.name === 'docs-class') {
+              if (!docs.classes.some(c => c.name === route.params.class)) this.goHome();
+            } else if (route.name === 'docs-typedef') {
+              if (!docs.typedefs.some(t => t.name === route.params.typedef)) this.goHome();
+            } else if (route.name === 'docs-file') {
+              if (!docs.custom[route.params.category] || !docs.custom[route.params.category].files[route.params.file]) {
+                this.goHome();
+              }
+            }
+          }
         }).catch(err => {
           console.error('Error while loading', startSource, startTag, err);
           this.error = err;
@@ -103,11 +120,14 @@
         if (this.$route.query.scrollTo && this.docs) {
           const scroll = () => {
             let el = document.getElementById(`doc-for-${this.$route.query.scrollTo}`);
+            // For backwards-compatibility of old event URLs
+            if (!el) el = document.getElementById(`doc-for-e-${this.$route.query.scrollTo}`);
             if (!el) el = document.getElementById(this.$route.query.scrollTo);
             if (!el) return;
             el.setAttribute('data-scrolled', true);
             setTimeout(() => el.setAttribute('data-scrolled', false), 1000);
-            el.scrollIntoView(true);
+            setTimeout(() => el.removeAttribute('data-scrolled'), 2000);
+            el.scrollIntoView();
             window.scrollBy(0, -50);
           };
 
@@ -121,6 +141,20 @@
           else scroll();
         }
       },
+
+      goHome() {
+        console.log('Redirecting to default file due to the current page not existing in the newly-loaded tag\'s docs.');
+        this.$router.replace({ name: 'docs-file', params: {
+          source: this.source.id,
+          tag: this.tag,
+          category: this.source.defaultFile.category,
+          file: this.source.defaultFile.id,
+        } });
+      },
+
+      toggleDarkMode() {
+        this.$emit('toggleDarkMode');
+      },
     },
 
     watch: {
@@ -133,7 +167,7 @@
       },
 
       docs(to, from) {
-        if (!from) setTimeout(this.scroll, 600);
+        if (!from) setTimeout(this.scroll, 700);
       },
 
       $route(to, from) {
@@ -173,6 +207,14 @@
 
     pre {
       font-size: 1.0rem;
+    }
+  }
+
+  #app.dark #docs-body {
+    background: $color-content-bg-dark;
+
+    .sk-cube:before {
+      background: $color-content-bg-dark;
     }
   }
 

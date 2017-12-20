@@ -1,5 +1,5 @@
-/**
- * Added by Archomeda to support documentation for Archomeda/discord.js-commando-plus.
+/*
+ Original author: Archomeda
  */
 
 import DocsSource from './DocsSource';

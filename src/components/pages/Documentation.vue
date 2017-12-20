@@ -1,14 +1,14 @@
 <!--
-Original file by hydrabolt at https://github.com/hydrabolt/discord.js-site/blob/master/src/components/pages/Documentation.vue
-Modified by Archomeda:
+ Original author: hydrabolt
+ Modified by: Archomeda
  - Include Archomeda/discord.js-commando-plus related documentation
- - Remove hydrabolt/discord.js, Gawdl3y/discord.js-commando and devsnek/discord-rpc documentation
+ - Remove irrelevant documentation sources
 -->
 
 <template>
   <div id="docs">
     <docs-navbar :sources="sources" :source="source" />
-    <router-view :source="source" :tag="tag" />
+    <router-view :source="source" :tag="tag" :darkMode="darkMode" @toggleDarkMode="toggleDarkMode" />
   </div>
 </template>
 
@@ -18,6 +18,7 @@ Modified by Archomeda:
 
   export default {
     name: 'documentation',
+    props: ['darkMode'],
     components: {
       DocsNavbar,
     },
@@ -78,6 +79,10 @@ Modified by Archomeda:
             file: this.source.defaultFile.id,
           } });
         }
+      },
+
+      toggleDarkMode() {
+        this.$emit('toggleDarkMode');
       },
     },
 

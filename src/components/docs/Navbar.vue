@@ -1,6 +1,6 @@
 <!--
-Original file by hydrabolt at https://github.com/hydrabolt/discord.js-site/blob/master/src/components/Stats.vue
-Modified by Archomeda:
+ Original author: hydrabolt
+ Modified by: Archomeda
  - Remove source selector
 -->
 
@@ -16,13 +16,15 @@ Modified by Archomeda:
         <loading v-else />
       </transition>
 
-      <input v-model.trim="search" type="search" placeholder="Search" />
+      <input v-model.trim="search" type="search" placeholder="Search" @keypress.enter="goToSearch" />
       <router-link :to="{ name: 'docs-search' }"><em class="fa fa-search"></em></router-link>
     </container>
   </div>
 </template>
 
 <script>
+  import { SHITS } from '../../util';
+
   export default {
     name: 'docs-navbar',
     props: ['sources', 'source'],
@@ -50,6 +52,10 @@ Modified by Archomeda:
       updateTagChoice() {
         if (this.tags) this.tagChoice = this.$route.params.tag || this.source.recentTag || this.source.defaultTag;
       },
+
+      goToSearch() {
+        if (this.$route.name !== 'docs-search') this.$router.push({ name: 'docs-search' });
+      },
     },
 
     watch: {
@@ -59,7 +65,8 @@ Modified by Archomeda:
 
       tagChoice(tag) {
         if (tag && this.$route.params.tag !== tag) {
-          this.$router.push({ name: 'docs-tag', params: { source: this.sourceChoice, tag: tag } });
+          SHITS.switching = true;
+          this.$router.push({ name: this.$route.name, params: { ...this.$route.params, tag } });
         }
       },
 

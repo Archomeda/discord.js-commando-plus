@@ -1,7 +1,7 @@
 <!--
-Original file by hydrabolt at https://github.com/hydrabolt/discord.js-site/blob/master/src/components/AppNavbar.vue
-Modified by Archomeda:
- - Change GitHub link to Archomeda/discord.js-commando-plus
+ Original author: hydrabolt
+ Modified by: Archomeda
+ - Changed GitHub link to Archomeda/discord.js-commando-plus
 -->
 
 <template>

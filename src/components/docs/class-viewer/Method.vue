@@ -24,7 +24,7 @@
 			<div class="method-return">
         Returns:
         <span v-if="method.returns">
-  				<types v-for="rtrn in method.returns.types || method.returns" :names="rtrn" :variable="method.returns.variable" :nullable="method.returns.nullable" :docs="docs" :key="rtrn" />
+  				<types v-for="rtrn in method.returns.types || method.returns" :names="rtrn" :variable="method.returns.variable" :nullable="method.returns.nullable" :docs="docs" :key="typeKey(rtrn)" />
         </span>
         <type-link v-else :type="['void']" :docs="docs" class="docs-type" />
         <p v-if="method.returns && method.returns.description">{{ method.returns.description }}</p>
@@ -62,7 +62,7 @@
   import ParamTable from './ParamTable.vue';
   import SourceButton from '../SourceButton.vue';
   import See from '../See.vue';
-  import { convertLinks, parseLink } from '../../../util';
+  import { convertLinks, parseLink, typeKey } from '../../../util';
 
   export default {
     name: 'class-method',
@@ -94,6 +94,10 @@
         return `${this.method.scope === 'static' ? 's-' : ''}${this.method.name}`;
       },
     },
+
+    methods: {
+      typeKey,
+    },
   };
 </script>
 
@@ -106,7 +110,7 @@
 		}
 
 		h3 a:hover .method-param {
-			color: $color-primary;
+			color: $color-primary !important;
 		}
 	}
 
@@ -135,7 +139,7 @@
 	.method-return {
 		margin-top: 20px;
 		color: lighten($color-content-text, 35%);
-		font-weight: bold;
+    font-weight: bold;
 
 		.docs-type {
 			font-family: $font-monospace;
@@ -150,10 +154,28 @@
 	.method-throws, .method-emits, .method-examples {
 		margin-top: 16px;
 		color: lighten($color-content-text, 35%);
-		font-weight: bold;
+    font-weight: bold;
 
 		pre {
 			font-weight: normal;
 		}
-	}
+  }
+
+  #app.dark {
+    .method-param {
+      color: darken($color-content-text-dark, 20%);
+    }
+
+    .method-return {
+      color: darken($color-content-text-dark, 35%);
+
+      p {
+        color: darken($color-content-text-dark, 10%);
+      }
+    }
+
+    .method-throws, .method-emits, .method-examples {
+      color: darken($color-content-text-dark, 35%);
+    }
+  }
 </style>
