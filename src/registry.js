@@ -334,12 +334,16 @@ class CommandRegistry {
     /**
      * Registers the default built-in module with its groups and commands to the registry.
      * @param {Object} [commandsToLoad] - Describes which commands to load
+     * @param {boolean} commandsToLoad.blacklist - The commands:blacklist command
+     * @param {boolean} commandsToLoad.clear-whitelist - The commands:blacklist command
      * @param {boolean} commandsToLoad.disable - The commands:disable command
      * @param {boolean} commandsToLoad.enable - The commands:enable command
      * @param {boolean} commandsToLoad.groups - The commands:groups command
      * @param {boolean} commandsToLoad.load - The commands:load command
      * @param {boolean} commandsToLoad.reload - The commands:reload command
+     * @param {boolean} commandsToLoad.show-whitelist - The commands:show-whitelist command
      * @param {boolean} commandsToLoad.unload - The commands:unload command
+     * @param {boolean} commandsToLoad.whitelist - The commands:whitelist command
      * @param {boolean} commandsToLoad.eval - The utils:eval command
      * @param {boolean} commandsToLoad.help - The utils:help command
      * @param {boolean} commandsToLoad.ping - The utils:ping command

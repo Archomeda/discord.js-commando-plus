@@ -1,4 +1,27 @@
 {
+  "blacklist": {
+    "description": "Blacklists a channel for the usage of a command",
+    "details": "You can only whitelist or blacklist channels for command usage. Whenever a whitelist is set, it ignores the blacklist, and vice versa. Blacklists do not apply to the administrators and the bot owner(s). You can use `all` to set the blacklist for all commands. Only the administrators and bot owner(s) may change the blacklist.",
+    "args": {
+      "cmdOrGrp-prompt": "[W|w]hich command or command group would you like to blacklist a channel for?",
+      "channels-prompt": "[W|w]hich channel(s) would you like to blacklist for the command?"
+    },
+    "output": {
+      "admin-only": "[O|o]nly the administrators and bot owner(s) may change the command blacklists.",
+      "blacklist-applied": "[T|t]he blacklist has been applied to the following commands: {{commands}}."
+    }
+  },
+  "clear-whitelist": {
+    "description": "Clears the whitelisted and blacklisted channels for the usage of a command",
+    "details": "You can use `all` to set the whitelist for all commands. Only the administrators and bot owner(s) may change the whitelist.",
+    "args": {
+      "cmdOrGrp-prompt": "[W|w]hich command or command group would you like to clear the whitelist and blacklist of?"
+    },
+    "output": {
+      "admin-only": "[O|o]nly the administrators and bot owner(s) may change the command whitelists.",
+      "whitelist-removed": "[T|t]he whitelist has been cleared for the following commands: {{commands}}."
+    }
+  },
   "disable": {
     "description": "Disables a command or command group",
     "details": "The argument must be the name or ID (partial or whole) of a command or a command group. Only administrators may use this command.",
@@ -63,6 +86,18 @@
       "group-shards-failed": "[A|a]ttempted to reload all the commands in the group '{{args.command.name}}', but reloading it on other shards has failed."
     }
   },
+  "show-whitelist": {
+    "description": "Shows the whitelisted channels for a command",
+    "details": "The resulting channels are the channels where the specified command is allowed or disallowed to be used. These settings do not apply to administrators and the bot owner(s).",
+    "args": {
+      "command-prompt": "[W|w]hich command would you like to show the whitelist for?"
+    },
+    "output": {
+      "command-allowed": "[T|t]he command `{{args.command.name}}` is allowed to be used in all channels.",
+      "command-blacklist": "[T|t]he command `{{args.command.name}}` is **disallowed** to be used in the following channels: {{channels}}.",
+      "command-whitelist": "[T|t]he command `{{args.command.name}}` is **allowed** to be used in the following channels **only**: {{channels}}."
+    }
+  },
   "unload": {
     "description": "Unloads a command",
     "details": "The argument must be the name or ID (partial or whole) of a command. Only the bot owner(s) may use this command.",
@@ -72,6 +107,18 @@
     "output": {
       "command": "[T|t]he command '{{args.command.name}}' has been unloaded across all shards.",
       "command-shards-failed": "[A|a]ttempted to unload the command '{{args.command.name}}', but unloading it on other shards has failed."
+    }
+  },
+  "whitelist": {
+    "description": "Whitelists a channel for the usage of a command",
+    "details": "You can only whitelist or blacklist channels for command usage. Whenever a whitelist is set, it ignores the blacklist, and vice versa. Whitelists do not apply to the administrators and the bot owner(s). You can use `all` to set the whitelist for all commands. Only the administrators and bot owner(s) may change the whitelist.",
+    "args": {
+      "cmdOrGrp-prompt": "[W|w]hich command or command group would you like to whitelist a channel for?",
+      "channels-prompt": "[W|w]hich channel(s) would you like to whitelist for the command?"
+    },
+    "output": {
+      "admin-only": "[O|o]nly the administrators and bot owner(s) may change the command whitelists.",
+      "whitelist-applied": "[T|t]he whitelist has been applied to the following commands: {{commands}}."
     }
   }
 }

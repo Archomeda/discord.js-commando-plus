@@ -11,6 +11,12 @@ class BuiltInModule extends Module {
         const check = id =>
             typeof commandsToLoad === 'undefined' || typeof commandsToLoad[id] === 'undefined' || commandsToLoad[id];
 
+        if (check('blacklist')) {
+            toLoad.push(new (require('./commands/blacklist'))(client));
+        }
+        if (check('clear-whitelist')) {
+            toLoad.push(new (require('./commands/clear-whitelist'))(client));
+        }
         if (check('disable')) {
             toLoad.push(new (require('./commands/disable'))(client));
         }
@@ -26,8 +32,14 @@ class BuiltInModule extends Module {
         if (check('reload')) {
             toLoad.push(new (require('./commands/reload'))(client));
         }
+        if (check('show-whitelist')) {
+            toLoad.push(new (require('./commands/show-whitelist'))(client));
+        }
         if (check('unload')) {
             toLoad.push(new (require('./commands/unload'))(client));
+        }
+        if (check('whitelist')) {
+            toLoad.push(new (require('./commands/whitelist'))(client));
         }
 
         if (check('eval')) {

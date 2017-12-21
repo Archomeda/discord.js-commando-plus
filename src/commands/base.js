@@ -9,6 +9,10 @@
  - Added Command.reactTimeout()
  - Added Command.runReact()
  - Added Command.shouldHandleReaction()
+ - Added Command.setWhitelistIn()
+ - Added Command.setBlacklistIn()
+ - Added Command.clearWhitelistIn()
+ - Added Command.isWhitelistedIn()
  - Changed Command.reload()
  */
 
@@ -394,6 +398,86 @@ class Command {
         }
 
         return throttle;
+    }
+
+    /**
+     * Sets the whitelisted channels of a command in a guild.
+     * @param {GuildResolvable} guild - Guild to set the whitelisted channels of the command in
+     * @param {ChannelResolvable[]} list - The list of channels
+     * @return {void}
+     */
+    setWhitelistIn(guild, list) {
+        if (!guild) {
+            throw new TypeError('Guild must not be undefined');
+        }
+        if (typeof list === 'undefined') {
+            throw new TypeError('List must not be undefined');
+        }
+        guild = this.client.resolver.resolveGuild(guild);
+        list = list.map(c => this.client.resolver.resolveChannel(c).id);
+
+        guild.settings.set(`whitelisted-channels.${this.name}`, list);
+        guild.settings.remove(`blacklisted-channels.${this.name}`);
+    }
+
+    /**
+     * Sets the blacklisted channels of a command in a guild.
+     * @param {GuildResolvable} guild - Guild to set the blacklisted channels of the command in
+     * @param {ChannelResolvable[]} list - The list of channels
+     * @return {void}
+     */
+    setBlacklistIn(guild, list) {
+        if (!guild) {
+            throw new TypeError('Guild must not be undefined');
+        }
+        if (typeof list === 'undefined') {
+            throw new TypeError('List must not be undefined');
+        }
+        guild = this.client.resolver.resolveGuild(guild);
+        list = list.map(c => this.client.resolver.resolveChannel(c).id);
+
+        guild.settings.set(`blacklisted-channels.${this.name}`, list);
+        guild.settings.remove(`whitelisted-channels.${this.name}`);
+    }
+
+    /**
+     * Clears the whitelisted channels of a command in a guild.
+     * @param {GuildResolvable} guild - Guild to set the whitelisted channels of the command in
+     * @return {void}
+     */
+    clearWhitelistIn(guild) {
+        if (!guild) {
+            throw new TypeError('Guild must not be undefined');
+        }
+        guild = this.client.resolver.resolveGuild(guild);
+
+        guild.settings.remove(`blacklisted-channels.${this.name}`);
+        guild.settings.remove(`whitelisted-channels.${this.name}`);
+    }
+
+    /**
+     * Checks if the channel is whitelisted for a command.
+     * If a command has not been explicitly whitelisted nor blacklisted, this returns true.
+     * @param {GuildResolvable} guild - Guild to set the whitelisted channels of the command in
+     * @param {ChannelResolvable} channel - The channel to check
+     * @return {boolean} True if whitelisted; false otherwise.
+     */
+    isWhitelistedIn(guild, channel) {
+        if (!guild) {
+            return true;
+        }
+        guild = this.client.resolver.resolveGuild(guild);
+        channel = this.client.resolver.resolveChannel(channel).id;
+
+        const whitelist = guild.settings.get(`whitelisted-channels.${this.name}`, []);
+        if (whitelist.length > 0) {
+            return whitelist.includes(channel);
+        }
+        const blacklist = guild.settings.get(`blacklisted-channels.${this.name}`, []);
+        if (blacklist.length > 0) {
+            return !blacklist.includes(channel);
+        }
+        return true;
     }
 
     /**

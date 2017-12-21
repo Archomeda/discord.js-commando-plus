@@ -5,8 +5,12 @@
  - Renamed SettingProvider to SettingsProvider
  - Moved some code from SQLiteProvider to SettingsProvider to decrease code duplication
  - Changed SettingsProvider.initListeners()
+ - Changed SettingsProvider.get()
+ - Changed SettingsProvider.set()
  - Changed SettingsProvider.setupGuild()
  */
+
+const objectPath = require('object-path');
 
 const { Guild } = require('discord.js');
 
@@ -115,7 +119,7 @@ class SettingsProvider {
      */
     get(guild, key, defVal) {
         const settings = this.settings.get(this.constructor.getGuildID(guild));
-        return settings ? typeof settings[key] !== 'undefined' ? settings[key] : defVal : defVal;
+        return settings && objectPath.has(settings, key) ? objectPath.get(settings, key) : defVal;
     }
 
     /**
@@ -132,7 +136,7 @@ class SettingsProvider {
             settings = {};
             this.settings.set(guild, settings);
         }
-        settings[key] = val;
+        objectPath.set(settings, key, val);
         if (guild === 'global') {
             this.updateOtherShards(key, val);
         }
@@ -148,12 +152,11 @@ class SettingsProvider {
     remove(guild, key) {
         guild = this.constructor.getGuildID(guild);
         const settings = this.settings.get(guild);
-        if (!settings || typeof settings[key] === 'undefined') {
+        if (!settings || !objectPath.has(settings, key)) {
             return undefined;
         }
-
-        const val = settings[key];
-        settings[key] = undefined;
+        const val = objectPath.get(settings, key);
+        objectPath.del(settings, key);
         if (guild === 'global') {
             this.updateOtherShards(key, undefined);
         }
@@ -270,16 +273,22 @@ class SettingsProvider {
         }
         key = JSON.stringify(key);
         val = typeof val !== 'undefined' ? JSON.stringify(val) : 'undefined';
+        /* eslint-disable indent */
         this.client.shard.broadcastEval(`
             if (this.shard.id !== ${this.client.shard.id} && this.settingsProvider && this.settingsProvider.settings) {
+                const objectPath = require('object-path'); // Untested, but hey maybe it works
                 let global = this.settingsProvider.settings.get('global');
                 if (!global) {
                     global = {};
                     this.settingsProvider.settings.set('global', global);
                 }
-                global[${key}] = ${val};
+                ${typeof val !== 'undefined' ?
+                    `objectPath.set(global, ${key}, ${val});` :
+                    `objectPath.del(global, ${key}`
+                }
             }
 		`);
+        /* eslint-enable indent */
     }
 
     /**

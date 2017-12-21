@@ -70,7 +70,8 @@ class YAMLSettingsProvider extends SettingsProvider {
     async set(guild, key, val) {
         guild = this.constructor.getGuildID(guild);
         val = await super.set(guild, key, val);
-        await writeFileAsync(path.join(this.directory, `${guild}.yml`), yaml.safeDump(this.settings.get(guild)));
+        await writeFileAsync(path.join(this.directory, `${guild}.yml`),
+            yaml.safeDump(this.settings.get(guild), { noRefs: true }));
         return val;
     }
 
@@ -81,7 +82,8 @@ class YAMLSettingsProvider extends SettingsProvider {
             return undefined;
         }
 
-        await writeFileAsync(path.join(this.directory, `${guild}.yml`), yaml.safeDump(this.settings.get(guild)));
+        await writeFileAsync(path.join(this.directory, `${guild}.yml`),
+            yaml.safeDump(this.settings.get(guild), { noRefs: true }));
         return val;
     }
 

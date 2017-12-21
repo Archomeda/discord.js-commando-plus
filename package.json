@@ -23,6 +23,7 @@
     "common-tags": "^1.0.0",
     "deepmerge": "^2.0.1",
     "escape-string-regexp": "^1.0.0",
+    "object-path": "^0.11.4",
     "require-all": "^2.0.0"
   },
   "devDependencies": {

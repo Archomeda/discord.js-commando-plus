@@ -21,7 +21,7 @@ declare module 'sqlite' {
 }
 
 declare module 'discord.js-commando' {
-    import { Channel, Client, ClientOptions, ClientUserSettings, Collection, DMChannel, Emoji, GroupDMChannel, Guild, GuildChannel, GuildMember, GuildResolvable, Message, MessageAttachment, MessageEmbed, MessageOptions, MessageReaction, PermissionResolvable, ReactionEmoji, RichEmbed, Role, Snowflake, StringResolvable, TextChannel, User, UserResolvable, Webhook } from 'discord.js';
+    import { Channel, ChannelResolvable, Client, ClientOptions, ClientUserSettings, Collection, DMChannel, Emoji, GroupDMChannel, Guild, GuildChannel, GuildMember, GuildResolvable, Message, MessageAttachment, MessageEmbed, MessageOptions, MessageReaction, PermissionResolvable, ReactionEmoji, RichEmbed, Role, Snowflake, StringResolvable, TextChannel, User, UserResolvable, Webhook } from 'discord.js';
     import { i18next } from 'i8next';
     import { Mongoose, Schema as MongooseSchema } from 'mongoose';
     import { NodeCache } from 'node-cache';
@@ -116,16 +116,20 @@ declare module 'discord.js-commando' {
         public patterns: RegExp[];
         public throttling: ThrottlingOptions;
 
+        public clearWhitelistIn(guild: GuildResolvable): void;
         public editTimeout(message: CommandMessage, response: Message): Promise<CommandMessage>;
         public getMissingPermissions(message: CommandMessage): PermissionResolvable[];
         public hasPermission(message: CommandMessage): boolean;
         public isEnabledIn(guild: GuildResolvable): boolean;
         public isUsable(message: Message): boolean;
+        public isWhitelistedIn(guild: GuildResolvable, channel: ChannelResolvable): boolean;
         public reactTimeout(message: CommandMessage, response: Message): Promise<CommandMessage>;
         public reload(): void;
         public run(message: CommandMessage, args: object | string | string[], fromPattern: boolean): Promise<Message | Message[]>;
         public runReact(message: CommandMessage, reaction: MessageReaction): Promise<Message>;
+        public setBlacklistIn(guild: GuildResolvable, list: ChannelResolvable[]): void;
         public setEnabledIn(guild: GuildResolvable, enabled: boolean): void;
+        public setWhitelistIn(guild: GuildResolvable, list: ChannelResolvable[]): void;
         public shouldHandleReaction(message: CommandMessage, reaction: MessageReaction, user: User): boolean;
         public unload(): void;
         public usage(argString?: string, prefix?: string, user?: User): string;

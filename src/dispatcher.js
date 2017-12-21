@@ -155,7 +155,11 @@ class CommandDispatcher {
 
             if (!inhibited) {
                 if (cmdMsg.command) {
-                    if (!cmdMsg.command.isEnabledIn(message.guild)) {
+                    if (!this.client.isOwner(message.author) && !message.member.hasPermission('ADMINISTRATOR') &&
+                        !cmdMsg.command.isWhitelistedIn(message.guild, message.channel)) {
+                        // Ignore and stop
+                        return;
+                    } else if (!cmdMsg.command.isEnabledIn(message.guild)) {
                         responses = await cmdMsg.reply(this.client.localization.tl(
                             'errors', 'command-disabled', message.guild, { command: cmdMsg.command.name }));
                     } else if (!oldMessage || typeof oldCmdMsg !== 'undefined') {
