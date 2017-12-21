@@ -51,11 +51,6 @@ class CommandWhitelist extends Command {
     run(msg, args) {
         let { cmdOrGrp } = args;
 
-        if (!msg.guild) {
-            // Only allowed in guilds
-            return;
-        }
-
         // Check the user's permission before changing anything
         if (!msg.member.hasPermission('ADMINISTRATOR') && !this.client.isOwner(msg.author)) {
             return msg.reply(this.localization.tl('output.admin-only', msg.guild, { args, cmd: this }));

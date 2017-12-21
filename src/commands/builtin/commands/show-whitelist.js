@@ -28,11 +28,6 @@ class CommandWhitelist extends Command {
     run(msg, args) {
         let { command } = args;
 
-        if (!msg.guild) {
-            // Only allowed in guilds
-            return;
-        }
-
         const whitelist = msg.guild.settings.get(`whitelisted-channels.${command.name}`, [])
             .map(c => msg.guild.channels.get(c))
             .filter(c => c);
