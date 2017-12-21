@@ -1,9 +1,9 @@
 /**
- * A base worker.
+ * A base worker that runs independently of any Discord guild.
  * Workers are run globally. Keep that in mind if guild related things are required.
  * @abstract
  */
-class BaseWorker {
+class Worker {
     /**
      * @typedef {Object} WorkerInfo
      * @property {string} id - The worker id
@@ -125,4 +125,4 @@ class BaseWorker {
     }
 }
 
-module.exports = BaseWorker;
+module.exports = Worker;
