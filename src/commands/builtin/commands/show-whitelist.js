@@ -44,6 +44,7 @@ class CommandWhitelist extends Command {
             return msg.reply(this.localization.tl('output.command-blacklist', msg.guild,
                 { args, cmd: this, channels: blacklist }));
         }
+        return undefined;
     }
 }
 

@@ -2,6 +2,8 @@
  Original author: Gawdl3y
  Modified by: Archomeda
  - Added GuildExtension.language
+ - Added GuildExtension.isWorkerEnabled()
+ - Added GuildExtension.setWorkerEnabled()
  */
 
 const Command = require('../commands/base');
@@ -203,6 +205,57 @@ class GuildExtension {
     }
 
     /**
+     * Sets whether a worker is enabled in the guild.
+     * @param {WorkerResolvable} worker - The worker to set the status of
+     * @param {boolean} enabled - Whether the worker should be enabled or disabled
+     * @return {void}
+     */
+    setWorkerEnabled(worker, enabled) {
+        worker = this.client.registry.resolveWorker(worker);
+        if (worker.guarded) {
+            throw new Error('The worker is guarded.');
+        }
+        if (typeof enabled === 'undefined') {
+            throw new TypeError('The parameter enabled cannot be undefined');
+        }
+        enabled = Boolean(enabled);
+
+        if (!this._workersEnabled) {
+            /**
+             * Map object of internal worker statuses, mapped by worker id.
+             * @type {Object}
+             * @private
+             */
+            this._workersEnabled = {};
+        }
+        this._workersEnabled[worker.id] = enabled;
+        /**
+         * Emitted whenever a worker is enabled or disabled in a guild.
+         * @event CommandoExtClient#workerStatusChange
+         * @param {?Guild} guild - The guild that the command was enabled or disabled in (null for global).
+         * @param {BaseWorker} worker - The worker that was enabled or disabled.
+         * @param {boolean} enabled - Whether the worker is enabled or disabled.
+         */
+        this.client.emit('workerStatusChange', this, worker, enabled);
+    }
+
+    /**
+     * Checks whether a worker is enabled in the guild.
+     * @param {WorkerResolvable} worker - The worker to check the status of
+     * @return {boolean} True if enabled; false otherwise.
+     */
+    isWorkerEnabled(worker) {
+        worker = this.client.registry.resolveWorker(worker);
+        if (worker.guarded) {
+            return true;
+        }
+        if (!this._workersEnabled || typeof this._workersEnabled[worker.id] === 'undefined') {
+            return worker._globalEnabled;
+        }
+        return this._workersEnabled[worker.id];
+    }
+
+    /**
      * Applies the interface to a class prototype.
      * @param {Function} target - The constructor function to apply to the prototype of
      * @return {void}
@@ -217,6 +270,8 @@ class GuildExtension {
             'isCommandEnabled',
             'setGroupEnabled',
             'isGroupEnabled',
+            'setWorkerEnabled',
+            'isWorkerEnabled',
             'commandUsage'
         ]) {
             Object.defineProperty(target.prototype, prop, Object.getOwnPropertyDescriptor(this.prototype, prop));

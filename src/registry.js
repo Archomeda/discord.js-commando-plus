@@ -4,10 +4,16 @@
  - Added ModuleResolvable
  - Added CommandRegistry.modules
  - Added CommandRegistry.findModules()
+ - Added CommandRegistry.findWorkers()
  - Added CommandRegistry.registerBuiltInModule()
  - Added CommandRegistry.registerModule()
  - Added CommandRegistry.registerModules()
+ - Added CommandRegistry.registerWorker()
+ - Added CommandRegistry.registerWorkers()
+ - Added CommandRegistry.reregisterWorker()
  - Added CommandRegistry.resolveModule()
+ - Added CommandRegistry.resolveWorker()
+ - Added CommandRegistry.unregisterWorker()
  - Changed signature of CommandRegistry.resolveCommandPath()
  - Removed CommandRegistry.commandsPath
  - Removed CommandRegistry.registerCommandsIn()
@@ -22,6 +28,7 @@ const Command = require('./commands/base');
 const CommandGroup = require('./commands/group');
 const CommandMessage = require('./commands/message');
 const ArgumentType = require('./types/base');
+const Worker = require('./workers/base');
 
 /**
  * Handles registration and searching of commands and groups.
@@ -56,6 +63,12 @@ class CommandRegistry {
          * @type {Collection<string, CommandGroup>}
          */
         this.groups = new discord.Collection();
+
+        /**
+         * Registered workers.
+         * @type {Collection<string, Worker>}
+         */
+        this.workers = new discord.Collection();
 
         /**
          * Registered argument types.
@@ -258,6 +271,173 @@ class CommandRegistry {
     }
 
     /**
+     * Reregisters a command (does not support changing name, group, module or memberName).
+     * @param {Command|Function} command - New command
+     * @param {Command} oldCommand - Old command
+     * @return {void}
+     */
+    reregisterCommand(command, oldCommand) {
+        if (typeof command === 'function') {
+            command = new command(this.client); // eslint-disable-line new-cap
+        }
+        if (command.name !== oldCommand.name) {
+            throw new Error('Command name cannot change.');
+        }
+        if (command.groupID !== oldCommand.groupID) {
+            throw new Error('Command group cannot change.');
+        }
+        if (command.moduleID !== oldCommand.moduleID) {
+            throw new Error('Command module cannot change.');
+        }
+        if (command.memberName !== oldCommand.memberName) {
+            throw new Error('Command memberName cannot change.');
+        }
+        command.group = this.resolveGroup(command.groupID);
+        command.group.commands.set(command.name, command);
+        command.module = this.resolveModule(command.moduleID);
+        command.module.commands.set(command.name, command);
+        this.commands.set(command.name, command);
+        /**
+         * Emitted when a command is reregistered.
+         * @event CommandoClient#commandReregister
+         * @param {Command} newCommand - New command
+         * @param {Command} oldCommand - Old command
+         */
+        this.client.emit('commandReregister', command, oldCommand);
+        this.client.emit('debug', `Reregistered command ${command.moduleID}:${command.groupID}:${command.memberName}.`);
+    }
+
+    /**
+     * Unregisters a command.
+     * @param {Command} command - Command to unregister
+     * @return {void}
+     */
+    unregisterCommand(command) {
+        this.commands.delete(command.name);
+        command.group.commands.delete(command.name);
+        command.module.commands.delete(command.name);
+        /**
+         * Emitted when a command is unregistered.
+         * @event CommandoClient#commandUnregister
+         * @param {Command} command - Command that was unregistered
+         */
+        this.client.emit('commandUnregister', command);
+        this.client.emit('debug', `Unregistered command ${command.moduleID}:${command.groupID}:${command.memberName}.`);
+    }
+
+    /**
+     * Registers a single object to be usable by the eval command.
+     * @param {string} key - The key for the object
+     * @param {Object} obj - The object
+     * @return {CommandRegistry} This.
+     * @see {@link CommandRegistry#registerEvalObjects}
+     */
+    registerEvalObject(key, obj) {
+        const registerObj = {};
+        registerObj[key] = obj;
+        return this.registerEvalObjects(registerObj);
+    }
+
+    /**
+     * Registers multiple objects to be usable by the eval command.
+     * @param {Object} obj - An object of keys: values
+     * @return {CommandRegistry} This.
+     */
+    registerEvalObjects(obj) {
+        Object.assign(this.evalObjects, obj);
+        return this;
+    }
+
+    /**
+     * Registers a single worker.
+     * @param {Worker|Function} worker - Either a worker instance, or a constructor for one
+     * @return {CommandRegistry} Itself.
+     */
+    registerWorker(worker) {
+        return this.registerWorkers([worker]);
+    }
+
+    /**
+     * Registers multiple workers.
+     * @param {Worker[]|Function[]} workers - An array of worker instances or constructors
+     * @return {CommandRegistry} Itself.
+     */
+    registerWorkers(workers) {
+        if (!Array.isArray(workers)) {
+            throw new TypeError('The parameter modules must be an array');
+        }
+
+        for (let worker of workers) {
+            if (typeof worker === 'function') {
+                worker = new worker(this.client); // eslint-disable-line new-cap
+            }
+
+            // Verify that it's an actual worker
+            if (!(worker instanceof Worker)) {
+                this.client.emit('warn', `Attempting to register an invalid worker object: ${worker}; skipping`);
+                continue;
+            }
+
+            // Make sure there aren't any conflicts
+            if (this.workers.some(w => w.id === worker.id)) {
+                throw new Error(`A worker with the id "${worker.id}" is already registered`);
+            }
+
+            // Add the worker
+            /**
+             * Emitted when a worker is registered.
+             * @event CommandoExtClient#workerRegister
+             * @param {BaseWorker} worker - The worker that was registered
+             * @param {Registry} registry - The registry that the worker was registered to
+             */
+            this.client.emit('workerRegister', worker, this);
+            this.client.emit('debug', `Registered worker ${worker.id}`);
+        }
+
+        return this;
+    }
+
+    /**
+     * Reregisters a worker (does not support changing id).
+     * @param {Worker|Function} worker - The worker
+     * @param {Worker} oldWorker - The old worker
+     * @return {void}
+     */
+    reregisterWorker(worker, oldWorker) {
+        if (typeof worker === 'function') {
+            worker = new worker(this.client); // eslint-disable-line new-cap
+        }
+        if (worker.id !== oldWorker.id) {
+            throw new Error('Worker id cannot change');
+        }
+        this.workers.set(worker.id, worker);
+        /**
+         * Emitted when a worker is reregistered.
+         * @event CommandoExtClient#workerReregister
+         * @param {BaseWorker} newWorker - The new worker
+         * @param {BaseWorker} oldWorker - The old worker
+         */
+        this.client.emit('workerReregister', worker, oldWorker);
+        this.client.debug('debug', `Reregistered worker ${worker.id}`);
+    }
+
+    /**
+     * Unregisters a worker.
+     * @param {BaseWorker} worker - The worker to unregister
+     * @return {void}
+     */
+    unregisterWorker(worker) {
+        this.workers.delete(worker.id);
+        /**
+         * Emitted when a worker is unregistered.
+         * @event CommandoExtClient#workerUnregister
+         * @param {BaseWorker} worker - The worker that was unregistered
+         */
+        this.client.emit('workerUnregister', worker);
+        this.client.emit('debug', `Unregistered worker ${worker.id}.`);
+    }
+
+    /**
      * Registers a single argument type.
      * @param {ArgumentType|Function} type - Either an ArgumentType instance, or a constructor for one
      * @return {CommandRegistry} This.
@@ -385,84 +565,6 @@ class CommandRegistry {
             require('./types/group'),
             require('./types/command-or-group')
         ]);
-        return this;
-    }
-
-    /**
-     * Reregisters a command (does not support changing name, group, module or memberName).
-     * @param {Command|Function} command - New command
-     * @param {Command} oldCommand - Old command
-     * @return {void}
-     */
-    reregisterCommand(command, oldCommand) {
-        if (typeof command === 'function') {
-            command = new command(this.client); // eslint-disable-line new-cap
-        }
-        if (command.name !== oldCommand.name) {
-            throw new Error('Command name cannot change.');
-        }
-        if (command.groupID !== oldCommand.groupID) {
-            throw new Error('Command group cannot change.');
-        }
-        if (command.moduleID !== oldCommand.moduleID) {
-            throw new Error('Command module cannot change.');
-        }
-        if (command.memberName !== oldCommand.memberName) {
-            throw new Error('Command memberName cannot change.');
-        }
-        command.group = this.resolveGroup(command.groupID);
-        command.group.commands.set(command.name, command);
-        command.module = this.resolveModule(command.moduleID);
-        command.module.commands.set(command.name, command);
-        this.commands.set(command.name, command);
-        /**
-         * Emitted when a command is reregistered.
-         * @event CommandoClient#commandReregister
-         * @param {Command} newCommand - New command
-         * @param {Command} oldCommand - Old command
-         */
-        this.client.emit('commandReregister', command, oldCommand);
-        this.client.emit('debug', `Reregistered command ${command.moduleID}:${command.groupID}:${command.memberName}.`);
-    }
-
-    /**
-     * Unregisters a command.
-     * @param {Command} command - Command to unregister
-     * @return {void}
-     */
-    unregisterCommand(command) {
-        this.commands.delete(command.name);
-        command.group.commands.delete(command.name);
-        command.module.commands.delete(command.name);
-        /**
-         * Emitted when a command is unregistered.
-         * @event CommandoClient#commandUnregister
-         * @param {Command} command - Command that was unregistered
-         */
-        this.client.emit('commandUnregister', command);
-        this.client.emit('debug', `Unregistered command ${command.moduleID}:${command.groupID}:${command.memberName}.`);
-    }
-
-    /**
-     * Registers a single object to be usable by the eval command.
-     * @param {string} key - The key for the object
-     * @param {Object} obj - The object
-     * @return {CommandRegistry} This.
-     * @see {@link CommandRegistry#registerEvalObjects}
-     */
-    registerEvalObject(key, obj) {
-        const registerObj = {};
-        registerObj[key] = obj;
-        return this.registerEvalObjects(registerObj);
-    }
-
-    /**
-     * Registers multiple objects to be usable by the eval command.
-     * @param {Object} obj - An object of keys: values
-     * @return {CommandRegistry} This.
-     */
-    registerEvalObjects(obj) {
-        Object.assign(this.evalObjects, obj);
         return this;
     }
 
@@ -645,6 +747,60 @@ class CommandRegistry {
         module = this.resolveModule(module);
         return path.join(module.commandsDirectory, group, `${memberName}.js`);
     }
+
+    /**
+     * Finds all workers that match the search string.
+     * @param {?string} [searchString] - The string to search for
+     * @param {boolean} [exact = false] - Whether the search should be exact
+     * @return {BaseWorker[]} All workers that are found.
+     */
+    findWorkers(searchString = null, exact = false) {
+        if (!searchString) {
+            return Array.from(this.workers);
+        }
+
+        // Find all matches
+        const lcSearch = searchString.toLowerCase();
+        const matchedWorkers = this.workers.filterArray(
+            exact ? workerFilterExact(lcSearch) : workerFilterInexact(lcSearch)
+        );
+        if (exact) {
+            return matchedWorkers;
+        }
+
+        // See if there's an exact match
+        for (const worker of matchedWorkers) {
+            if (worker.id.toLowerCase() === lcSearch) {
+                return [worker];
+            }
+        }
+        return matchedWorkers;
+    }
+
+    /**
+     * A WorkerResolvable can be:
+     * * A BaseWorker
+     * * A worker id
+     * @typedef {BaseWorker|string} WorkerResolvable
+     */
+
+    /**
+     * Resolves a WorkerResolver to a Worker object.
+     * @param {WorkerResolvable} worker - The worker to resolve
+     * @return {BaseWorker} The resolved worker.
+     */
+    resolveWorker(worker) {
+        if (worker instanceof Worker) {
+            return worker;
+        }
+        if (typeof worker === 'string') {
+            const workers = this.findWorkers(worker, true);
+            if (workers.length === 1) {
+                return workers[0];
+            }
+        }
+        throw new Error('Unable to resolve worker.');
+    }
 }
 
 function moduleFilterExact(search) {
@@ -673,6 +829,14 @@ function commandFilterInexact(search) {
     return cmd => cmd.name.includes(search) ||
     `${cmd.groupID}:${cmd.memberName}` === search ||
     (cmd.aliases && cmd.aliases.some(ali => ali.includes(search)));
+}
+
+function workerFilterExact(search) {
+    return w => w.id === search;
+}
+
+function workerFilterInexact(search) {
+    return w => w.id.includes(search);
 }
 
 module.exports = CommandRegistry;

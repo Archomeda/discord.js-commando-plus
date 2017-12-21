@@ -340,10 +340,12 @@ declare module 'discord.js-commando' {
         public groups: Collection<string, CommandGroup>;
         public modules: Collection<string, Module>;
         public types: Collection<string, ArgumentType>;
+        public workers: Collection<string, Worker>;
 
         public findCommands(searchString?: string, exact?: boolean, message?: Message): Command[];
         public findGroups(searchString?: string, exact?: boolean): CommandGroup[];
         public findModules(searchString?: string, exact?: boolean): Module[];
+        public findWorkers(searchString?: string, exact?: boolean): Worker[];
         public registerBuiltInModule() : CommandRegistry;
         public registerCommand(command: Command | Function): CommandRegistry;
         public registerCommands(commands: Command[] | Function[]): CommandRegistry;
@@ -358,12 +360,17 @@ declare module 'discord.js-commando' {
         public registerType(type: ArgumentType | Function): CommandRegistry;
         public registerTypes(type: ArgumentType[] | Function[]): CommandRegistry;
         public registerTypesIn(options: string | {}): CommandRegistry;
+        public registerWorker(worker: Worker | Function): CommandRegistry;
+        public registerWorkers(workers: Worker[] | Function[]): CommandRegistry;
         public reregisterCommand(command: Command | Function, oldCommand: Command): void;
+        public reregistryWorkers(worker: Worker | Function, oldWorker: Worker): void;
         public resolveCommand(command: CommandResolvable): Command;
         public resolveCommandPath(module: ModuleResolvable, groups: string, memberName: string): string;
         public resolveGroup(group: CommandGroupResolvable): CommandGroup;
+        public resolveWorker(worker: WorkerResolvable): Worker;
         public resolveModule(module: ModuleResolvable): Module;
         public unregisterCommand(command: Command): void;
+        public unregisterWorker(worker: Worker): CommandRegistry;
     }
 
     export class FriendlyError extends Error {
@@ -384,8 +391,10 @@ declare module 'discord.js-commando' {
         public commandUsage(command?: string, user?: User): string;
         public isCommandEndabled(command: CommandResolvable): boolean;
         public isGroupEnabled(group: CommandGroupResolvable): boolean;
+        public isWorkerEnabled(worker: WorkerResolvable): boolean;
         public setCommandEnabled(command: CommandResolvable, enabled: boolean): void;
         public setGroupdEnabled(group: CommandGroupResolvable, enabled: boolean): void;
+        public setWorkerEnabled(worker: WorkerResolvable, enabled: boolean): void;
     }
 
     export class GuildSettingsHelper {
@@ -509,6 +518,23 @@ declare module 'discord.js-commando' {
         public set(guild: Guild | string, key: string, val: any): Promise<any>;
     }
 
+    export class Worker {
+        public constructor(client: CommandoClient, info: WorkerInfo);
+
+        private _globalEnabled: boolean;
+
+        private static validateInfo(client: CommandoClient, info: WorkerInfo);
+
+        public id: string;
+        public guarded: boolean;
+
+        public isEnabledIn(guild: GuildResolvable): boolean;
+        public run(): Promise<Message | Message[]>;
+        public setEnabledIn(guild: GuildResolvable, enabled: boolean): void;
+
+        public static usage(command: string, prefix?: string, user?: User): string;
+    }
+
     export class YAMLSettingsProvider extends SettingsProvider {
         public constructor(directory: string);
 
@@ -593,4 +619,9 @@ declare module 'discord.js-commando' {
         usages: number;
         duration: number;
     }
+
+    type WorkerInfo = {
+        guarded?: boolean;
+        id: string;
+    };
 }
