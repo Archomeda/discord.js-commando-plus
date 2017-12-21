@@ -386,7 +386,7 @@ class CommandRegistry {
             // Add the worker
             /**
              * Emitted when a worker is registered.
-             * @event CommandoExtClient#workerRegister
+             * @event CommandoClient#workerRegister
              * @param {BaseWorker} worker - The worker that was registered
              * @param {Registry} registry - The registry that the worker was registered to
              */
@@ -413,7 +413,7 @@ class CommandRegistry {
         this.workers.set(worker.id, worker);
         /**
          * Emitted when a worker is reregistered.
-         * @event CommandoExtClient#workerReregister
+         * @event CommandoClient#workerReregister
          * @param {BaseWorker} newWorker - The new worker
          * @param {BaseWorker} oldWorker - The old worker
          */
@@ -430,7 +430,7 @@ class CommandRegistry {
         this.workers.delete(worker.id);
         /**
          * Emitted when a worker is unregistered.
-         * @event CommandoExtClient#workerUnregister
+         * @event CommandoClient#workerUnregister
          * @param {BaseWorker} worker - The worker that was unregistered
          */
         this.client.emit('workerUnregister', worker);
