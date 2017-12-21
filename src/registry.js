@@ -387,7 +387,7 @@ class CommandRegistry {
             /**
              * Emitted when a worker is registered.
              * @event CommandoClient#workerRegister
-             * @param {BaseWorker} worker - The worker that was registered
+             * @param {Worker} worker - The worker that was registered
              * @param {Registry} registry - The registry that the worker was registered to
              */
             this.client.emit('workerRegister', worker, this);
@@ -414,8 +414,8 @@ class CommandRegistry {
         /**
          * Emitted when a worker is reregistered.
          * @event CommandoClient#workerReregister
-         * @param {BaseWorker} newWorker - The new worker
-         * @param {BaseWorker} oldWorker - The old worker
+         * @param {Worker} newWorker - The new worker
+         * @param {Worker} oldWorker - The old worker
          */
         this.client.emit('workerReregister', worker, oldWorker);
         this.client.debug('debug', `Reregistered worker ${worker.id}`);
@@ -423,7 +423,7 @@ class CommandRegistry {
 
     /**
      * Unregisters a worker.
-     * @param {BaseWorker} worker - The worker to unregister
+     * @param {Worker} worker - The worker to unregister
      * @return {void}
      */
     unregisterWorker(worker) {
@@ -431,7 +431,7 @@ class CommandRegistry {
         /**
          * Emitted when a worker is unregistered.
          * @event CommandoClient#workerUnregister
-         * @param {BaseWorker} worker - The worker that was unregistered
+         * @param {Worker} worker - The worker that was unregistered
          */
         this.client.emit('workerUnregister', worker);
         this.client.emit('debug', `Unregistered worker ${worker.id}.`);
@@ -752,7 +752,7 @@ class CommandRegistry {
      * Finds all workers that match the search string.
      * @param {?string} [searchString] - The string to search for
      * @param {boolean} [exact = false] - Whether the search should be exact
-     * @return {BaseWorker[]} All workers that are found.
+     * @return {Worker[]} All workers that are found.
      */
     findWorkers(searchString = null, exact = false) {
         if (!searchString) {
@@ -779,15 +779,15 @@ class CommandRegistry {
 
     /**
      * A WorkerResolvable can be:
-     * * A BaseWorker
+     * * A Worker
      * * A worker id
-     * @typedef {BaseWorker|string} WorkerResolvable
+     * @typedef {Worker|string} WorkerResolvable
      */
 
     /**
      * Resolves a WorkerResolver to a Worker object.
      * @param {WorkerResolvable} worker - The worker to resolve
-     * @return {BaseWorker} The resolved worker.
+     * @return {Worker} The resolved worker.
      */
     resolveWorker(worker) {
         if (worker instanceof Worker) {

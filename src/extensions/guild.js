@@ -233,7 +233,7 @@ class GuildExtension {
          * Emitted whenever a worker is enabled or disabled in a guild.
          * @event CommandoClient#workerStatusChange
          * @param {?Guild} guild - The guild that the command was enabled or disabled in (null for global).
-         * @param {BaseWorker} worker - The worker that was enabled or disabled.
+         * @param {Worker} worker - The worker that was enabled or disabled.
          * @param {boolean} enabled - Whether the worker is enabled or disabled.
          */
         this.client.emit('workerStatusChange', this, worker, enabled);

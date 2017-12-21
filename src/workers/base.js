@@ -16,15 +16,15 @@ class Worker {
      * @param {WorkerInfo} info - The worker information
      */
     constructor(client, info) {
-        if (this.constructor.name === 'BaseWorker') {
-            throw new Error('BaseWorker is abstract and cannot be instantiated directly');
+        if (this.constructor.name === 'Worker') {
+            throw new Error('Worker is abstract and cannot be instantiated directly');
         }
 
         this.constructor.validateInfo(client, info);
 
         /**
          * The client this module is for.
-         * @name BaseWorker#client
+         * @name Worker#client
          * @type {CommandoClient}
          * @readonly
          */
