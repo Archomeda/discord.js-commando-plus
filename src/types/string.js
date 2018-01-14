@@ -12,9 +12,6 @@ class StringArgumentType extends ArgumentType {
     }
 
     validate(value, msg, arg) {
-        if (!value) {
-            return false;
-        }
         if (arg.min !== null && typeof arg.min !== 'undefined' && value.length < arg.min) {
             return this.client.localization.tl('validation', 'string-count-above', msg.guild, {
                 argument: arg.label,

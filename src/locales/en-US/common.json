@@ -1,6 +1,7 @@
 {
   "command-cancelled": "[T|t]he command has been cancelled.",
   "disambiguation-channels": "[M|m]ultiple channels found. Please be more specific.",
+  "disambiguation-commands": "[M|m]ultiple commands found. Please be more specific.",
   "disambiguation-list": "**{{label}}:** {{items}}",
   "disambiguation-members": "[M|m]ultiple members found. Please be more specific.",
   "disambiguation-multiple": "[M|m]ultiple matches found. Please be more specific:\n{{items}}",

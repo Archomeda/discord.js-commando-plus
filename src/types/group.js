@@ -14,9 +14,6 @@ class GroupArgumentType extends ArgumentType {
     }
 
     validate(value, msg) {
-        if (!value) {
-            return false;
-        }
         const groups = this.client.registry.findGroups(value);
         if (groups.length === 1) {
             return true;

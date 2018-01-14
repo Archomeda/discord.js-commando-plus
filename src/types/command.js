@@ -14,9 +14,6 @@ class CommandArgumentType extends ArgumentType {
     }
 
     validate(value, msg) {
-        if (!value) {
-            return false;
-        }
         const commands = this.client.registry.findCommands(value);
         if (commands.length === 1) {
             return true;

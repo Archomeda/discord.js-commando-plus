@@ -48,14 +48,14 @@ class CommandHelp extends Command {
                 let help = stripIndents`
                     ${oneLine`
                         ${this.localization.tl('partial.command-header', msg.guild,
-                            { name: commands[0].name, description: commands[0].localization.tl(this.description) })}
+                    { name: commands[0].name, description: commands[0].localization.tl(this.description) })}
                         ${commands[0].guildOnly ? ` ${this.localization.tl('partial.guild-only', msg.guild)}` : ''}
                         ${commands[0].nsfw ? ` ${this.localization.tl('partial.nsfw', msg.guild)}` : ''}
                     `}
                     
                     ${this.localization.tl('partial.command-format', msg.guild,
-                        { usage: msg.anyUsage(`${commands[0].name}${commands[0].format ? ` ${commands[0].format}` : ''}`) }
-                    )}
+                    { usage: msg.anyUsage(`${commands[0].name}${commands[0].format ? ` ${commands[0].format}` : ''}`) }
+                )}
                 `;
                 /* eslint-enable max-len, indent */
                 if (commands[0].aliases.length > 0) {
@@ -83,6 +83,8 @@ class CommandHelp extends Command {
                     messages.push(await msg.reply(this.localization.tl('output.sending-dm-failed', msg.guild)));
                 }
                 return messages;
+            } else if (commands.length > 15) {
+                return msg.reply(this.client.localization.tl('common', 'disambiguation-commands', msg.guild));
             } else if (commands.length > 1) {
                 return msg.reply(formatDisambiguation(msg.guild, {
                     label: this.client.localization.tl('glossary', 'commands', msg.guild),
