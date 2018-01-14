@@ -801,6 +801,17 @@ class CommandRegistry {
         }
         throw new Error('Unable to resolve worker.');
     }
+
+    /**
+     * Resolves a worker file path from a worker ID.
+     * @param {ModuleResolvable} module - The module
+     * @param {string} workerId - ID of the worker
+     * @return {string} Fully-resolved path to the corresponding worker file.
+     */
+    resolveWorkerPath(module, workerId) {
+        module = this.resolveModule(module);
+        return path.join(module.workersDirectory, `${workerId}.js`);
+    }
 }
 
 function moduleFilterExact(search) {

@@ -5,6 +5,7 @@
 const discord = require('discord.js');
 const Command = require('./commands/base');
 const LocaleHelper = require('./providers/locale/helper');
+const Worker = require('./workers/base');
 
 /**
  * A module can contain commands, command groups, workers and localizations that can be registered to a client in one
@@ -16,7 +17,9 @@ class Module {
      * @property {string} id - The id of the module (must be lowercase)
      * @property {Command[]} commands - The commands associated with this module
      * @property {CommandGroup[]|Function[]|Array<string[]>} groups - The groups associated with this module
-     * @property {string} commandsDirectory - Fully resolved path to the module's commands directory.
+     * @property {string} commandsDirectory - Fully resolved path to the module's commands directory
+     * @property {Worker[]} workers - The workers associated with this module
+     * @property {string} workersDirectory - Fully resolved path to the module's workers directory
      * @property {string} localizationDirectory - The directory that contains the localizations for this module.
      * The directory must contain language culture name subdirectories, e.g. en-US.
      * Inside those directories you can create JSON translation files.
@@ -63,10 +66,29 @@ class Module {
         this.groups = info.groups;
 
         /**
-         * Fully resolved path to the modules's commands directory.
+         * Fully resolved path to the module's commands directory.
          * @type {string}
          */
         this.commandsDirectory = info.commandsDirectory;
+
+        /**
+         * The workers associated with this module.
+         * @type {Map<string, Worker>}
+         */
+        this.workers = new discord.Collection();
+
+        if (info.workers) {
+            for (const worker of info.workers) {
+                worker.module = this;
+                this.workers.set(worker.id, worker);
+            }
+        }
+
+        /**
+         * Fully resolved path to the module's workers directory.
+         * @type {string}
+         */
+        this.workersDirectory = info.workersDirectory;
 
         /**
          * The directory where the localizations for this module can be found.
@@ -105,7 +127,13 @@ class Module {
             throw new TypeError('Module commands must be an Array of Commands.');
         }
         if (typeof info.commandsDirectory !== 'string') {
-            throw new TypeError('Module commands directroy must be a string.');
+            throw new TypeError('Module commands directory must be a string.');
+        }
+        if (info.workers && (!Array.isArray(info.workers) || info.workers.some(w => !(w instanceof Worker)))) {
+            throw new TypeError('Module workers must be an Array of Workers.');
+        }
+        if (typeof info.workersDirectory !== 'string') {
+            throw new TypeError('Module workers directory must be a string.');
         }
         if (typeof info.localizationDirectory !== 'string') {
             throw new TypeError('Module localization directory must be a string.');

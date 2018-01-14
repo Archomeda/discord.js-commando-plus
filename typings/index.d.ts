@@ -527,6 +527,8 @@ declare module 'discord.js-commando' {
 
         public id: string;
         public guarded: boolean;
+        public module: Module;
+        public moduleID: string;
 
         public isEnabledIn(guild: GuildResolvable): boolean;
         public run(): Promise<Message | Message[]>;

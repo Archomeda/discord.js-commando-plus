@@ -6,8 +6,9 @@
 class Worker {
     /**
      * @typedef {Object} WorkerInfo
-     * @property {string} id - The worker id
-     * @property {boolean} [guarded = false] - Whether the worker should be protected from disabling.
+     * @property {string} module - The ID of the module the worker belongs to (must be lowercase)
+     * @property {string} id - The worker ID (must be lowercase)
+     * @property {boolean} [guarded = false] - Whether the worker should be protected from disabling
      */
 
     /**
@@ -29,6 +30,18 @@ class Worker {
          * @readonly
          */
         Object.defineProperty(this, 'client', { value: client });
+
+        /**
+         * ID of the module the command belongs to.
+         * @type {string}
+         */
+        this.moduleID = info.module;
+
+        /**
+         * The module the command belongs to, assigned upon registration through a module.
+         * @type {?Module}
+         */
+        this.module = null;
 
         /**
          * The worker id.
