@@ -149,6 +149,10 @@ class CommandRegistry {
             for (const command of module.commands) {
                 command.module = module;
             }
+            this.registerWorkers(module.workers.array());
+            for (const worker of module.workers) {
+                worker.module = module;
+            }
         }
         return this;
     }
@@ -384,6 +388,7 @@ class CommandRegistry {
             }
 
             // Add the worker
+            this.workers.set(worker.id, worker);
             /**
              * Emitted when a worker is registered.
              * @event CommandoClient#workerRegister
@@ -391,7 +396,7 @@ class CommandRegistry {
              * @param {Registry} registry - The registry that the worker was registered to
              */
             this.client.emit('workerRegister', worker, this);
-            this.client.emit('debug', `Registered worker ${worker.id}`);
+            this.client.emit('debug', `Registered worker ${worker.id}.`);
         }
 
         return this;

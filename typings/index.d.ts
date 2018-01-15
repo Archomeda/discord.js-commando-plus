@@ -494,6 +494,7 @@ declare module 'discord.js-commando' {
         private setupGuild(guild: string, settings: {}): void;
         private setupGuildCommand(guild: Guild, command: Command, settings: {}): void;
         private setupGuildGroup(guild: Guild, group: CommandGroup, settings: {}): void;
+        private setupGuildWorker(guild: Guild, worker: Worker, settings: {}): void;
         private updateOtherShards(key: string, val: any): void;
     }
 
@@ -531,8 +532,11 @@ declare module 'discord.js-commando' {
         public moduleID: string;
 
         public isEnabledIn(guild: GuildResolvable): boolean;
+        public getEnabledGuilds(): Collection<Snowflake, Guild>;
         public run(): Promise<Message | Message[]>;
+        public reload(): void;
         public setEnabledIn(guild: GuildResolvable, enabled: boolean): void;
+        public unload(): void;
 
         public static usage(command: string, prefix?: string, user?: User): string;
     }

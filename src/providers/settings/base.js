@@ -4,6 +4,7 @@
  - Moved from ./src/providers/base.js to ./src/providers/settings/base.js
  - Renamed SettingProvider to SettingsProvider
  - Moved some code from SQLiteProvider to SettingsProvider to decrease code duplication
+ - Added SettingsProvider.setupGuildWorker()
  - Changed SettingsProvider.initListeners()
  - Changed SettingsProvider.get()
  - Changed SettingsProvider.set()
@@ -70,6 +71,7 @@ class SettingsProvider {
             .set('languageChange', (guild, language) => this.set(guild, 'language', language))
             .set('commandStatusChange', (guild, command, enabled) => this.set(guild, `cmd-${command.name}`, enabled))
             .set('groupStatusChange', (guild, group, enabled) => this.set(guild, `grp-${group.id}`, enabled))
+            .set('workerStatusChange', (guild, worker, enabled) => this.set(guild, `wkr-${worker.id}`, enabled))
             .set('guildCreate', guild => {
                 const settings = this.settings.get(guild.id);
                 if (!settings) {
@@ -91,6 +93,14 @@ class SettingsProvider {
                         continue;
                     }
                     this.setupGuildGroup(this.client.guilds.get(guild), group, settings);
+                }
+            })
+            .set('workerRegister', worker => {
+                for (const [guild, settings] of this.settings) {
+                    if (guild !== 'global' && !this.client.guilds.has(guild)) {
+                        continue;
+                    }
+                    this.setupGuildWorker(this.client.guilds.get(guild), worker, settings);
                 }
             });
         for (const [event, listener] of this.listeners) {
@@ -207,12 +217,15 @@ class SettingsProvider {
             }
         }
 
-        // Load all command/group statuses
+        // Load all command, group and worker statuses
         for (const command of this.client.registry.commands.values()) {
             this.setupGuildCommand(guild, command, settings);
         }
         for (const group of this.client.registry.groups.values()) {
             this.setupGuildGroup(guild, group, settings);
+        }
+        for (const worker of this.client.registry.workers.values()) {
+            this.setupGuildWorker(guild, worker, settings);
         }
     }
 
@@ -257,6 +270,32 @@ class SettingsProvider {
             guild._groupsEnabled[group.id] = settings[`grp-${group.id}`];
         } else {
             group._globalEnabled = settings[`grp-${group.id}`];
+        }
+    }
+
+    /**
+     * Sets up a worker's status in a guild from the guild's settings.
+     * @param {?Guild} guild - Guild to set the status in
+     * @param {Worker} worker - Worker to set the status of
+     * @param {Object} settings - Settings of the guild
+     * @return {void}
+     * @private
+     */
+    setupGuildWorker(guild, worker, settings) {
+        if (typeof settings[`wkr-${worker.id}`] === 'undefined') {
+            return;
+        }
+        if (guild) {
+            if (!guild._workersEnabled) {
+                guild._workersEnabled = {};
+            }
+            guild._workersEnabled[worker.id] = settings[`wkr-${worker.id}`];
+        } else {
+            worker._globalEnabled = settings[`wkr-${worker.id}`];
+            // Start the worker here initially here because we currently have no better place for it
+            if (worker._globalEnabled) {
+                worker.start();
+            }
         }
     }
 

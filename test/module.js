@@ -13,6 +13,9 @@ class TestModule extends Module {
             new (require('./commands/utils/split'))(client),
             new (require('./commands/utils/user-info'))(client)
         ];
+        const workers = [
+            new (require('./workers/print-guilds'))(client)
+        ];
         super(client, {
             id: 'test',
             commands,
@@ -20,7 +23,9 @@ class TestModule extends Module {
                 ['math', 'Math'],
                 ['utils', 'Utilities']
             ],
+            workers,
             commandsDirectory: path.join(__dirname, 'commands'),
+            workersDirectory: path.join(__dirname, 'workers'),
             localizationDirectory: path.join(__dirname, 'locales')
         });
     }

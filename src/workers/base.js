@@ -8,6 +8,8 @@ class Worker {
      * @typedef {Object} WorkerInfo
      * @property {string} module - The ID of the module the worker belongs to (must be lowercase)
      * @property {string} id - The worker ID (must be lowercase)
+     * @property {number} timer - The time in milliseconds at which this worker should operate (must be at least 1
+     * second)
      * @property {boolean} [guarded = false] - Whether the worker should be protected from disabling
      */
 
@@ -50,6 +52,12 @@ class Worker {
         this.id = info.id;
 
         /**
+         * The time in milliseconds at which this worker operates.
+         * @type {number}
+         */
+        this.timer = info.timer;
+
+        /**
          * Whether the worker is protected from being disabled.
          * @type {boolean}
          */
@@ -62,7 +70,12 @@ class Worker {
          */
         this._globalEnabled = true;
 
-        // TODO: Add worker timer
+        /**
+         * The timeout ID.
+         * @type {Object}
+         * @private
+         */
+        this._timeoutID = undefined;
     }
 
     /**
@@ -116,7 +129,78 @@ class Worker {
         return guild.isWorkerEnabled(this);
     }
 
-    // TODO: Add reload and unload capabilities
+    /**
+     * Gets the guilds in which this worker is enabled in.
+     * @return {Collection<Snowflake, Guild>} The guilds.
+     */
+    getEnabledGuilds() {
+        return this.client.guilds.filter(g => g.isWorkerEnabled(this));
+    }
+
+    /**
+     * Starts the worker.
+     * @return {void}
+     * @private
+     */
+    start() {
+        if (this._timeoutID) {
+            clearTimeout(this._timeoutID);
+        }
+        const exec = () => {
+            const result = this.run();
+            this._timeoutID = setTimeout(exec, this.timer);
+            return result;
+        };
+        // Explicitly run our worker after 5 seconds
+        this._timeoutID = setTimeout(exec, 5000);
+    }
+
+    /**
+     * Stops the worker.
+     * @return {void}
+     * @private
+     */
+    stop() {
+        if (this._timeoutID) {
+            clearTimeout(this._timeoutID);
+            this._timeoutID = undefined;
+        }
+    }
+
+    /**
+     * Reloads the worker.
+     * @return {void}
+     */
+    reload() {
+        let workerPath, cached, newWorker;
+        try {
+            workerPath = this.client.registry.resolveWorkerPath(this.moduleID, this.id);
+            cached = require.cache[workerPath];
+            delete require.cache[workerPath];
+            newWorker = require(workerPath);
+        } catch (err) {
+            if (cached) {
+                require.cache[workerPath] = cached;
+            }
+            throw err;
+        }
+
+        this.client.registry.reregisterWorker(newWorker, this);
+    }
+
+    /**
+     * Unloads the worker.
+     * @return {void}
+     */
+    unload() {
+        const workerPath = this.client.registry.resolveWorkerPath(this.moduleID, this.id);
+        if (!require.cache[workerPath]) {
+            throw new Error('Worker cannot be unloaded.');
+        }
+        delete require.cache[workerPath];
+        this.client.registry.unregisterWorker(this);
+    }
+
 
     /**
      * Validates the constructor parameters.
@@ -134,6 +218,18 @@ class Worker {
         }
         if (typeof info.id !== 'string') {
             throw new TypeError('The worker id must be a string');
+        }
+        if (info.id !== info.id.toLowerCase()) {
+            throw new Error('Worker id must be lowercase.');
+        }
+        if (info.module !== info.module.toLowerCase()) {
+            throw new Error('Worker module must be lowercase.');
+        }
+        if (typeof info.timer !== 'number' || isNaN(info.timer)) {
+            throw new TypeError('Worker timer must be a number.');
+        }
+        if (info.timer < 1000) {
+            throw new RangeError('Worker timer must be at least 1000 (ms).');
         }
     }
 }

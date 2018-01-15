@@ -5,6 +5,7 @@ module.exports = {
     CommandoClient: require('./client'),
     Command: require('./commands/base'),
     CommandGroup: require('./commands/group'),
+    Worker: require('./workers/base'),
     CommandMessage: require('./commands/message'),
     ArgumentCollector: require('./commands/collector'),
     Argument: require('./commands/argument'),
