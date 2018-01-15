@@ -47,13 +47,13 @@ function formatDisambiguation(guild, items) {
 /**
  * Formats text where the first letter should be lowercase or uppercase.
  * @param {string} text - The text; should start with [X|x] where X is the uppercase letter(s)
- * and x the lowercase letter(s) (skips _ and * starting Discord formatting characters)
+ * and x the lowercase letter(s) (skips every character until [X|x] has been found)
  * @param {boolean} [lowercase=false] - True for lowercase, false for uppercase
  * @return {string} The formatted text.
  */
 function formatFirstLetter(text, lowercase = false) {
     const token = lowercase ? '$1$3' : '$1$2';
-    text = text.replace(/^([*_\s]*)\[([^|]+)\|([^)]+)\]/, token);
+    text = text.replace(/^(.*?)\[([^|]+)\|([^\]]+)]/, token);
     return text;
 }
 
