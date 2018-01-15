@@ -1,0 +1,100 @@
+{
+  "disable": {
+    "description": "Disables a command, command group or worker",
+    "details": "The argument must be the name or ID (partial or whole) of a command, a command group or a worker. Only administrators may use this command.",
+    "args": {
+      "cmdOrGrpOrWkr-prompt": "[W|w]hich command, command group or worker would you like to disable?"
+    },
+    "output": {
+      "command-already-disabled": "[T|t]he command '{{args.cmdOrGrpOrWkr.name}}' is already disabled.",
+      "command-disabled": "[T|t]he command '{{args.cmdOrGrpOrWkr.name}}' has been disabled.",
+      "command-guarded": "[T|t]he command '{{args.cmdOrGrpOrWkr.name}}' cannot be disabled.",
+      "group-already-disabled": "[T|t]he group '{{args.cmdOrGrpOrWkr.name}}' is already disabled.",
+      "group-disabled": "[T|t]he group '{{args.cmdOrGrpOrWkr.name}}' has been disabled.",
+      "group-guarded": "[T|t]he group '{{args.cmdOrGrpOrWkr.name}}' cannot be disabled.",
+      "worker-already-disabled": "[T|t]he worker '{{args.cmdOrGrpOrWkr.id}}' is already disabled.",
+      "worker-disabled": "[T|t]he worker '{{args.cmdOrGrpOrWkr.id}}' has been disabled.",
+      "worker-guarded": "[T|t]he worker '{{args.cmdOrGrpOrWkr.id}}' cannot be disabled."
+    }
+  },
+  "enable": {
+    "description": "Enables a command, command group or worker",
+    "details": "The argument must be the name or ID (partial or whole) of a command, a command group or a worker. Only administrators may use this command.",
+    "args": {
+      "cmdOrGrpOrWkr-prompt": "[W|w]hich command, command group or worker would you like to enable?"
+    },
+    "output": {
+      "command-already-enabled": "[T|t]he command '{{args.cmdOrGrpOrWkr.name}}' is already enabled.",
+      "command-enabled": "[T|t]he command '{{args.cmdOrGrpOrWkr.name}}' has been enabled.",
+      "group-already-enabled": "[T|t]he group '{{args.cmdOrGrpOrWkr.name}}' is already enabled.",
+      "group-enabled": "[T|t]he group '{{args.cmdOrGrpOrWkr.name}}' has been enabled.",
+      "worker-already-enabled": "[T|t]he worker '{{args.cmdOrGrpOrWkr.id}}' is already enabled.",
+      "worker-enabled": "[T|t]he worker '{{args.cmdOrGrpOrWkr.id}}' has been enabled."
+    }
+  },
+  "groups": {
+    "description": "Lists all command groups",
+    "details": "Only administrators may use this command.",
+    "partial": {
+      "disabled": "disabled",
+      "enabled": "enabled"
+    },
+    "output": {
+      "header": "Groups"
+    }
+  },
+  "load": {
+    "description": "Loads a new command or worker",
+    "details": "The argument must be the full name of the command (`module:group:memberName`) or worker (`module:workerID`). Only the bot owner(s) may use this command.",
+    "args": {
+      "cmdOrWkr-prompt": "[W|w]hich command or worker would you like to load?"
+    },
+    "output": {
+      "command": "[T|t]he command '{{args.cmdOrWkr.name}}' has been loaded across all shards.",
+      "command-already-registered": "[T|t]he command '{{args.cmdOrWkr.name}}' has already been registered.",
+      "command-shards-failed": "[A|a]ttempted to load the command '{{args.cmdOrWkr.name}}', but loading it on other shards has failed.",
+      "worker": "[T|t]he worker '{{args.cmdOrWkr.id}}' has been loaded across all shards.",
+      "worker-already-registered": "[T|t]he worker '{{args.cmdOrWkr.id}}' has already been registered.",
+      "worker-shards-failed": "[A|a]ttempted to load the worker '{{args.cmdOrWkr.id}}', but loading it on other shards has failed."
+    }
+  },
+  "reload": {
+    "description": "Reloads a command, command group or worker",
+    "details": "The argument must be the name or ID (partial or whole) of a command, a command group or a worker. Providing a command group will reload all the commands in that group. Only the bot owner(s) may use this command.",
+    "args": {
+      "cmdOrGrpOrWkr-prompt": "[W|w]hich command, command group or worker would you like to reload?"
+    },
+    "output": {
+      "command": "[T|t]he command '{{args.cmdOrGrpOrWkr.name}}' has been reloaded across all shards.",
+      "command-shards-failed": "[A|a]ttempted to reload the command '{{args.cmdOrGrpOrWkr.name}}', but reloading it on other shards has failed.",
+      "group": "[A|a]ll commands in the group '{{args.cmdOrGrpOrWkr.name}}' have been reloaded across all shards.",
+      "group-shards-failed": "[A|a]ttempted to reload all the commands in the group '{{args.cmdOrGrpOrWkr.name}}', but reloading it on other shards has failed.",
+      "worker": "[T|t]he worker '{{args.cmdOrGrpOrWkr.id}}' has been reloaded across all shards.",
+      "worker-shards-failed": "[A|a]ttempted to reload the worker '{{args.cmdOrGrpOrWkr.id}}', but reloading it on other shards has failed."
+    }
+  },
+  "unload": {
+    "description": "Unloads a command or worker",
+    "details": "The argument must be the name or ID (partial or whole) of a command or a worker. Only the bot owner(s) may use this command.",
+    "args": {
+      "cmdOrWkr-prompt": "[W|w]hich command or worker would you like to unload?"
+    },
+    "output": {
+      "command": "[T|t]he command '{{args.cmdOrWkr.name}}' has been unloaded across all shards.",
+      "command-shards-failed": "[A|a]ttempted to unload the command '{{args.cmdOrWkr.name}}', but unloading it on other shards has failed.",
+      "worker": "[T|t]he worker '{{args.cmdOrWkr.id}}' has been unloaded across all shards.",
+      "worker-shards-failed": "[A|a]ttempted to unload the worker '{{args.cmdOrWkr.id}}', but unloading it on other shards has failed."
+    }
+  },
+  "workers": {
+    "description": "Lists all workers",
+    "details": "Only administrators may use this command.",
+    "partial": {
+      "disabled": "disabled",
+      "enabled": "enabled"
+    },
+    "output": {
+      "header": "Workers"
+    }
+  }
+}

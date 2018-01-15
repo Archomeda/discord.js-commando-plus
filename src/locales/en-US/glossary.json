@@ -4,5 +4,6 @@
   "groups": "[G|g]roups",
   "members": "[M|m]embers",
   "roles": "[R|r]oles",
-  "users": "[U|u]sers"
+  "users": "[U|u]sers",
+  "workers": "[W|w]orkers"
 }

@@ -11,7 +11,7 @@ class CommandGroups extends Command {
         super(client, {
             name: 'groups',
             aliases: ['list-groups', 'show-groups'],
-            group: 'commands',
+            group: 'admin',
             module: 'builtin',
             memberName: 'groups',
             guarded: true

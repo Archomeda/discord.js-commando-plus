@@ -2,6 +2,7 @@
  Original author: Gawdl3y
  Modified by: Archomeda
  - Added support for localization
+ - Added support for workers
  */
 
 const Command = require('../../../commands/base');
@@ -10,8 +11,8 @@ class CommandEnable extends Command {
     constructor(client) {
         super(client, {
             name: 'enable',
-            aliases: ['enable-command', 'cmd-on', 'command-on'],
-            group: 'commands',
+            aliases: ['on'],
+            group: 'admin',
             module: 'builtin',
             memberName: 'enable',
             examples: ['enable util', 'enable Utility', 'enable prefix'],
@@ -19,9 +20,9 @@ class CommandEnable extends Command {
 
             args: [
                 {
-                    key: 'cmdOrGrp',
-                    label: 'command/group',
-                    type: 'command-or-group'
+                    key: 'cmdOrGrpOrWkr',
+                    label: 'command/group/worker',
+                    type: 'command-or-group-or-worker'
                 }
             ]
         });
@@ -35,16 +36,20 @@ class CommandEnable extends Command {
     }
 
     run(msg, args) {
-        const { cmdOrGrp } = args;
-        const isCmd = Boolean(cmdOrGrp.groupID);
+        const { cmdOrGrpOrWkr } = args;
 
-        if (cmdOrGrp.isEnabledIn(msg.guild)) {
-            return msg.reply(this.localization.tl(
-                `output.${isCmd ? 'command' : 'group'}-already-enabled`, msg.guild, { args, cmd: this }));
+        let type = 'group';
+        if (cmdOrGrpOrWkr.groupID) {
+            type = 'command';
+        } else if (cmdOrGrpOrWkr.timer) {
+            type = 'worker';
         }
-        cmdOrGrp.setEnabledIn(msg.guild, true);
-        return msg.reply(this.localization.tl(
-            `output.${isCmd ? 'command' : 'group'}-enabled`, msg.guild, { args, cmd: this }));
+
+        if (cmdOrGrpOrWkr.isEnabledIn(msg.guild)) {
+            return msg.reply(this.localization.tl(`output.${type}-already-enabled`, msg.guild, { args, cmd: this }));
+        }
+        cmdOrGrpOrWkr.setEnabledIn(msg.guild, true);
+        return msg.reply(this.localization.tl(`output.${type}-enabled`, msg.guild, { args, cmd: this }));
     }
 }
 
