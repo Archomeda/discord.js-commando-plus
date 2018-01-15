@@ -9,7 +9,7 @@ const util = require('util');
 const { stripIndents } = require('common-tags');
 const discord = require('discord.js');
 const escapeRegex = require('escape-string-regexp');
-const Command = require('../../base');
+const Command = require('../../../commands/base');
 
 const nl = '!!NL!!';
 const nlPattern = new RegExp(nl, 'g');

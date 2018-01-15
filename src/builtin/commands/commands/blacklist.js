@@ -2,18 +2,18 @@
  Original author: Archomeda
  */
 
-const Command = require('../../base');
+const Command = require('../../../commands/base');
 const CommandOrGroupArgumentType = require('../../../types/command-or-group');
 
-class CommandWhitelist extends Command {
+class CommandBlacklist extends Command {
     constructor(client) {
         super(client, {
-            name: 'clear-whitelist',
+            name: 'blacklist',
             group: 'commands',
             module: 'builtin',
-            memberName: 'clear-whitelist',
-            aliases: ['cwl'],
-            examples: ['clear-whitelist help', 'clear-whitelist all'],
+            memberName: 'blacklist',
+            aliases: ['bl'],
+            examples: ['blacklist help help-channel', 'blacklist all bot-channel'],
             guarded: true,
             guildOnly: true,
 
@@ -36,6 +36,11 @@ class CommandWhitelist extends Command {
                         const type = new CommandOrGroupArgumentType(this.client);
                         return type.parse(val);
                     }
+                },
+                {
+                    key: 'channels',
+                    type: 'channel',
+                    infinite: true
                 }
             ]
         });
@@ -49,7 +54,7 @@ class CommandWhitelist extends Command {
     }
 
     run(msg, args) {
-        let { cmdOrGrp } = args;
+        let { cmdOrGrp, channels } = args;
 
         // Check the user's permission before changing anything
         if (!msg.member.hasPermission('ADMINISTRATOR') && !this.client.isOwner(msg.author)) {
@@ -64,12 +69,12 @@ class CommandWhitelist extends Command {
         }
 
         for (const command of commands) {
-            command.clearWhitelistIn(msg.guild);
+            command.setBlacklistIn(msg.guild, channels);
         }
 
-        return msg.reply(this.localization.tl('output.whitelist-removed', msg.guild,
+        return msg.reply(this.localization.tl('output.blacklist-applied', msg.guild,
             { args, cmd: this, commands: commands.map(c => `\`${c.name}\``) }));
     }
 }
 
-module.exports = CommandWhitelist;
+module.exports = CommandBlacklist;

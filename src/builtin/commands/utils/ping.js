@@ -4,7 +4,7 @@
  - Added support for localization
  */
 
-const Command = require('../../base');
+const Command = require('../../../commands/base');
 const { formatFirstLetter } = require('../../../util');
 
 class CommandPing extends Command {

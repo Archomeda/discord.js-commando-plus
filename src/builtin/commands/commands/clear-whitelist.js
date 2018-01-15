@@ -2,18 +2,18 @@
  Original author: Archomeda
  */
 
-const Command = require('../../base');
+const Command = require('../../../commands/base');
 const CommandOrGroupArgumentType = require('../../../types/command-or-group');
 
 class CommandWhitelist extends Command {
     constructor(client) {
         super(client, {
-            name: 'whitelist',
+            name: 'clear-whitelist',
             group: 'commands',
             module: 'builtin',
-            memberName: 'whitelist',
-            aliases: ['wl'],
-            examples: ['whitelist help help-channel', 'whitelist all bot-channel'],
+            memberName: 'clear-whitelist',
+            aliases: ['cwl'],
+            examples: ['clear-whitelist help', 'clear-whitelist all'],
             guarded: true,
             guildOnly: true,
 
@@ -36,11 +36,6 @@ class CommandWhitelist extends Command {
                         const type = new CommandOrGroupArgumentType(this.client);
                         return type.parse(val);
                     }
-                },
-                {
-                    key: 'channels',
-                    type: 'channel',
-                    infinite: true
                 }
             ]
         });
@@ -54,7 +49,7 @@ class CommandWhitelist extends Command {
     }
 
     run(msg, args) {
-        let { cmdOrGrp, channels } = args;
+        let { cmdOrGrp } = args;
 
         // Check the user's permission before changing anything
         if (!msg.member.hasPermission('ADMINISTRATOR') && !this.client.isOwner(msg.author)) {
@@ -69,10 +64,10 @@ class CommandWhitelist extends Command {
         }
 
         for (const command of commands) {
-            command.setWhitelistIn(msg.guild, channels);
+            command.clearWhitelistIn(msg.guild);
         }
 
-        return msg.reply(this.localization.tl('output.whitelist-applied', msg.guild,
+        return msg.reply(this.localization.tl('output.whitelist-removed', msg.guild,
             { args, cmd: this, commands: commands.map(c => `\`${c.name}\``) }));
     }
 }

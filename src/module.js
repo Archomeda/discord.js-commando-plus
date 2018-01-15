@@ -126,13 +126,13 @@ class Module {
         if (info.commands && (!Array.isArray(info.commands) || info.commands.some(c => !(c instanceof Command)))) {
             throw new TypeError('Module commands must be an Array of Commands.');
         }
-        if (typeof info.commandsDirectory !== 'string') {
+        if (info.commandsDirectory && typeof info.commandsDirectory !== 'string') {
             throw new TypeError('Module commands directory must be a string.');
         }
         if (info.workers && (!Array.isArray(info.workers) || info.workers.some(w => !(w instanceof Worker)))) {
             throw new TypeError('Module workers must be an Array of Workers.');
         }
-        if (typeof info.workersDirectory !== 'string') {
+        if (info.workersDirectory && typeof info.workersDirectory !== 'string') {
             throw new TypeError('Module workers directory must be a string.');
         }
         if (typeof info.localizationDirectory !== 'string') {

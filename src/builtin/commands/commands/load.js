@@ -5,7 +5,7 @@
  */
 
 const fs = require('fs');
-const Command = require('../../base');
+const Command = require('../../../commands/base');
 
 class CommandLoad extends Command {
     constructor(client) {

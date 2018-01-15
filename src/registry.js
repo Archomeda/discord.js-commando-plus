@@ -13,6 +13,7 @@
  - Added CommandRegistry.reregisterWorker()
  - Added CommandRegistry.resolveModule()
  - Added CommandRegistry.resolveWorker()
+ - Added CommandRegistry.resolveWorkerPath()
  - Added CommandRegistry.unregisterWorker()
  - Changed signature of CommandRegistry.resolveCommandPath()
  - Removed CommandRegistry.commandsPath
@@ -531,7 +532,7 @@ class CommandRegistry {
      * @return {CommandRegistry} This.
      */
     registerBuiltInModule(commandsToLoad) {
-        return this.registerModule(require('./commands/builtin/module'), commandsToLoad);
+        return this.registerModule(require('./builtin/module'), commandsToLoad);
     }
 
     /**

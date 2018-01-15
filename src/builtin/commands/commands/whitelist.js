@@ -2,18 +2,18 @@
  Original author: Archomeda
  */
 
-const Command = require('../../base');
+const Command = require('../../../commands/base');
 const CommandOrGroupArgumentType = require('../../../types/command-or-group');
 
-class CommandBlacklist extends Command {
+class CommandWhitelist extends Command {
     constructor(client) {
         super(client, {
-            name: 'blacklist',
+            name: 'whitelist',
             group: 'commands',
             module: 'builtin',
-            memberName: 'blacklist',
-            aliases: ['bl'],
-            examples: ['blacklist help help-channel', 'blacklist all bot-channel'],
+            memberName: 'whitelist',
+            aliases: ['wl'],
+            examples: ['whitelist help help-channel', 'whitelist all bot-channel'],
             guarded: true,
             guildOnly: true,
 
@@ -69,12 +69,12 @@ class CommandBlacklist extends Command {
         }
 
         for (const command of commands) {
-            command.setBlacklistIn(msg.guild, channels);
+            command.setWhitelistIn(msg.guild, channels);
         }
 
-        return msg.reply(this.localization.tl('output.blacklist-applied', msg.guild,
+        return msg.reply(this.localization.tl('output.whitelist-applied', msg.guild,
             { args, cmd: this, commands: commands.map(c => `\`${c.name}\``) }));
     }
 }
 
-module.exports = CommandBlacklist;
+module.exports = CommandWhitelist;

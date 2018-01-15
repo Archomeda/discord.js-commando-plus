@@ -2,7 +2,7 @@
  Original author: Archomeda
  */
 
-const Command = require('../../base');
+const Command = require('../../../commands/base');
 
 class CommandWhitelist extends Command {
     constructor(client) {

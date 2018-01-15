@@ -5,7 +5,7 @@
  */
 
 const { stripIndents, oneLine } = require('common-tags');
-const Command = require('../../base');
+const Command = require('../../../commands/base');
 const { formatDisambiguation } = require('../../../util');
 
 class CommandHelp extends Command {
