@@ -106,6 +106,11 @@ class Worker {
 
         if (!guild) {
             this._globalEnabled = enabled;
+            if (enabled) {
+                this.start();
+            } else {
+                this.stop();
+            }
             this.client.emit('workerStatusChange', null, this, enabled);
             return;
         }
@@ -197,6 +202,7 @@ class Worker {
         if (!require.cache[workerPath]) {
             throw new Error('Worker cannot be unloaded.');
         }
+        this.stop();
         delete require.cache[workerPath];
         this.client.registry.unregisterWorker(this);
     }

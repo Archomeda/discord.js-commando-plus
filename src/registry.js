@@ -397,6 +397,11 @@ class CommandRegistry {
              */
             this.client.emit('workerRegister', worker, this);
             this.client.emit('debug', `Registered worker ${worker.id}.`);
+
+            // Start the worker if it's configured to be active
+            if (this.client.settingsProvider && this.client.settings.get(`wkr-${worker.id}`)) {
+                worker.start();
+            }
         }
 
         return this;
@@ -415,6 +420,7 @@ class CommandRegistry {
         if (worker.id !== oldWorker.id) {
             throw new Error('Worker id cannot change');
         }
+        worker._globalEnabled = oldWorker._globalEnabled;
         this.workers.set(worker.id, worker);
         /**
          * Emitted when a worker is reregistered.
@@ -423,7 +429,12 @@ class CommandRegistry {
          * @param {Worker} oldWorker - The old worker
          */
         this.client.emit('workerReregister', worker, oldWorker);
-        this.client.debug('debug', `Reregistered worker ${worker.id}`);
+        this.client.emit('debug', `Reregistered worker ${worker.id}`);
+
+        // Start the worker again if it was running before
+        if (worker._globalEnabled) {
+            worker.start();
+        }
     }
 
     /**

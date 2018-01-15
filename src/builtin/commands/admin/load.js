@@ -22,7 +22,7 @@ class CommandLoad extends Command {
             args: [
                 {
                     key: 'cmdOrWkr',
-                    label: 'command-or-worker',
+                    label: 'command/worker',
                     validate: (val, msg) => new Promise(resolve => {
                         if (!val) {
                             return resolve(false);
@@ -67,15 +67,14 @@ class CommandLoad extends Command {
     }
 
     async run(msg, args) {
-        let { cmdOrWkr } = args;
-        if (cmdOrWkr.prototype.groupID) {
-            this.client.registry.registerCommand(cmdOrWkr);
-            cmdOrWkr = this.client.registry.commands.last();
+        if (args.cmdOrWkr.prototype.groupID) {
+            this.client.registry.registerCommand(args.cmdOrWkr);
+            args.cmdOrWkr = this.client.registry.commands.last();
         } else {
-            this.client.registry.registerWorker(cmdOrWkr);
-            cmdOrWkr = this.client.registry.workers.last();
+            this.client.registry.registerWorker(args.cmdOrWkr);
+            args.cmdOrWkr = this.client.registry.workers.last();
         }
-        const type = cmdOrWkr.groupID ? 'command' : 'worker';
+        const type = args.cmdOrWkr.groupID ? 'command' : 'worker';
 
         if (this.client.shard) {
             try {
@@ -84,9 +83,9 @@ class CommandLoad extends Command {
                     if (this.shard.id !== ${this.client.shard.id}) {
                         ${type === 'command' ?
                             `const path = this.registry.resolveCommandPath(
-                                '${cmdOrWkr.moduleID}', '${cmdOrWkr.groupID}', '${cmdOrWkr.name}');` :
+                                '${args.cmdOrWkr.moduleID}', '${args.cmdOrWkr.groupID}', '${args.cmdOrWkr.name}');` :
                             `const path = this.registry.resolveWorkerPath(
-                                '${cmdOrWkr.moduleID}', '${cmdOrWkr.id}');`}
+                                '${args.cmdOrWkr.moduleID}', '${args.cmdOrWkr.id}');`}
                         delete require.cache[path];
                         ${type === 'command' ? 'this.registry.registerCommand(require(path));' :
                             'this.registry.registerWorker(require(path));'}
