@@ -195,7 +195,7 @@ class CommandDispatcher {
             }
         }
 
-        this.cacheCommandMessage(message, oldMessage, cmdMsg, responses, timeoutIds);
+        this.cacheCommandMessage(message, cmdMsg, responses, timeoutIds);
     }
 
     /**
@@ -225,7 +225,7 @@ class CommandDispatcher {
             responses = message.responses;
         }
 
-        this.cacheCommandMessage(message.message, message.message, message, responses, timeoutIds);
+        this.cacheCommandMessage(message.message, message, responses, timeoutIds);
     }
 
     /**
@@ -293,7 +293,6 @@ class CommandDispatcher {
     /**
      * Caches a command message to be editable.
      * @param {Message} message - Triggering message
-     * @param {Message} oldMessage - Triggering message's old version
      * @param {CommandMessage} cmdMsg - Command message to cache
      * @param {Message|Message[]} responses - Responses to the message
      * @param {Object} [timeoutIds] - The timeout ids
@@ -302,7 +301,7 @@ class CommandDispatcher {
      * @return {void}
      * @private
      */
-    cacheCommandMessage(message, oldMessage, cmdMsg, responses, timeoutIds = {}) {
+    cacheCommandMessage(message, cmdMsg, responses, timeoutIds = {}) {
         if (this.client.options.commandEditableDuration <= 0 && this.client.options.commandReactableDuration <= 0) {
             return;
         }
@@ -312,22 +311,28 @@ class CommandDispatcher {
         if (responses !== null) {
             if (timeoutIds.edit) {
                 clearTimeout(timeoutIds.edit);
+                timeoutIds.edit = undefined;
             }
             if (timeoutIds.react) {
                 clearTimeout(timeoutIds.react);
+                timeoutIds.react = undefined;
             }
             // Only get the last response to listen for reactions
             const reactResponse = Array.isArray(responses) ? responses[responses.length - 1] : responses;
 
-            timeoutIds.edit = setTimeout(async() => {
-                await cmdMsg.command.editTimeout(cmdMsg, responses);
+            timeoutIds.edit = setTimeout(async () => {
+                if (cmdMsg && cmdMsg.command) {
+                    await cmdMsg.command.editTimeout(cmdMsg, responses);
+                }
                 if (this.client.options.commandEditableDuration > this.client.options.commandReactableDuration) {
                     return this._results.delete(message.id);
                 }
                 return undefined;
             }, this.client.options.commandEditableDuration * 1000);
-            timeoutIds.react = setTimeout(async() => {
-                await cmdMsg.command.reactTimeout(cmdMsg, responses);
+            timeoutIds.react = setTimeout(async () => {
+                if (cmdMsg && cmdMsg.command) {
+                    await cmdMsg.command.reactTimeout(cmdMsg, responses);
+                }
                 this._commandResponses.delete(reactResponse.id);
                 if (this.client.options.commandReactableDuration > this.client.options.commandEditableDuration) {
                     return this._results.delete(message.id);
@@ -336,7 +341,9 @@ class CommandDispatcher {
             }, this.client.options.commandReactableDuration * 1000);
 
             this._results.set(message.id, { message: cmdMsg, timeoutIds });
-            this._commandResponses.set(reactResponse.id, message.id);
+            if (reactResponse) {
+                this._commandResponses.set(reactResponse.id, message.id);
+            }
         } else {
             this._results.delete(message.id);
         }
