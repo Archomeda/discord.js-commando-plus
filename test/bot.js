@@ -95,7 +95,6 @@ if (sqlite) {
 }
 
 client.registry
-    .registerGroup('math', 'Math')
     .registerDefaults()
     .registerModule(new (require('./module'))(client));
 
