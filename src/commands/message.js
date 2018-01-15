@@ -337,7 +337,7 @@ class CommandMessage {
      * @return {Promise<Message|Message[]>} The response message.
      * @private
      */
-    respond({ type = 'reply', content, options, lang, fromEdit = false }) {
+    respond({ type = 'reply', content, options, lang, fromEdit = false }) { // eslint-disable-line complexity
         const shouldEdit = this.responses && !fromEdit;
         if (shouldEdit) {
             if (options && options.split && typeof options.split !== 'object') {

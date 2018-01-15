@@ -125,7 +125,7 @@ class CommandDispatcher {
      * @return {Promise<void>} The promise.
      * @private
      */
-    async handleMessage(message, oldMessage) {
+    async handleMessage(message, oldMessage) { // eslint-disable-line complexity
         if (!this.shouldHandleMessage(message, oldMessage)) {
             return;
         }
@@ -320,7 +320,7 @@ class CommandDispatcher {
             // Only get the last response to listen for reactions
             const reactResponse = Array.isArray(responses) ? responses[responses.length - 1] : responses;
 
-            timeoutIds.edit = setTimeout(async () => {
+            timeoutIds.edit = setTimeout(async() => {
                 if (cmdMsg && cmdMsg.command) {
                     await cmdMsg.command.editTimeout(cmdMsg, responses);
                 }
@@ -329,7 +329,7 @@ class CommandDispatcher {
                 }
                 return undefined;
             }, this.client.options.commandEditableDuration * 1000);
-            timeoutIds.react = setTimeout(async () => {
+            timeoutIds.react = setTimeout(async() => {
                 if (cmdMsg && cmdMsg.command) {
                     await cmdMsg.command.reactTimeout(cmdMsg, responses);
                 }

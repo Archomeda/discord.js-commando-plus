@@ -391,7 +391,7 @@ class Argument {
      * @return {void}
      * @private
      */
-    static validateInfo(client, info) {
+    static validateInfo(client, info) { // eslint-disable-line complexity
         if (!client) {
             throw new Error('The argument client must be specified.');
         }
