@@ -47,9 +47,6 @@ class CommandWhitelist extends Command {
     }
 
     hasPermission(msg) {
-        if (!msg.guild) {
-            return this.client.isOwner(msg.author);
-        }
         return msg.member.hasPermission('ADMINISTRATOR') || this.client.isOwner(msg.author);
     }
 

@@ -12,7 +12,7 @@ class CommandWhitelist extends Command {
             group: 'commands',
             module: 'builtin',
             memberName: 'clear-whitelist',
-            aliases: ['cwl'],
+            aliases: ['cwl', 'clear-wl'],
             examples: ['clear-whitelist help', 'clear-whitelist all'],
             guarded: true,
             guildOnly: true,
@@ -42,9 +42,6 @@ class CommandWhitelist extends Command {
     }
 
     hasPermission(msg) {
-        if (!msg.guild) {
-            return this.client.isOwner(msg.author);
-        }
         return msg.member.hasPermission('ADMINISTRATOR') || this.client.isOwner(msg.author);
     }
 
