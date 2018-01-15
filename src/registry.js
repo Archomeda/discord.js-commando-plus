@@ -189,8 +189,7 @@ class CommandRegistry {
 
             const existing = this.groups.get(group.id);
             if (existing) {
-                existing.name = group.name;
-                this.client.emit('debug', `Group ${group.id} is already registered; renamed it to "${group.name}".`);
+                this.client.emit('debug', `Group ${group.id} is already registered; skipping.`);
             } else {
                 this.groups.set(group.id, group);
                 /**
