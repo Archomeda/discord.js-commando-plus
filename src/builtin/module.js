@@ -62,11 +62,7 @@ class BuiltInModule extends Module {
         super(client, {
             id: 'builtin',
             commands: toLoad,
-            groups: [
-                ['admin', 'Admin'],
-                ['commands', 'Commands'],
-                ['utils', 'Utilities']
-            ],
+            groups: ['admin', 'commands', 'utils'],
             commandsDirectory: path.join(__dirname, 'commands'),
             workersDirectory: path.join(__dirname, 'workers'),
             localizationDirectory: path.join(__dirname, '../locales')

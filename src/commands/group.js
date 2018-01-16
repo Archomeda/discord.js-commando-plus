@@ -1,3 +1,11 @@
+/*
+ Original author: Gawdl3y
+ Modified by: Archomeda
+ - Added GroupInfo
+ - Added GroupInfo.module
+ - Changed the constructor to take GroupInfo
+ */
+
 const discord = require('discord.js');
 
 /**
@@ -5,25 +13,21 @@ const discord = require('discord.js');
  */
 class CommandGroup {
     /**
-     * @param {CommandoClient} client - The client the group is for
+     * @typedef {Object} GroupInfo
      * @param {string} id - The ID for the group
-     * @param {string} [name=id] - The name of the group
-     * @param {boolean} [guarded=false] - Whether the group should be protected from disabling
+     * @property {string} [name=id] - The localization key that will be used to get the name of the module. Defaults to
+     * `<id>`.
+     * @property {string} module - The ID of the module the command belongs to (must be lowercase)
      * @param {Command[]} [commands] - The commands that the group contains
+     * @property {boolean} [guarded=false] - Whether the command should be protected from disabling
      */
-    constructor(client, id, name, guarded = false, commands = null) {
-        if (!client) {
-            throw new Error('A client must be specified.');
-        }
-        if (typeof id !== 'string') {
-            throw new TypeError('Group ID must be a string.');
-        }
-        if (id !== id.toLowerCase()) {
-            throw new Error('Group ID must be lowercase.');
-        }
-        if (commands && !Array.isArray(commands)) {
-            throw new TypeError('Group commands must be an Array of Commands.');
-        }
+
+    /**
+     * @param {CommandoClient} client - The client the group is for
+     * @param {GroupInfo} info - The group information
+     */
+    constructor(client, info) {
+        this.constructor.validateInfo(client, info);
 
         /**
          * Client that this group is for.
@@ -37,21 +41,33 @@ class CommandGroup {
          * ID of this group.
          * @type {string}
          */
-        this.id = id;
+        this.id = info.id;
 
         /**
-         * Name of this group.
+         * Locale key for the name of this group.
          * @type {string}
          */
-        this.name = name || id;
+        this.name = info.name || info.id;
+
+        /**
+         * ID of the module the group initially belongs to.
+         * @type {string}
+         */
+        this.moduleID = info.module;
+
+        /**
+         * The module the group initially belongs to, assigned upon registration through a module.
+         * @type {?Module}
+         */
+        this.module = null;
 
         /**
          * The commands in this group (added upon their registration).
          * @type {Collection<string, Command>}
          */
         this.commands = new discord.Collection();
-        if (commands) {
-            for (const command of commands) {
+        if (info.commands) {
+            for (const command of info.commands) {
                 this.commands.set(command.name, command);
             }
         }
@@ -60,7 +76,7 @@ class CommandGroup {
          * Whether or not this group is protected from being disabled.
          * @type {boolean}
          */
-        this.guarded = guarded;
+        this.guarded = info.guarded;
 
         this._globalEnabled = true;
     }
@@ -113,6 +129,40 @@ class CommandGroup {
     reload() {
         for (const command of this.commands.values()) {
             command.reload();
+        }
+    }
+
+    /**
+     * Validates the constructor parameters.
+     * @param {CommandoClient} client - Client to validate
+     * @param {GroupInfo} info - Info to validate
+     * @return {void}
+     * @private
+     */
+    static validateInfo(client, info) { // eslint-disable-line complexity
+        if (!client) {
+            throw new Error('A client must be specified.');
+        }
+        if (typeof info !== 'object') {
+            throw new TypeError('Group info must be an Object.');
+        }
+        if (typeof info.id !== 'string') {
+            throw new TypeError('Group ID must be a string.');
+        }
+        if (info.id !== info.id.toLowerCase()) {
+            throw new Error('Group ID must be lowercase.');
+        }
+        if ('name' in info && typeof info.name !== 'string') {
+            throw new TypeError('Group name must be a string.');
+        }
+        if (typeof info.module !== 'string') {
+            throw new TypeError('Group module must be a string.');
+        }
+        if (info.module !== info.module.toLowerCase()) {
+            throw new Error('Group module must be lowercase.');
+        }
+        if (info.commands && !Array.isArray(info.commands)) {
+            throw new TypeError('Group commands must be an Array of Commands.');
         }
     }
 }

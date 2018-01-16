@@ -33,7 +33,12 @@ class YourModule extends Commando.Module {
                 'a-group',
                 'a-second-group'
             ],
+            workers: [
+                require('a/path/to/a/worker'),
+                require('a/second/path/to/a/worker')
+            ],
             commandsDirectory: __dirname,
+            workersDirectory: __dirname,
             localizationDirectory: path.join(__dirname, 'locales')
         });
     }

@@ -19,10 +19,7 @@ class TestModule extends Module {
         super(client, {
             id: 'test',
             commands,
-            groups: [
-                ['math', 'Math'],
-                ['utils', 'Utilities']
-            ],
+            groups: ['math', 'utils'],
             workers,
             commandsDirectory: path.join(__dirname, 'commands'),
             workersDirectory: path.join(__dirname, 'workers'),

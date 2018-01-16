@@ -16,6 +16,7 @@
  - Added CommandRegistry.resolveWorkerPath()
  - Added CommandRegistry.unregisterWorker()
  - Changed signature of CommandRegistry.resolveCommandPath()
+ - Changed CommandRegistry.registerGroups() to take an array of IDs
  - Removed CommandRegistry.commandsPath
  - Removed CommandRegistry.registerCommandsIn()
  - Removed CommandRegistry.registerDefaultCommands()
@@ -144,7 +145,7 @@ class CommandRegistry {
             this.client.emit('moduleRegister', module, this);
             this.client.emit('debug', `Registered module ${module.id}.`);
 
-            this.registerGroups(module.groups);
+            this.registerGroups(module.groups, module);
             this.registerCommands(module.commands.array());
             for (const command of module.commands) {
                 command.module = module;
@@ -162,39 +163,45 @@ class CommandRegistry {
      * @param {CommandGroup|Function|string[]|string} group - A CommandGroup instance, a constructor,
      * an array of [ID, Name], or the group ID
      * @param {string} [name] - Name for the group (if the first argument is the group ID)
+     * @param {Module} [module] - The module that's associated with the group
      * @return {CommandRegistry} This.
      * @see {@link CommandRegistry#registerGroups}
      */
-    registerGroup(group, name) {
+    registerGroup(group, name, module) {
         if (typeof group === 'string') {
-            return this.registerGroups([[group, name]]);
+            return this.registerGroups([[group, name]], module);
         }
-        return this.registerGroups([group]);
+        return this.registerGroups([group], module);
     }
 
     /**
      * Registers multiple groups.
-     * @param {CommandGroup[]|Function[]|Array<string[]>} groups - An array of CommandGroup instances, constructors,
-     * or arrays of [ID, Name]
+     * @param {CommandGroup[]|Function[]|Array<string[]>|string[]} groups - An array of CommandGroup instances,
+     * constructors, arrays of [ID, Name] or an array of IDs
+     * @param {Module} [module] - The module that's associated with the group
      * @return {CommandRegistry} This.
      */
-    registerGroups(groups) {
+    registerGroups(groups, module) {
         if (!Array.isArray(groups)) {
             throw new TypeError('Groups must be an Array.');
         }
         for (let group of groups) {
             if (typeof group === 'function') {
                 group = new group(this.client); // eslint-disable-line new-cap
+            } else if (typeof group === 'string') {
+                group = new CommandGroup(this.client, { id: group, module: module.id });
             } else if (Array.isArray(group)) {
-                group = new CommandGroup(this.client, ...group);
+                group = new CommandGroup(this.client, { id: group[0], name: group[1], module: module.id });
             } else if (!(group instanceof CommandGroup)) {
-                group = new CommandGroup(this.client, group.id, group.name, null, group.commands);
+                group = new CommandGroup(this.client,
+                    { id: group.id, name: group.name, commands: group.commands, module: module.id });
             }
 
             const existing = this.groups.get(group.id);
             if (existing) {
                 this.client.emit('debug', `Group ${group.id} is already registered; skipping.`);
             } else {
+                group.module = module;
                 this.groups.set(group.id, group);
                 /**
                  * Emitted when a group is registered.

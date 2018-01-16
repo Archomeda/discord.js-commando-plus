@@ -171,6 +171,8 @@ declare module 'discord.js-commando' {
         public commands: Collection<string, Command>;
         public guarded: boolean;
         public id: string;
+        public moduleID: string;
+        public module: Module;
         public name: string;
 
         public isEnabledIn(guild: GuildResolvable): boolean;
@@ -356,7 +358,7 @@ declare module 'discord.js-commando' {
         public registerModule(module: Module): CommandRegistry;
         public registerModules(modules: Module[]): CommandRegistry;
         public registerGroup(group: CommandGroup | Function | string[] | string, name?: string): CommandRegistry;
-        public registerGroups(groups: CommandGroup[] | Function[] | string[][]): CommandRegistry;
+        public registerGroups(groups: CommandGroup[] | Function[] | string[][] | string[]): CommandRegistry;
         public registerType(type: ArgumentType | Function): CommandRegistry;
         public registerTypes(type: ArgumentType[] | Function[]): CommandRegistry;
         public registerTypesIn(options: string | {}): CommandRegistry;
@@ -452,7 +454,7 @@ declare module 'discord.js-commando' {
     export class Module {
         public readonly client: CommandoClient;
         public commands: Collection<string, Command>;
-        public groups: CommandGroup[] | Function[] | string[][];
+        public groups: CommandGroup[] | Function[] | string[][] | string[];
         public id: string;
         public localization: LocaleHelper;
         public localizationDirectory: string;
@@ -617,6 +619,14 @@ declare module 'discord.js-commando' {
     };
 
     type CommandResolvable = Command | string;
+
+    type GroupInfo = {
+        id: string;
+        name?: string;
+        module: string;
+        commands?: Command[];
+        guarded?: boolean;
+    };
 
     type Inhibitor = (msg: Message) => string | [string, Promise<any>];
 

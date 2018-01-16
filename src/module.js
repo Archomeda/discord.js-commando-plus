@@ -16,7 +16,7 @@ class Module {
      * @typedef {Object} ModuleInfo
      * @property {string} id - The id of the module (must be lowercase)
      * @property {Command[]} commands - The commands associated with this module
-     * @property {CommandGroup[]|Function[]|Array<string[]>} groups - The groups associated with this module
+     * @property {CommandGroup[]|Function[]|Array<string[]>|string[]} groups - The groups associated with this module
      * @property {string} commandsDirectory - Fully resolved path to the module's commands directory
      * @property {Worker[]} workers - The workers associated with this module
      * @property {string} workersDirectory - Fully resolved path to the module's workers directory
@@ -61,7 +61,7 @@ class Module {
 
         /**
          * The groups associated with this module.
-         * @type {CommandGroup[]|Function[]|Array<string[]>}
+         * @type {CommandGroup[]|Function[]|Array<string[]>|string[]}
          */
         this.groups = info.groups;
 
