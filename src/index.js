@@ -3,6 +3,7 @@ const discord = require('discord.js');
 module.exports = {
     Client: require('./client'),
     CommandoClient: require('./client'),
+    Module: require('./module'),
     Command: require('./commands/base'),
     CommandGroup: require('./commands/group'),
     Worker: require('./workers/base'),

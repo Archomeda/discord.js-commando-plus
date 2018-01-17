@@ -20,7 +20,7 @@ declare module 'sqlite' {
     export interface Statement {}
 }
 
-declare module 'discord.js-commando' {
+declare module 'discord.js-commando-plus' {
     import { Channel, ChannelResolvable, Client, ClientOptions, ClientUserSettings, Collection, DMChannel, Emoji, GroupDMChannel, Guild, GuildChannel, GuildMember, GuildResolvable, Message, MessageAttachment, MessageEmbed, MessageOptions, MessageReaction, PermissionResolvable, ReactionEmoji, RichEmbed, Role, Snowflake, StringResolvable, TextChannel, User, UserResolvable, Webhook } from 'discord.js';
     import { i18next } from 'i8next';
     import { Mongoose, Schema as MongooseSchema } from 'mongoose';
