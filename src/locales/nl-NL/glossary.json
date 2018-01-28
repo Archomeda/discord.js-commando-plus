@@ -1,0 +1,9 @@
+{
+  "channels": "[K|k]analen",
+  "commands": "[O|o]pdrachten",
+  "groups": "[G|g]roepen",
+  "members": "[L|l]eden",
+  "roles": "[R|r]ollen",
+  "users": "[G|g]ebruikers",
+  "workers": "[W|w]erkers"
+}

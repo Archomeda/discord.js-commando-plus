@@ -69,6 +69,8 @@ class I18nextLocaleProvider extends LocaleProvider {
             },
             interpolation: { escape: s => s }
         });
+
+        await this.localizer.loadLanguages(['nl-NL']);
     }
 
     async preloadNamespaces(namespaces) {

@@ -1,0 +1,100 @@
+{
+  "disable": {
+    "description": "Deactiveert een opdracht, opdrachtgroep of werker",
+    "details": "Het argument moet een naam of ID zijn (gedeeltelijk of geheel) van een opdracht, een opdrachtgroep of een werker. Alleen administratoren mogen deze opdracht gebruiken.",
+    "args": {
+      "cmdOrGrpOrWkr-prompt": "[W|w]elke opdracht, opdrachtgroep of werker will je deactiveren?"
+    },
+    "output": {
+      "command-already-disabled": "[D|D]e opdracht '{{args.cmdOrGrpOrWkr.name}}' is al gedeactiveerd.",
+      "command-disabled": "[D|d]e opdracht '{{args.cmdOrGrpOrWkr.name}}' is gedeactiveerd.",
+      "command-guarded": "[D|d]e opdracht '{{args.cmdOrGrpOrWkr.name}}' kan niet gedeactiveerd worden.",
+      "group-already-disabled": "[D|d]e groep '{{args.cmdOrGrpOrWkr.name}}' is al gedeactiveerd.",
+      "group-disabled": "[D|d]e groep '{{args.cmdOrGrpOrWkr.name}}' is gedeactiveerd.",
+      "group-guarded": "[D|d]e groep '{{args.cmdOrGrpOrWkr.name}}' kan niet gedeactiveerd worden.",
+      "worker-already-disabled": "[D|d]e werker '{{args.cmdOrGrpOrWkr.id}}' is al gedeactiveerd.",
+      "worker-disabled": "[D|d]e werker '{{args.cmdOrGrpOrWkr.id}}' is gedeactiveerd.",
+      "worker-guarded": "[D|d]e werker '{{args.cmdOrGrpOrWkr.id}}' kan niet gedeactiveerd worden."
+    }
+  },
+  "enable": {
+    "description": "Activeert een opdracht, opdrachtgroep of werker",
+    "details": "Het argument moet een naam of ID zijn (gedeeltelijk of geheel) van een opdracht, een opdrachtgroep of een werker. Alleen administratoren mogen deze opdracht gebruiken.",
+    "args": {
+      "cmdOrGrpOrWkr-prompt": "[W|w]elke opdracht, opdrachtgroep of werker will je activeren?"
+    },
+    "output": {
+      "command-already-enabled": "[D|D]e opdracht '{{args.cmdOrGrpOrWkr.name}}' is al geactiveerd.",
+      "command-enabled": "[D|d]e opdracht '{{args.cmdOrGrpOrWkr.name}}' is geactiveerd.",
+      "group-already-enabled": "[D|d]e groep '{{args.cmdOrGrpOrWkr.name}}' is al geactiveerd.",
+      "group-enabled": "[D|d]e groep '{{args.cmdOrGrpOrWkr.name}}' is geactiveerd.",
+      "worker-already-enabled": "[D|d]e werker '{{args.cmdOrGrpOrWkr.id}}' is al geactiveerd.",
+      "worker-enabled": "[D|d]e werker '{{args.cmdOrGrpOrWkr.id}}' is geactiveerd."
+    }
+  },
+  "groups": {
+    "description": "Toont alle opdrachtgroepen",
+    "details": "Alleen administratoren mogen deze opdracht gebruiken.",
+    "partial": {
+      "disabled": "gedeactiveerd",
+      "enabled": "geactiveerd"
+    },
+    "output": {
+      "header": "Groepen"
+    }
+  },
+  "load": {
+    "description": "Laadt een nieuwe opdracht of werker",
+    "details": "Het argument moet een volledige naam van een opdracht (`module:group:memberName`) of werker (`module:workerID`) zijn. Alleen bot-eigenaren mogen deze opdracht gebruiken.",
+    "args": {
+      "cmdOrGrpOrWkr-prompt": "[W|w]elke opdracht, opdrachtgroep of werker will je laden?"
+    },
+    "output": {
+      "command": "[D|d]e opdracht '{{args.cmdOrWkr.name}}' is geladen in alle shards.",
+      "command-already-registered": "[D|d]he command '{{args.cmdOrWkr.name}}' is al geregistreerd.",
+      "command-shards-failed": "[H|h]et is niet gelukt om de opdracht '{{args.cmdOrWkr.name}}' in alle shards te laden.",
+      "worker": "[D|d]e werker '{{args.cmdOrWkr.id}}' is geladen in alle shards.",
+      "worker-already-registered": "[D|d]e werker '{{args.cmdOrWkr.id}}' is al geregistreerd.",
+      "worker-shards-failed": "[H|h]et is niet gelukt om de werker '{{args.cmdOrWkr.id}}' in alle shards te laden."
+    }
+  },
+  "reload": {
+    "description": "Herlaadt een opdracht, opdrachtgroep of werker",
+    "details": "Het argument moet een naam of ID zijn (gedeeltelijk of geheel) van een opdracht, een opdrachtgroep of een werker. Als een opdrachtgroep is opgegeven, worden alle opdrachten in die groep herladen. Alleen bot-eigenaren mogen deze opdracht gebruiken.",
+    "args": {
+      "cmdOrGrpOrWkr-prompt": "[W|w]elke opdracht, opdrachtgroep of werker will je herladen?"
+    },
+    "output": {
+      "command": "[D|d]e opdracht '{{args.cmdOrGrpOrWkr.name}}' is herladen in alle shards.",
+      "command-shards-failed": "[H|h]et is niet gelukt om de opdracht '{{args.cmdOrGrpOrWkr.name}}' in alle shards te herladen.",
+      "group": "[A|a]lle opdrachten in de groep '{{args.cmdOrGrpOrWkr.name}}' is herladen in alle shards.",
+      "group-shards-failed": "[H|h]et is niet gelukt om alle opdrachten in de groep '{{args.cmdOrGrpOrWkr.name}}' in alle shards te herladen.",
+      "worker": "[D|d]e werker '{{args.cmdOrGrpOrWkr.name}}' is herladen in alle shards.",
+      "worker-shards-failed": "[H|h]et is niet gelukt om de werker '{{args.cmdOrGrpOrWkr.name}}' in alle shards te herladen."
+    }
+  },
+  "unload": {
+    "description": "Ontlaadt een opdracht of werker",
+    "details": "Het argument moet een naam of ID zijn (gedeeltelijk of geheel) van een opdracht of een werker. Alleen bot-eigenaren mogen deze opdracht gebruiken.",
+    "args": {
+      "cmdOrWkr-prompt": "[W|w]elke opdracht of werker will je ontladen?"
+    },
+    "output": {
+      "command": "[D|d]e opdracht '{{args.cmdOrWkr.name}}' is ontladen in alle shards.",
+      "command-shards-failed": "[H|h]et is niet gelukt om de opdracht '{{args.cmdOrGrpOrWkr.name}}' in alle shards te ontladen.",
+      "worker": "[D|d]e werker '{{args.cmdOrGrpOrWkr.name}}' is ontladen in alle shards.",
+      "worker-shards-failed": "[H|h]et is niet gelukt om de werker '{{args.cmdOrGrpOrWkr.name}}' in alle shards te ontladen."
+    }
+  },
+  "workers": {
+    "description": "Toont alle werkers",
+    "details": "Alleen administratoren mogen deze opdracht gebruiken.",
+    "partial": {
+      "disabled": "gedeactiveerd",
+      "enabled": "geactiveerd"
+    },
+    "output": {
+      "header": "Werkers"
+    }
+  }
+}

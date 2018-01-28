@@ -1,0 +1,49 @@
+{
+  "blacklist": {
+    "description": "Zet een kanaal op de zwarte lijst voor het gebruik van een opdracht",
+    "details": "Het is mogelijk om alleen een witte lijst of een zwarte lijst te gebruiken voor een opdracht. Als een witte lijst ingesteld is, wordt de zwarte lijst genegeerd, en vice versa. Zwarte lijsten zijn niet van toepassing op administratoren en bot-eigenaren. Je kan `all` gebruiken om een zwarte lijst in te stellen voor alle opdrachten. Alleen administratoren en bot-eigenaren mogen de zwarte lijst instellen.",
+    "args": {
+      "cmdOrGrp-prompt": "[V|v]oor welke opdracht of opdrachtgroep wil je de zwarte lijst instellen?",
+      "channels-prompt": "[W|w]elke kanalen will je op de zwarte lijst zetten?"
+    },
+    "output": {
+      "admin-only": "[A|a]lleen administratoren en bot-eigenaren mogen de zwarte lijst instellen.",
+      "blacklist-applied": "[D|d]e zwarte lijst is ingesteld voor de volgende opdrachten: {{commands}}."
+    }
+  },
+  "clear-whitelist": {
+    "description": "Maakt de witte lijst en zwarte lijst van kanalen voor het gebruik van een opdracht leeg",
+    "details": "Je kan `all` gebruiken om een witte lijst in te stellen voor alle opdrachten. Alleen administratoren en bot-eigenaren mogen de witte lijst instellen.",
+    "args": {
+      "cmdOrGrp-prompt": "[V|v]oor welke opdracht of opdrachtgroep wil je de witte lijst en zwarte lijst leegmaken?"
+    },
+    "output": {
+      "admin-only": "[A|a]lleen administratoren en bot-eigenaren mogen de witte lijst instellen.",
+      "whitelist-removed": "[D|d]e witte lijst is leeggemaakt voor de volgende opdrachten: {{commands}}."
+    }
+  },
+  "show-whitelist": {
+    "description": "Toont de witte lijst van kanalen voor het gebruik van een opdracht",
+    "details": "Het resultaat zijn de kanalen waarin de opgegeven opdracht gebruikt of niet gebruikt mag worden. Deze instelling is niet van toepassing op administratoren en bot-eigenaren.",
+    "args": {
+      "command-prompt": "[V|v]oor welke opdracht wil je de witte lijst tonen?"
+    },
+    "output": {
+      "command-allowed": "[D|d]e opdracht `{{args.command.name}}` mag gebruikt worden in elke kanaal.",
+      "command-blacklist": "[D|d]e opdracht `{{args.command.name}}` mag **niet** gebruikt worden in de volgende kanalen: {{channels}}.",
+      "command-whitelist": "[D|d]e opdracht `{{args.command.name}}` mag **alleen** gebruikt worden in de volgende kanalen: {{channels}}."
+    }
+  },
+  "whitelist": {
+    "description": "Zet een kanaal op de witte lijst voor het gebruik van een opdracht",
+    "details": "Het is mogelijk om alleen een witte lijst of een zwarte lijst te gebruiken voor een opdracht. Als een witte lijst ingesteld is, wordt de zwarte lijst genegeerd, en vice versa. Witte lijsten zijn niet van toepassing op administratoren en bot-eigenaren. Je kan `all` gebruiken om een witte lijst in te stellen voor alle opdrachten. Alleen administratoren en bot-eigenaren mogen de witte lijst instellen.",
+    "args": {
+      "cmdOrGrp-prompt": "[V|v]oor welke opdracht of opdrachtgroep wil je de witte lijst instellen?",
+      "channels-prompt": "[W|w]elke kanalen will je op de witte lijst zetten?"
+    },
+    "output": {
+      "admin-only": "[A|a]lleen administratoren en bot-eigenaren mogen de witte lijst instellen.",
+      "whitelist-applied": "[D|d]e witte lijst is ingesteld voor de volgende opdrachten: {{commands}}."
+    }
+  }
+}

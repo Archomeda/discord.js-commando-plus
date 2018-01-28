@@ -1,0 +1,90 @@
+{
+  "eval": {
+    "description": "Voert Javascript code uit",
+    "details": "Alleen bot-eigenaren mogen deze opdracht gebruiken.",
+    "args": {
+      "script-prompt": "[W|w]elke code wil je uitvoeren?"
+    },
+    "partial": {
+      "inpit": "Invoer",
+      "sensitive-censor": "--snip--"
+    },
+    "output": {
+      "callback-execution-time": "[*T|*t]erugkoppeling uitgevoerd na {{time}}ms.*",
+      "evaluation-error": "[F|f]out tijdens evaluatie: {{err.message}}",
+      "execution-time": "[*U|*u]itgevoerd in {{time}}ms.*"
+    }
+  },
+  "help": {
+    "description": "Toont een lijst met beschikbare opdrachten, of gedetailleerde informatie van een opgegeven opdracht",
+    "details": "De opdracht kan een gedeelte of de gehele naam van de opdracht zijn. Als geen opdracht opgegeven is, worden alle opdrachten getoond.",
+    "args": {
+      "command-prompt": "[V|v]oor welke opdracht wil je informatie tonen?"
+    },
+    "partial": {
+      "command-header": "__Opdracht **{{name}}**:__ {{description}}",
+      "command-format": "**Formaat:** {{usage}}",
+      "command-aliases": "**Aliassen:** {{aliases}}",
+      "command-group": "**Groep:** {{group}} ({{id}})",
+      "command-details": "**Details:** {{details}}",
+      "command-examples": "**Voorbeelden:** {{examples}}",
+      "description-all": "__**Alle opdrachten**__",
+      "description-dm": "__**Beschikbare opdrachten in deze PB**__",
+      "description-text": "__**Beschikbare opdrachten in {{guild}}**__",
+      "guild-only": "(alleen servers)",
+      "heading-dm": "[O|o]m een opdracht om elke server te gebruiken, gebruik {{guild_usage}}. Bijvoorbeeld, {{example}}. Om een opdracht in deze PB te gebruiken, gebruik {{dm_usage}} zonder voorvoegsel.\n\nGebruik {{detailed_help}} om gedetailleerde informatie over een opdracht te tonen.\nGebruik {{all_help}} om de lijst met *alle* opdrachten te tonen, inclusief de niet-beschikbare opdrachten.",
+      "heading-text": "[O|o]m een opdracht in {{guild}} te gebruiken, gebruik {{guild_usage}}. Bijvoorbeeld, {{example}}.\n\nGebruik {{detailed_help}} om gedetailleerde informatie over een opdracht te tonen.\nGebruik {{all_help}} om de lijst met *alle* opdrachten te tonen, inclusief de niet-beschikbare opdrachten.",
+      "nsfw": "(NSFW)"
+    },
+    "output": {
+      "no-command": "[H|h]et is niet gelukt om de opdracht te identificeren. Gebruik {{usage}} om de lijst met opdrachten te tonen.",
+      "sending-dm-failed": "[H|h]et is niet gelukt om een PB te versturen. Controleer of PB's aanstaan en probeer het opnieuw.",
+      "sent-dm": "[E|e]en PB is naar jou verstuurd."
+    }
+  },
+  "language": {
+    "description": "Toont of wijzigt de huidige taal",
+    "details": "Gebruik een taal-ID zoals `en-US` of gebruik `default` om de originele taal te herstellen. Als geen taal is opgegeven, dan wordt de huidige taal getoond.",
+    "args": {
+      "language-prompt": "[W|w]elke taal wil je gebruiken?"
+    },
+    "output": {
+      "admin-only": "[A|a]lleen administratoren en bot-eigenaren mogen de taal aanpassen.",
+      "language": "[D|d]e taal is ingesteld op `{{language}}`.",
+      "output-owner-only": "[A|a]lleen de bot-eigenaren mogen de globale taal instellen.",
+      "reset-default": "[D|d]e taal is gereset naar de standaardtaal `{{default}}`.",
+      "set-language": "[D|d]e taal is ingesteld op `{{language}}`."
+    }
+  },
+  "ping": {
+    "description": "Toont de ping van de bot naar de Discord server",
+    "details": "",
+    "partial": {
+      "heartbeat": "De heartbeat ping is {{time}}ms."
+    },
+    "output": {
+      "output-pinging": "[B|b]ezig met pingen...",
+      "output-pong": "[P|p]ong! De message round-trip heeft {{time}}ms geduurd."
+    }
+  },
+  "prefix": {
+    "description": "Toont of wijzigt het opdrachtvoorvoegsel",
+    "details": "Als geen voorvoegsel is opgegeven, dan wordt de huidige voorvoegsel getoond. Als het voorvoegsel \"default\" is, dan wordt het voorvoegsel gereset naar het standaardvoorvoegsel. Als het voorvoegsel \"none\" is, dan wordt het voorvoegsel geheel verwijderd en kunnen opdrachten alleen uitgevoerd worden door middel van vermeldingen. Alleen administratoren en bot-eigenaren mogen het voorvoegsel veranderen.",
+    "args": {
+      "prefix-prompt": "[W|w]elk voorvoegsel wil je gebruiken?"
+    },
+    "partial": {
+      "no-prefix": "geen voorvoegsel",
+      "run-commands": "Om opdrachten uit te voeren, gebruik {{anyUsage}}."
+    },
+    "output": {
+      "admin-only": "[A|a]lleen administratoren en bot-eigenaren mogen het voorvoegsel aanpassen.",
+      "output-owner-only": "[A|a]lleen de bot-eigenaren mogen het globale voorvoegsel instellen.",
+      "no-prefix": "[E|e]r is geen opdrachtvoorvoegsel. $t(builtin#utils:prefix.partial.run-commands)",
+      "prefix": "[H|h]et opdrachtvoorvoegsel is ingesteld op `{{prefix}}`. $t(builtin#utils:prefix.partial.run-commands)",
+      "removed-prefix": "[H|h]et opdrachtvoorvoegsel is verwijderd. $t(builtin#utils:prefix.partial.run-commands)",
+      "reset-default": "[H|h]et opdrachtvoorvoegsel is gereset naar het standaardvoorvoegsel (op dit moment {{default}}). $t(builtin#utils:prefix.partial.run-commands)",
+      "set-prefix": "[H|h]et opdrachtvoorvoegsel is ingesteld op `{{prefix}}`. $t(utils:prefix.partial.run-commands)"
+    }
+  }
+}

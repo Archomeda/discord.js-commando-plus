@@ -1,0 +1,20 @@
+{
+  "command-client-missing-permission": "Ik heb de permissie \"{{permission}}\" nodig om de opdracht `{{command}}` te laten werken.",
+  "command-client-missing-permissions": "Ik heb de volgende permissies nodig om de opdracht `{{command}}` te laten werken: {{permissions}}.",
+  "command-disabled": "[D|d]e opdracht `{{command}}` is gedeactiveerd.",
+  "command-error": "[E|e]r is een fout opgetreden tijdens het uitvoeren van de opdracht `{{command}}`: `{{error}}`.\nDit hoort niet te gebeuren.",
+  "command-missing-permission": "[D|d]e opdracht `{{command}}` vereist dat je de permissie \"{{permission}}\" hebt.",
+  "command-missing-permissions": "[D|d]e opdracht `{{command}}` vereist dat je de volgende permissies hebt: {{permissions}}.",
+  "command-missing-permissions-generic": "[J|j]e beschikt niet over de juiste permissies om de opdracht `{{command}}` uit te voeren.",
+  "command-nsfw-channels-only": "[D|d]e opdracht `{{command}}` kan alleen in NSFW kanalen gebruikt worden.",
+  "command-server-channels-only": "[D|d]e opdracht `{{command}}` kan alleen in server-kanalen gebruikt worden.",
+  "command-throttled": "[J|j]e moet {{seconds}} seconden wachten voordat je deze opdracht opnieuw mag gebruiken.",
+  "command-owner-only": "{D|d]e opdracht `{{command}}` mag alleen door de bot-eigenaren gebruikt worden.",
+  "command-unknown": "[O|o]nbekende opdracht. Gebruik {{usage}} om een lijst met alle opdrachten weer te geven.",
+  "contact-owner": "Contacteer de bot-eigenaar ({{owner}}).",
+  "contact-owner-in-server": "Contacteer de bot-eigenaar ({{owner}}) in deze server: {{invite}}.",
+  "contact-owners": "Contacteer de bot-eigenaren ({{owners}}).",
+  "contact-owners-in-server": "Contacteer de bot-eigenaren ({{owners}}) in deze server: {{invite}}.",
+  "invalid-argument": "[D|d]e opgegeven waarde voor {{label}} is ongeldig. Probeer het opnieuw.",
+  "invalid-command-format": "[O|o]ngeldige opdrachtformaat. Het geaccepteerde formaat is {{usage}}. Gebruik {{help_usage}} voor meer informatie."
+}

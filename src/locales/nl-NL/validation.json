@@ -1,0 +1,6 @@
+{
+  "number-above": "[G|g]ebruik een getal dat {{min}} of groter is.",
+  "number-below": "[G|g]ebruik een getal dat {{max}} of kleiner is.",
+  "string-count-above": "[G|g]ebruik minimaal {{min}} karakters voor het argument {{argument}}.",
+  "string-count-below": "[G|g]ebruik maximaal {{max}} karakters voor het argument {{argument}}."
+}

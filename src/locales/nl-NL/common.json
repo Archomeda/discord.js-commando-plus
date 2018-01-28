@@ -1,0 +1,17 @@
+{
+  "command-cancelled": "[D|d]e opdracht is geannuleerd.",
+  "disambiguation-channels": "[M|m]eerdere kanalen gevonden. Wees alsjeblieft specifieker.",
+  "disambiguation-commands": "[M|m]eerdere opdrachten gevonden. Wees alsjeblieft specifieker.",
+  "disambiguation-list": "**{{label}}:** {{items}}",
+  "disambiguation-members": "[M|m]eerdere leden gevonden. Wees alsjeblieft specifieker.",
+  "disambiguation-multiple": "[M|m]eerdere resultaten gevonden. Wees alsjeblieft specifieker:\n{{items}}",
+  "disambiguation-single": "[M|m]eerdere {{label}} gevonden. Wees alsjeblieft specifieker: {{items}}.",
+  "disambiguation-roles": "[M|m]eerdere rollen gevonden. Wees alsjeblieft specifieker.",
+  "disambiguation-users": "[M|m]eerdere gebruikers gevonden. Wees alsjeblieft specifieker.",
+  "argument-invalid": "[D|d]e opgegeven waarde voor {{label}} is ongeldig.\nProbeer het opnieuw. Antwoord met `cancel` om de opdracht te annuleren.",
+  "argument-invalid-infinite": "[D|d]e opgegeven waarde voor {{label}} is ongeldig:\n\"{{content}}\".\nProbeer het opnieuw. Antwoord met `cancel` om de opdracht te annuleren of met `finish` om de opdracht te voltooien.",
+  "argument-preview-too-long": "--te lang om weer te geven--",
+  "argument-retry": "Antwoord met `cancel` om de opdracht te annuleren.",
+  "argument-retry-infinite": "Antwoord met `cancel` om de opdracht te annuleren of met `finish` om de opdracht te voltooien.",
+  "argument-wait": "De opdracht wordt automatisch geannuleerd na {{seconds}} seconden als je tegen die tijd nog niet hebt geantwoord."
+}
