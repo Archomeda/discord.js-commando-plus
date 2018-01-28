@@ -19,7 +19,7 @@
     "description": "Displays a list of available commands, or detailed information for a specified command",
     "details": "The command may be part of a command name or a whole command name. If it isn't specified, all available commands will be listed.",
     "args": {
-      "command-prompt": "Which command would you like to view the help for?"
+      "command-prompt": "[W|w]hich command would you like to view the help for?"
     },
     "partial": {
       "command-header": "__Command **{{name}}**:__ {{description}}",
@@ -40,6 +40,20 @@
       "no-command": "[U|u]nable to identify command. Use {{usage}} to view the list of all commands.",
       "sending-dm-failed": "[U|u]nable to send you a DM. Check if you have DMs disabled and try again.",
       "sent-dm": "[S|s]ent you a DM with information."
+    }
+  },
+  "language": {
+    "description": "Shows or changes the current language",
+    "details": "Use a language ID such as `en-US` or use `default` to restore to the global language. If no language is provided, the current language will be shown.",
+    "args": {
+      "language-prompt": "[W|w]hich language would you like to use?"
+    },
+    "output": {
+      "admin-only": "[O|o]nly the administrators and bot owner(s) may change the language.",
+      "language": "[T|t]he language is set to `{{language}}`.",
+      "output-owner-only": "[O|o]nly the bot owner(s) may change the global language.",
+      "reset-default": "[T|t]he language has been reset to the default language `{{default}}`.",
+      "set-language": "[T|t]he language has been changed to `{{language}}`."
     }
   },
   "ping": {

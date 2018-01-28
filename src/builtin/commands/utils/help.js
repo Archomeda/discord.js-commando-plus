@@ -36,6 +36,10 @@ class CommandHelp extends Command {
         const commands = this.client.registry.findCommands(command, false, msg);
         const showAll = command && command.toLowerCase() === 'all';
 
+        // Make sure to preload the localizations
+        await this.client.localeProvider.preloadNamespaces(this.client.registry.groups.map(g =>
+            `${g.moduleID}#groups`, msg.guild ? msg.guild.language : this.client.language));
+
         if (command && !showAll) {
             if (commands.length === 1) {
                 // Make sure to preload the localizations
@@ -63,7 +67,7 @@ class CommandHelp extends Command {
                         { aliases: commands[0].aliases.join(', ') })}`;
                 }
                 help += `\n${this.localization.tl('partial.command-group', msg.guild, {
-                    group: commands[0].group.name,
+                    group: commands[0].group.module.localization.tl('groups', commands[0].group.name, msg.guild),
                     id: `${commands[0].groupID}:${commands[0].memberName}`
                 })}`;
                 help += `\n${this.localization.tl('partial.command-details', msg.guild,
@@ -129,9 +133,9 @@ class CommandHelp extends Command {
                     
 					${(showAll ? groups : groups.filter(grp => grp.commands.some(cmd => cmd.isUsable(msg))))
                     .map(grp => stripIndents`
-							__${grp.name}__
+							__${grp.module.localization.tl('groups', grp.name, msg.guild)}__
 							${(showAll ? grp.commands : grp.commands.filter(cmd => cmd.isUsable(msg)))
-                        .map(cmd => `**${cmd.name}:** ${cmd.localization.tl(this.description)}${cmd.nsfw ? this.localization.tl('partial.nsfw', msg.guild) : ''}`).join('\n')
+                        .map(cmd => `**${cmd.name}:** ${cmd.localization.tl(this.description, msg.guild)}${cmd.nsfw ? this.localization.tl('partial.nsfw', msg.guild) : ''}`).join('\n')
                         }
 						`).join('\n\n')
                     }

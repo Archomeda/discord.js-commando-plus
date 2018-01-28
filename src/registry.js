@@ -550,6 +550,7 @@ class CommandRegistry {
      * @param {boolean} commandsToLoad.whitelist - The commands:whitelist command
      * @param {boolean} commandsToLoad.eval - The utils:eval command
      * @param {boolean} commandsToLoad.help - The utils:help command
+     * @param {boolean} commandsToLoad.language - The utils:language command
      * @param {boolean} commandsToLoad.ping - The utils:ping command
      * @param {boolean} commandsToLoad.prefix - The utils:prefix command
      * @return {CommandRegistry} This.

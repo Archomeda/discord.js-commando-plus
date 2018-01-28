@@ -52,6 +52,9 @@ class BuiltInModule extends Module {
         if (check('help')) {
             toLoad.push(new (require('./commands/utils/help'))(client));
         }
+        if (check('language')) {
+            toLoad.push(new (require('./commands/utils/language'))(client));
+        }
         if (check('ping')) {
             toLoad.push(new (require('./commands/utils/ping'))(client));
         }
