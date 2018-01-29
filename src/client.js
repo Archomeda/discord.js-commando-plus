@@ -295,16 +295,15 @@ class CommandoClient extends discord.Client {
         if (this.readyTimestamp) {
             this.emit('debug', `Set ${logName} to ${provider.constructor.name} - initializing...`);
             await provider.init(this);
+            this.emit('debug', `Finished initialization of ${logName}`);
         } else {
             this.emit('debug', `Set ${logName} to ${provider.constructor.name} - initialize once client is ready`);
-            await new Promise(resolve => {
-                this.once('ready', () => {
-                    this.emit('debug', `Initializing ${logName}...`);
-                    resolve(provider.init(this));
-                });
+            this.once('ready', async() => {
+                this.emit('debug', `Initializing ${logName}...`);
+                await provider.init(this);
+                this.emit('debug', `Finished initialization of ${logName}`);
             });
         }
-        this.emit('debug', `Finished initialization of ${logName}`);
     }
 
     async destroy() {
