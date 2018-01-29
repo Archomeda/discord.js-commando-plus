@@ -68,7 +68,7 @@ class Worker {
          * @type {boolean}
          * @private
          */
-        this._globalEnabled = true;
+        this._globalEnabled = false;
 
         /**
          * The timeout ID.
