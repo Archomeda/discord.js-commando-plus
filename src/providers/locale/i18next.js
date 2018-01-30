@@ -21,12 +21,13 @@ class I18nextLocaleProvider extends LocaleProvider {
      * @param {i18next} i18next - The i18next instance
      * @param {string} [directory] - The path to the directory where the extra localizations are located that override
      * the default localizations
+     * @param {Object} [options] - Additional i18next options to pass to the initializer
      * @example
      * // Create and use a new i18next locale provider
      * const i18next = require('i18next');
      * client.setLocaleProvider(new I18nextLocaleProvider(i18next, 'path/to/localization/overrides'));
      */
-    constructor(i18next, directory) {
+    constructor(i18next, directory, options) {
         super();
 
         /**
@@ -44,6 +45,12 @@ class I18nextLocaleProvider extends LocaleProvider {
          * @readonly
          */
         this.directory = directory ? path.resolve(directory) : null;
+
+        /**
+         * The additional options for the i18next initializer.
+         * @type {Object}
+         */
+        this.options = options;
     }
 
     async init(client) {
@@ -67,7 +74,8 @@ class I18nextLocaleProvider extends LocaleProvider {
                     return module ? path.resolve(path.join(module.localizationDirectory, '{{lng}}/{{ns}}.json')) : null;
                 }
             },
-            interpolation: { escape: s => s }
+            interpolation: { escape: s => s },
+            ...this.options
         });
 
         await this.localizer.loadLanguages(['nl-NL']);
