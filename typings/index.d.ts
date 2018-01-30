@@ -412,11 +412,11 @@ declare module 'discord.js-commando-plus' {
     }
 
     export class I18nextLocaleProvider extends LocaleProvider {
-        public constructor(i18next: i18next, language: string, directory: string);
+        public constructor(i18next: i18next, directory: string, options: Object);
 
         public readonly directory: string;
-        public language: string;
         public readonly localizer: i18next;
+        public readonly options: Object;
     }
 
     export class LocaleHelper {
