@@ -67,11 +67,16 @@ In order for a command to be displayed, it must be enabled in the guild (or glob
 Passing the `all` argument will list all commands, regardless of context.
 Passing anything else will search for any commands that match, and display detailed information if only one is found.
 
+### help (builtin:util:language)
+This command, if not provided with any arguments, will display the current language.
+If the command is used in a guild channel and an argument is specified, it will set the language for the guild if the user is a guild admin, or the bot owner.
+If the command is used in a DM and an argument is specified, it will set the global default langauge if the user is the bot owner.
+
 ### ping (builtin:util:ping)
 The ping command will send a message, then edit it to contain the amount of time it took.
 It also displays the client's heartbeat ping.
 
 ### prefix (builtin:util:prefix)
 This command, if not provided with any arguments, will display the current command prefix, and how to use commands.
-If the command is used in a guild channel and an argument is specified, it will set the command prefix for the guild if the user is a guild admin, or the bot owner,
+If the command is used in a guild channel and an argument is specified, it will set the command prefix for the guild if the user is a guild admin, or the bot owner.
 If the command is used in a DM and an argument is specified, it will set the global default command prefix if the user is the bot owner.

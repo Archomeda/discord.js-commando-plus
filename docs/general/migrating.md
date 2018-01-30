@@ -2,7 +2,7 @@
 While Commando-Plus is mostly compatible with Commando, there are a few changes you have to apply.
 Please also follow the revised [first steps](https://archomeda.github.io/discord.js-commando-plus/#/docs/commando-plus/master/general/first-steps) as there are some additional things you have to be aware of.
 
-## From branch 11.2 or master
+## From branch 11.2
 ### Client
 - Renamed: property `CommandoClient.provider` to `CommandClient.settingsProvider`
 - Renamed: function `CommandoClient.setProvider` to `CommandoClient.setSettingsProvider`
