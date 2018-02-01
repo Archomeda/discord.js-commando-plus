@@ -609,7 +609,7 @@ class Command {
             mentionPart = `\`@${user.username.replace(/ /g, '\xa0')}#${user.discriminator}\xa0${nbcmd}\``;
         }
 
-        return `${prefixPart || ''}${prefix && user ? ' or ' : ''}${mentionPart || ''}`;
+        return `${prefixPart || ''}${prefix && user ? ' / ' : ''}${mentionPart || ''}`;
     }
 
     /**
