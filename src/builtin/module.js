@@ -11,6 +11,9 @@ class BuiltInModule extends Module {
         const check = id =>
             typeof commandsToLoad === 'undefined' || typeof commandsToLoad[id] === 'undefined' || commandsToLoad[id];
 
+        if (check('activity')) {
+            toLoad.push(new (require('./commands/admin/activity'))(client));
+        }
         if (check('disable')) {
             toLoad.push(new (require('./commands/admin/disable'))(client));
         }

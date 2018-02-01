@@ -69,6 +69,7 @@ class SettingsProvider {
         this.listeners
             .set('commandPrefixChange', (guild, prefix) => this.set(guild, 'prefix', prefix))
             .set('languageChange', (guild, language) => this.set(guild, 'language', language))
+            .set('defaultActivityChange', (type, game, url) => this.set('global', 'activity', { type, game, url }))
             .set('commandStatusChange', (guild, command, enabled) => this.set(guild, `cmd-${command.name}`, enabled))
             .set('groupStatusChange', (guild, group, enabled) => this.set(guild, `grp-${group.id}`, enabled))
             .set('workerStatusChange', (guild, worker, enabled) => this.set(guild, `wkr-${worker.id}`, enabled))
@@ -216,6 +217,15 @@ class SettingsProvider {
             } else {
                 this.client._language = settings.language;
             }
+        }
+
+        // Load the activity
+        if (!guild && typeof settings.activity !== 'undefined' && settings.activity.type !== 'NONE') {
+            const options = { type: settings.activity.type };
+            if (settings.activity.url) {
+                options.url = settings.activity.url;
+            }
+            await this.client.user.setActivity(settings.activity.game, options);
         }
 
         // Load all command, group and worker statuses

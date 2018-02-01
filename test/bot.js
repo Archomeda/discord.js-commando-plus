@@ -94,8 +94,15 @@ if (sqlite) {
         .catch(console.error);
 }
 
-client.registry
-    .registerDefaults()
-    .registerModule(new (require('./module'))(client));
+client.registry.registerDefaults();
+client.registry.registerModule(new (require('./module'))(client));
 
 client.login(auth.token);
+
+function stop() {
+    client.destroy();
+    process.exit();
+}
+
+process.on('SIGTERM', stop);
+process.on('SIGINT', stop);

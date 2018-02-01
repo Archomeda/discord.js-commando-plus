@@ -1,4 +1,16 @@
 {
+  "activity": {
+    "description": "Verandert de activiteit van de bot",
+    "details": "Alleen bot-eigenaren mogen deze opdracht gebruiken.",
+    "args": {
+      "type-prompt": "[W|w]elke type activiteit wil je gebruiken (playing/streaming/listening/watching/none)?",
+      "game-prompt": "[W|w]elk spel moet getoond worden?",
+      "url-prompt": "[W|w]elke stream-URL moet worden gebruikt?"
+    },
+    "output": {
+      "set-activity": "[D|d]e activiteit is ingesteld."
+    }
+  },
   "disable": {
     "description": "Deactiveert een opdracht, opdrachtgroep of werker",
     "details": "Het argument moet een naam of ID zijn (gedeeltelijk of geheel) van een opdracht, een opdrachtgroep of een werker. Alleen administratoren mogen deze opdracht gebruiken.",

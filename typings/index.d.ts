@@ -348,10 +348,10 @@ declare module 'discord.js-commando-plus' {
         public findGroups(searchString?: string, exact?: boolean): CommandGroup[];
         public findModules(searchString?: string, exact?: boolean): Module[];
         public findWorkers(searchString?: string, exact?: boolean): Worker[];
-        public registerBuiltInModule() : CommandRegistry;
+        public registerBuiltInModule() : Promise<CommandRegistry>;
         public registerCommand(command: Command | Function): CommandRegistry;
         public registerCommands(commands: Command[] | Function[]): CommandRegistry;
-        public registerDefaults(): CommandRegistry;
+        public registerDefaults(): Promise<CommandRegistry>;
         public registerDefaultTypes(): CommandRegistry;
         public registerEvalObject(key: string, obj: {}): CommandRegistry;
         public registerEvalObjects(obj: {}): CommandRegistry;

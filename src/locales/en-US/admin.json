@@ -1,4 +1,16 @@
 {
+  "activity": {
+    "description": "Changes the bot activity",
+    "details": "Only the bot owner(s) may use this command.",
+    "args": {
+      "type-prompt": "[W|w]hich activity type do you want to use (playing/streaming/listening/watching/none)?",
+      "game-prompt": "[W|w]hich game should appear?",
+      "url-prompt": "[W|w]hich streaming URL should be used?"
+    },
+    "output": {
+      "set-activity": "[T|t]he activity has been set."
+    }
+  },
   "disable": {
     "description": "Disables a command, command group or worker",
     "details": "The argument must be the name or ID (partial or whole) of a command, a command group or a worker. Only administrators may use this command.",

@@ -528,17 +528,18 @@ class CommandRegistry {
 
     /**
      * Registers the default argument types, groups, and commands.
-     * @return {CommandRegistry} This.
+     * @return {Promise<CommandRegistry>} The promise to itself.
      */
-    registerDefaults() {
+    async registerDefaults() {
         this.registerDefaultTypes();
-        this.registerBuiltInModule();
+        await this.registerBuiltInModule();
         return this;
     }
 
     /**
      * Registers the default built-in module with its groups and commands to the registry.
      * @param {Object} [commandsToLoad] - Describes which commands to load
+     * @param {boolean} commandsToLoad.activity - The admin:activity command
      * @param {boolean} commandsToLoad.disable - The admin:disable command
      * @param {boolean} commandsToLoad.enable - The admin:enable command
      * @param {boolean} commandsToLoad.load - The admin:load command
@@ -555,7 +556,7 @@ class CommandRegistry {
      * @param {boolean} commandsToLoad.language - The utils:language command
      * @param {boolean} commandsToLoad.ping - The utils:ping command
      * @param {boolean} commandsToLoad.prefix - The utils:prefix command
-     * @return {CommandRegistry} This.
+     * @return {Promise<CommandRegistry>} The promise to itself.
      */
     registerBuiltInModule(commandsToLoad) {
         return this.registerModule(require('./builtin/module'), commandsToLoad);
