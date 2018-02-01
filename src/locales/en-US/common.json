@@ -1,4 +1,10 @@
 {
+  "argument-invalid": "[Y|y]ou have provided an invalid {{label}}.\nPlease try again. Respond with `cancel` to cancel the command.",
+  "argument-invalid-infinite": "[Y|y]ou have provided an invalid {{label}}:\n\"{{content}}\".\nPlease try again. Respond with `cancel` to cancel the command or `finish` to finish the command up to this point.",
+  "argument-preview-too-long": "--too long to show--",
+  "argument-retry": "Respond with `cancel` to cancel the command.",
+  "argument-retry-infinite": "Respond with `cancel` to cancel the command or `finish` to finish up the command to this point.",
+  "argument-wait": "The command will be cancelled automatically in {{seconds}} seconds if you don't respond.",
   "command-cancelled": "[T|t]he command has been cancelled.",
   "disambiguation-channels": "[M|m]ultiple channels found. Please be more specific.",
   "disambiguation-commands": "[M|m]ultiple commands found. Please be more specific.",
@@ -7,11 +13,5 @@
   "disambiguation-multiple": "[M|m]ultiple matches found. Please be more specific:\n{{items}}",
   "disambiguation-single": "[M|m]ultiple {{label}} found. Please be more specific: {{items}}.",
   "disambiguation-roles": "[M|m]ultiple roles found. Please be more specific.",
-  "disambiguation-users": "[M|m]ultiple users found. Please be more specific.",
-  "argument-invalid": "[Y|y]ou have provided an invalid {{label}}.\nPlease try again. Respond with `cancel` to cancel the command.",
-  "argument-invalid-infinite": "[Y|y]ou have provided an invalid {{label}}:\n\"{{content}}\".\nPlease try again. Respond with `cancel` to cancel the command or `finish` to finish the command up to this point.",
-  "argument-preview-too-long": "--too long to show--",
-  "argument-retry": "Respond with `cancel` to cancel the command.",
-  "argument-retry-infinite": "Respond with `cancel` to cancel the command or `finish` to finish up the command to this point.",
-  "argument-wait": "The command will be cancelled automatically in {{seconds}} seconds if you don't respond."
+  "disambiguation-users": "[M|m]ultiple users found. Please be more specific."
 }
