@@ -57,7 +57,7 @@ class Worker {
          * The time in milliseconds at which this worker operates.
          * @type {number}
          */
-        this.timer = info.timer;
+        this.timer = info.timer || 0;
 
         /**
          * Whether the worker is protected from being disabled.
@@ -69,7 +69,8 @@ class Worker {
          * Whether the worker should be enabled by default globally.
          * @type {boolean}
          */
-        this.globalEnabledDefault = Boolean(info.globalEnabledDefault);
+        this.globalEnabledDefault = typeof info.globalEnabledDefault !== 'undefined' ?
+            Boolean(info.globalEnabledDefault) : true;
 
         /**
          * Whether the worker should be enabled by default in guilds
@@ -265,11 +266,13 @@ class Worker {
         if (info.module !== info.module.toLowerCase()) {
             throw new Error('Worker module must be lowercase.');
         }
-        if (typeof info.timer !== 'number' || isNaN(info.timer)) {
-            throw new TypeError('Worker timer must be a number.');
-        }
-        if (info.timer !== 0 && info.timer < 1000) {
-            throw new RangeError('Worker timer must be at least 1000 (ms).');
+        if (typeof info.timer !== 'undefined') {
+            if (typeof info.timer !== 'number' || isNaN(info.timer)) {
+                throw new TypeError('Worker timer must be a number.');
+            }
+            if (info.timer !== 0 && info.timer < 1000) {
+                throw new RangeError('Worker timer must be at least 1000 (ms).');
+            }
         }
     }
 }
