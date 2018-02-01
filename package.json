@@ -34,7 +34,7 @@
     "i18next": "^10.0.7",
     "js-yaml": "^3.10.0",
     "jsdoc-strip-async-await": "^0.1.0",
-    "mongoose": "^5.0.2",
+    "mongoose": "^5.0.3",
     "node-cache": "^4.1.1",
     "redis": "^2.8.0",
     "sqlite": "^2.0.0",
@@ -44,7 +44,7 @@
     "discord.js": "^11.3.0",
     "i18next": "^10.0.7",
     "js-yaml": "^3.10.0",
-    "mongoose": "^4.13.2",
+    "mongoose": "^5.0.3",
     "node-cache": "^4.1.1",
     "redis": "^2.8.0",
     "sqlite": "^2.0.0"
