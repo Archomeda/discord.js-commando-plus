@@ -30,7 +30,7 @@ class CommandUnload extends Command {
 
     async run(msg, args) {
         const { cmdOrWkr } = args;
-        cmdOrWkr.unload();
+        await cmdOrWkr.unload();
 
         const type = cmdOrWkr.groupID ? 'command' : 'worker';
         const registry = cmdOrWkr.groupID ? 'commands' : 'workers';

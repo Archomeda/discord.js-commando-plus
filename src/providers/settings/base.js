@@ -95,12 +95,13 @@ class SettingsProvider {
                     this.setupGuildGroup(this.client.guilds.get(guild), group, settings);
                 }
             })
-            .set('workerRegister', worker => {
+            .set('workerRegister', async worker => {
                 for (const [guild, settings] of this.settings) {
                     if (guild !== 'global' && !this.client.guilds.has(guild)) {
                         continue;
                     }
-                    this.setupGuildWorker(this.client.guilds.get(guild), worker, settings);
+                    // eslint-disable-next-line no-await-in-loop
+                    await this.setupGuildWorker(this.client.guilds.get(guild), worker, settings);
                 }
             });
         for (const [event, listener] of this.listeners) {
@@ -190,10 +191,10 @@ class SettingsProvider {
      * Loads all settings for a guild.
      * @param {string} guild - Guild ID to load the settings of (or 'global')
      * @param {Object} settings - Settings to load
-     * @return {void}
+     * @return {Promise<void>} The promise.
      * @private
      */
-    setupGuild(guild, settings) {
+    async setupGuild(guild, settings) {
         if (typeof guild !== 'string') {
             throw new TypeError('The guild must be a guild ID or "global".');
         }
@@ -225,7 +226,7 @@ class SettingsProvider {
             this.setupGuildGroup(guild, group, settings);
         }
         for (const worker of this.client.registry.workers.values()) {
-            this.setupGuildWorker(guild, worker, settings);
+            await this.setupGuildWorker(guild, worker, settings); // eslint-disable-line no-await-in-loop
         }
     }
 
@@ -278,10 +279,10 @@ class SettingsProvider {
      * @param {?Guild} guild - Guild to set the status in
      * @param {Worker} worker - Worker to set the status of
      * @param {Object} settings - Settings of the guild
-     * @return {void}
+     * @return {Promise<void>} The promise.
      * @private
      */
-    setupGuildWorker(guild, worker, settings) {
+    async setupGuildWorker(guild, worker, settings) {
         if (typeof settings[`wkr-${worker.id}`] === 'undefined') {
             return;
         }
@@ -291,10 +292,13 @@ class SettingsProvider {
             }
             guild._workersEnabled[worker.id] = settings[`wkr-${worker.id}`];
         } else {
-            worker._globalEnabled = settings[`wkr-${worker.id}`];
             // Start the worker here initially here because we currently have no better place for it
+            worker._globalEnabled = worker.globalEnabledDefault;
+            if (typeof settings[`wkr-${worker.id}`] !== 'undefined') {
+                worker._globalEnabled = settings[`wkr-${worker.id}`];
+            }
             if (worker._globalEnabled) {
-                worker.start();
+                await worker.start();
             }
         }
     }

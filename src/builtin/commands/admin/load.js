@@ -71,7 +71,7 @@ class CommandLoad extends Command {
             this.client.registry.registerCommand(args.cmdOrWkr);
             args.cmdOrWkr = this.client.registry.commands.last();
         } else {
-            this.client.registry.registerWorker(args.cmdOrWkr);
+            await this.client.registry.registerWorker(args.cmdOrWkr);
             args.cmdOrWkr = this.client.registry.workers.last();
         }
         const type = args.cmdOrWkr.groupID ? 'command' : 'worker';

@@ -8,9 +8,11 @@ class Worker {
      * @typedef {Object} WorkerInfo
      * @property {string} module - The ID of the module the worker belongs to (must be lowercase)
      * @property {string} id - The worker ID (must be lowercase)
-     * @property {number} timer - The time in milliseconds at which this worker should operate (must be at least 1
-     * second)
+     * @property {number} [timer = 0] - The time in milliseconds at which this worker should operate (must be at least 1
+     * second, disabled if 0)
      * @property {boolean} [guarded = false] - Whether the worker should be protected from disabling
+     * @property {boolean} [globalEnabledDefault = true] - Whether the worker should be enabled by default globally
+     * @property {boolean} [guildEnabledDefault = false] - Whether the worker should be enabled by default in guilds
      */
 
     /**
@@ -61,7 +63,19 @@ class Worker {
          * Whether the worker is protected from being disabled.
          * @type {boolean}
          */
-        this.guarded = info.guarded;
+        this.guarded = Boolean(info.guarded);
+
+        /**
+         * Whether the worker should be enabled by default globally.
+         * @type {boolean}
+         */
+        this.globalEnabledDefault = Boolean(info.globalEnabledDefault);
+
+        /**
+         * Whether the worker should be enabled by default in guilds
+         * @type {boolean}
+         */
+        this.guildEnabledDefault = Boolean(info.guildEnabledDefault);
 
         /**
          * Whether the worker is enabled globally.
@@ -80,11 +94,27 @@ class Worker {
 
     /**
      * Runs the worker.
-     * @return {Promise<?Message|?Array<Message>>} The message(s).
+     * @return {Promise<void>} The message(s).
      * @abstract
      */
     run() { // eslint-disable-line no-unused-vars
         throw new Error(`${this.constructor.name} doesn't have a run() method.`);
+    }
+
+    /**
+     * Gets called whenever the worker is starting.
+     * @return {Promise<void>} The promise.
+     */
+    onStart() { // eslint-disable-line no-empty-function
+
+    }
+
+    /**
+     * Gets called whenever the worker is stopping.
+     * @return {Promise<void>} The promise
+     */
+    onStop() { // eslint-disable-line no-empty-function
+
     }
 
     /**
@@ -144,28 +174,32 @@ class Worker {
 
     /**
      * Starts the worker.
-     * @return {void}
+     * @return {Promise<void>} The promise.
      * @private
      */
-    start() {
+    async start() {
         if (this._timeoutID) {
             clearTimeout(this._timeoutID);
         }
         const exec = () => {
             const result = this.run();
-            this._timeoutID = setTimeout(exec, this.timer);
+            if (this.timer > 0) {
+                this._timeoutID = setTimeout(exec, this.timer);
+            }
             return result;
         };
+        await this.onStart();
         // Explicitly run our worker after 5 seconds
         this._timeoutID = setTimeout(exec, 5000);
     }
 
     /**
      * Stops the worker.
-     * @return {void}
+     * @return {Promise<void>} The promise.
      * @private
      */
-    stop() {
+    async stop() {
+        await this.onStop();
         if (this._timeoutID) {
             clearTimeout(this._timeoutID);
             this._timeoutID = undefined;
@@ -174,9 +208,9 @@ class Worker {
 
     /**
      * Reloads the worker.
-     * @return {void}
+     * @return {Promise<void>} The promise.
      */
-    reload() {
+    async reload() {
         let workerPath, cached, newWorker;
         try {
             workerPath = this.client.registry.resolveWorkerPath(this.moduleID, this.id);
@@ -190,21 +224,21 @@ class Worker {
             throw err;
         }
 
-        this.client.registry.reregisterWorker(newWorker, this);
+        await this.client.registry.reregisterWorker(newWorker, this);
     }
 
     /**
      * Unloads the worker.
-     * @return {void}
+     * @return {Promise<void>} The promise.
      */
-    unload() {
+    async unload() {
         const workerPath = this.client.registry.resolveWorkerPath(this.moduleID, this.id);
         if (!require.cache[workerPath]) {
             throw new Error('Worker cannot be unloaded.');
         }
-        this.stop();
+        await this.stop();
         delete require.cache[workerPath];
-        this.client.registry.unregisterWorker(this);
+        await this.client.registry.unregisterWorker(this);
     }
 
 
@@ -234,7 +268,7 @@ class Worker {
         if (typeof info.timer !== 'number' || isNaN(info.timer)) {
             throw new TypeError('Worker timer must be a number.');
         }
-        if (info.timer < 1000) {
+        if (info.timer !== 0 && info.timer < 1000) {
             throw new RangeError('Worker timer must be at least 1000 (ms).');
         }
     }

@@ -355,24 +355,24 @@ declare module 'discord.js-commando-plus' {
         public registerDefaultTypes(): CommandRegistry;
         public registerEvalObject(key: string, obj: {}): CommandRegistry;
         public registerEvalObjects(obj: {}): CommandRegistry;
-        public registerModule(module: Module): CommandRegistry;
-        public registerModules(modules: Module[]): CommandRegistry;
+        public registerModule(module: Module): Promise<CommandRegistry>;
+        public registerModules(modules: Module[]): Promise<CommandRegistry>;
         public registerGroup(group: CommandGroup | Function | string[] | string, name?: string): CommandRegistry;
         public registerGroups(groups: CommandGroup[] | Function[] | string[][] | string[]): CommandRegistry;
         public registerType(type: ArgumentType | Function): CommandRegistry;
         public registerTypes(type: ArgumentType[] | Function[]): CommandRegistry;
         public registerTypesIn(options: string | {}): CommandRegistry;
-        public registerWorker(worker: Worker | Function): CommandRegistry;
-        public registerWorkers(workers: Worker[] | Function[]): CommandRegistry;
+        public registerWorker(worker: Worker | Function): Promise<CommandRegistry>;
+        public registerWorkers(workers: Worker[] | Function[]): Promise<CommandRegistry>;
         public reregisterCommand(command: Command | Function, oldCommand: Command): void;
-        public reregistryWorkers(worker: Worker | Function, oldWorker: Worker): void;
+        public reregistryWorkers(worker: Worker | Function, oldWorker: Worker): Promise<void>;
         public resolveCommand(command: CommandResolvable): Command;
         public resolveCommandPath(module: ModuleResolvable, groups: string, memberName: string): string;
         public resolveGroup(group: CommandGroupResolvable): CommandGroup;
         public resolveWorker(worker: WorkerResolvable): Worker;
         public resolveModule(module: ModuleResolvable): Module;
         public unregisterCommand(command: Command): void;
-        public unregisterWorker(worker: Worker): CommandRegistry;
+        public unregisterWorker(worker: Worker): Promise<CommandRegistry>;
     }
 
     export class FriendlyError extends Error {
@@ -529,14 +529,18 @@ declare module 'discord.js-commando-plus' {
         private static validateInfo(client: CommandoClient, info: WorkerInfo);
 
         public id: string;
+        public globalEnabledDefault: boolean;
+        public guildEnabledDefault: boolean;
         public guarded: boolean;
         public module: Module;
         public moduleID: string;
 
         public isEnabledIn(guild: GuildResolvable): boolean;
         public getEnabledGuilds(): Collection<Snowflake, Guild>;
-        public run(): Promise<Message | Message[]>;
-        public reload(): void;
+        public onStart(): Promise<void>;
+        public onStop(): Promise<void>;
+        public run(): Promise<void>;
+        public reload(): Promise<void>;
         public setEnabledIn(guild: GuildResolvable, enabled: boolean): void;
         public unload(): void;
 
@@ -638,7 +642,11 @@ declare module 'discord.js-commando-plus' {
     }
 
     type WorkerInfo = {
+        globalEnabledDefault: boolean;
         guarded?: boolean;
+        guildEnabledDefault: boolean;
         id: string;
+        module: string;
+        timer: number;
     };
 }

@@ -250,7 +250,7 @@ class GuildExtension {
             return true;
         }
         if (!this._workersEnabled || typeof this._workersEnabled[worker.id] === 'undefined') {
-            return worker._globalEnabled;
+            return worker.guildEnabledDefault && worker._globalEnabled;
         }
         return this._workersEnabled[worker.id];
     }

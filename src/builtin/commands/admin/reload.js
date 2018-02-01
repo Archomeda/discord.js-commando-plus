@@ -44,7 +44,7 @@ class CommandReload extends Command {
             name = cmdOrGrpOrWkr.id;
         }
 
-        cmdOrGrpOrWkr.reload();
+        await cmdOrGrpOrWkr.reload();
 
         if (this.client.shard) {
             try {

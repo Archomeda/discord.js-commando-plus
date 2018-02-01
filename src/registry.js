@@ -89,7 +89,7 @@ class CommandRegistry {
      * Registers a single module.
      * @param {Module|Function} module - The module instance or constructor
      * @param {...*} [args] - The arguments for the constructor
-     * @return {CommandRegistry} This.
+     * @return {Promise<CommandRegistry>} The promise to itself.
      * @see {@link CommandRegistry#registerModules}
      */
     registerModule(module, ...args) {
@@ -103,9 +103,9 @@ class CommandRegistry {
      * Registers multiple modules.
      * @param {Module[]|Function[]|Array[]} modules - An array of module instances or constructors,
      * or an array of [constructor, argsArray].
-     * @return {CommandRegistry} This.
+     * @return {Promise<CommandRegistry>} The promise to itself.
      */
-    registerModules(modules) {
+    async registerModules(modules) {
         if (!Array.isArray(modules)) {
             throw new TypeError('Modules must be an Array.');
         }
@@ -150,7 +150,7 @@ class CommandRegistry {
             for (const command of module.commands) {
                 command.module = module;
             }
-            this.registerWorkers(module.workers.array());
+            await this.registerWorkers(module.workers.array()); // eslint-disable-line no-await-in-loop
             for (const worker of module.workers) {
                 worker.module = module;
             }
@@ -362,7 +362,7 @@ class CommandRegistry {
     /**
      * Registers a single worker.
      * @param {Worker|Function} worker - Either a worker instance, or a constructor for one
-     * @return {CommandRegistry} Itself.
+     * @return {Promise<CommandRegistry>} The promise to itself.
      */
     registerWorker(worker) {
         return this.registerWorkers([worker]);
@@ -371,9 +371,9 @@ class CommandRegistry {
     /**
      * Registers multiple workers.
      * @param {Worker[]|Function[]} workers - An array of worker instances or constructors
-     * @return {CommandRegistry} Itself.
+     * @return {Promise<CommandRegistry>} The promise to itself.
      */
-    registerWorkers(workers) {
+    async registerWorkers(workers) {
         if (!Array.isArray(workers)) {
             throw new TypeError('The parameter modules must be an array');
         }
@@ -406,8 +406,9 @@ class CommandRegistry {
             this.client.emit('debug', `Registered worker ${worker.id}.`);
 
             // Start the worker if it's configured to be active
-            if (this.client.settingsProvider && this.client.settings.get(`wkr-${worker.id}`)) {
-                worker.start();
+            if (worker.globalEnabledDefault ||
+                (this.client.settingsProvider && this.client.settings.get(`wkr-${worker.id}`))) {
+                await worker.start(); // eslint-disable-line no-await-in-loop
             }
         }
 
@@ -418,9 +419,9 @@ class CommandRegistry {
      * Reregisters a worker (does not support changing id).
      * @param {Worker|Function} worker - The worker
      * @param {Worker} oldWorker - The old worker
-     * @return {void}
+     * @return {Promise<void>} The promise.
      */
-    reregisterWorker(worker, oldWorker) {
+    async reregisterWorker(worker, oldWorker) {
         if (typeof worker === 'function') {
             worker = new worker(this.client); // eslint-disable-line new-cap
         }
@@ -440,16 +441,17 @@ class CommandRegistry {
 
         // Start the worker again if it was running before
         if (worker._globalEnabled) {
-            worker.start();
+            await worker.start();
         }
     }
 
     /**
      * Unregisters a worker.
      * @param {Worker} worker - The worker to unregister
-     * @return {void}
+     * @return {Promise<void>} The promise
      */
-    unregisterWorker(worker) {
+    async unregisterWorker(worker) {
+        await worker.stop();
         this.workers.delete(worker.id);
         /**
          * Emitted when a worker is unregistered.
