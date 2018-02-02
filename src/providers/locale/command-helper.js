@@ -3,7 +3,9 @@
  */
 
 /**
- * Helper class to use {@link LocaleProvider} methods for a specific command or worker.
+ * Helper class to use {@link LocaleProvider} methods for a specific command.
+ * The localization file is stored in the specified module localizations folder as `<command_group_id>.json`.
+ * The command localizations are stored inside the property `<command_id>`.
  */
 class CommandLocaleHelper {
     /**
@@ -35,7 +37,6 @@ class CommandLocaleHelper {
      * @param {GuildResolvable} [guild] - The guild
      * @param {Object} [vars] - Extra variables for the translator
      * @return {string} The translation.
-     * @abstract
      */
     translate(key, guild, vars) {
         if (guild) {

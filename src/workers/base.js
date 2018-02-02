@@ -1,5 +1,6 @@
 const cron = require('node-cron');
 const Task = require('node-cron/src/task');
+const WorkerLocaleHelper = require('../providers/locale/worker-helper');
 
 /**
  * A base worker that runs independently of any Discord guild.
@@ -96,6 +97,12 @@ class Worker {
          * @private
          */
         this._task = undefined;
+
+        /**
+         * Shortcut to use locale provider methods for the worker locales.
+         * @type {WorkerLocaleHelper}
+         */
+        this.localization = new WorkerLocaleHelper(client, this);
     }
 
     /**

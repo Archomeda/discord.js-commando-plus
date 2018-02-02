@@ -538,6 +538,7 @@ declare module 'discord.js-commando-plus' {
         public globalEnabledDefault: boolean;
         public guildEnabledDefault: boolean;
         public guarded: boolean;
+        public localization: WorkerLocaleHelper;
         public module: Module;
         public moduleID: string;
 
@@ -551,6 +552,16 @@ declare module 'discord.js-commando-plus' {
         public unload(): void;
 
         public static usage(command: string, prefix?: string, user?: User): string;
+    }
+
+    export class WorkerLocaleHelper {
+        public constructor(client: CommandoClient, worker: Worker);
+
+        public readonly client: CommandoClient;
+        public readonly worker: Worker;
+
+        public tl(key: string, guild: GuildResolvable, vars?: {}): string;
+        public translate(key: string, guild: GuildResolvable, vars?: {}): string;
     }
 
     export class YAMLSettingsProvider extends SettingsProvider {
