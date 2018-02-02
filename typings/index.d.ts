@@ -547,7 +547,7 @@ declare module 'discord.js-commando-plus' {
         public onStop(): Promise<void>;
         public run(): Promise<void>;
         public reload(): Promise<void>;
-        public setEnabledIn(guild: GuildResolvable, enabled: boolean): void;
+        public setEnabledIn(guild: GuildResolvable, enabled: boolean): Promise<void>;
         public unload(): void;
 
         public static usage(command: string, prefix?: string, user?: User): string;

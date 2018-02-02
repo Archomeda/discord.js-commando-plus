@@ -35,20 +35,20 @@ class CommandEnable extends Command {
         return msg.member.hasPermission('ADMINISTRATOR') || this.client.isOwner(msg.author);
     }
 
-    run(msg, args) {
+    async run(msg, args) {
         const { cmdOrGrpOrWkr } = args;
 
         let type = 'group';
         if (cmdOrGrpOrWkr.groupID) {
             type = 'command';
-        } else if (cmdOrGrpOrWkr.timer) {
+        } else if (cmdOrGrpOrWkr.schedule) {
             type = 'worker';
         }
 
         if (cmdOrGrpOrWkr.isEnabledIn(msg.guild)) {
             return msg.reply(this.localization.tl(`output.${type}-already-enabled`, msg.guild, { args, cmd: this }));
         }
-        cmdOrGrpOrWkr.setEnabledIn(msg.guild, true);
+        await cmdOrGrpOrWkr.setEnabledIn(msg.guild, true);
         return msg.reply(this.localization.tl(`output.${type}-enabled`, msg.guild, { args, cmd: this }));
     }
 }

@@ -9,7 +9,7 @@ class WorkerPrintGuilds extends commando.Worker {
         super(client, {
             id: 'print-guilds',
             module: 'test',
-            timer: 60000
+            schedule: 60000
         });
     }
 

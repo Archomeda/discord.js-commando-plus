@@ -38,7 +38,7 @@ class CommandReload extends Command {
             type = 'command';
             registry = 'commands';
             name = cmdOrGrpOrWkr.name;
-        } else if (cmdOrGrpOrWkr.timer) {
+        } else if (cmdOrGrpOrWkr.schedule) {
             type = 'worker';
             registry = 'workers';
             name = cmdOrGrpOrWkr.id;

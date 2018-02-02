@@ -1,3 +1,6 @@
+const cron = require('node-cron');
+const Task = require('node-cron/src/task');
+
 /**
  * A base worker that runs independently of any Discord guild.
  * Workers are run globally. Keep that in mind if guild related things are required.
@@ -8,8 +11,9 @@ class Worker {
      * @typedef {Object} WorkerInfo
      * @property {string} module - The ID of the module the worker belongs to (must be lowercase)
      * @property {string} id - The worker ID (must be lowercase)
-     * @property {number} [timer = 0] - The time in milliseconds at which this worker should operate (must be at least 1
-     * second, disabled if 0)
+     * @property {number|string} [schedule = null] - The schedule this worker runs at; can be a number which indicates
+     * a time in milliseconds for a repeating worker (must be at least 1 second), a cron string for advanced scheduling,
+     * or null or undefined for when the worker needs to be run once
      * @property {boolean} [guarded = false] - Whether the worker should be protected from disabling
      * @property {boolean} [globalEnabledDefault = true] - Whether the worker should be enabled by default globally
      * @property {boolean} [guildEnabledDefault = false] - Whether the worker should be enabled by default in guilds
@@ -54,10 +58,11 @@ class Worker {
         this.id = info.id;
 
         /**
-         * The time in milliseconds at which this worker operates.
-         * @type {number}
+         * The schedule this worker operates at. Either a number for a time in milliseconds at which this worker is
+         * repeated at, or a cron string for advanced scheduling, or null if the worker only runs once.
+         * @type {?(number|string)}
          */
-        this.timer = info.timer || 0;
+        this.schedule = info.schedule || null;
 
         /**
          * Whether the worker is protected from being disabled.
@@ -86,11 +91,11 @@ class Worker {
         this._globalEnabled = false;
 
         /**
-         * The timeout ID.
-         * @type {Object}
+         * The cron task or the timeout ID.
+         * @type {Task|number}
          * @private
          */
-        this._timeoutID = undefined;
+        this._task = undefined;
     }
 
     /**
@@ -122,9 +127,9 @@ class Worker {
      * Enables or disables the worker in a guild.
      * @param {?GuildResolvable} guild - The guild to enable or disable the worker in
      * @param {boolean} enabled - Whether the worker should be enabled or disabled
-     * @return {void}
+     * @return {Promise<void>} The promise.
      */
-    setEnabledIn(guild, enabled) {
+    async setEnabledIn(guild, enabled) {
         if (typeof guild === 'undefined') {
             throw new TypeError('The parameter guild cannot be undefined');
         }
@@ -138,9 +143,9 @@ class Worker {
         if (!guild) {
             this._globalEnabled = enabled;
             if (enabled) {
-                this.start();
+                await this.start();
             } else {
-                this.stop();
+                await this.stop();
             }
             this.client.emit('workerStatusChange', null, this, enabled);
             return;
@@ -179,19 +184,25 @@ class Worker {
      * @private
      */
     async start() {
-        if (this._timeoutID) {
-            clearTimeout(this._timeoutID);
+        if (this._task) {
+            return;
         }
+
         const exec = () => {
             const result = this.run();
-            if (this.timer > 0) {
-                this._timeoutID = setTimeout(exec, this.timer);
+            if (typeof this.schedule === 'number') {
+                this._task = setTimeout(exec, this.schedule);
             }
             return result;
         };
         await this.onStart();
-        // Explicitly run our worker after 5 seconds
-        this._timeoutID = setTimeout(exec, 5000);
+
+        if (typeof this.schedule === 'number') {
+            // Explicitly run our worker after 5 seconds
+            this._task = setTimeout(exec, 5000);
+        } else {
+            this._task = cron.schedule(this.schedule, exec, true);
+        }
     }
 
     /**
@@ -200,10 +211,14 @@ class Worker {
      * @private
      */
     async stop() {
-        await this.onStop();
-        if (this._timeoutID) {
-            clearTimeout(this._timeoutID);
-            this._timeoutID = undefined;
+        if (this._task) {
+            await this.onStop();
+            if (this._task instanceof Task) {
+                this._task.stop();
+            } else {
+                clearTimeout(this._task);
+            }
+            this._task = undefined;
         }
     }
 
@@ -266,12 +281,11 @@ class Worker {
         if (info.module !== info.module.toLowerCase()) {
             throw new Error('Worker module must be lowercase.');
         }
-        if (typeof info.timer !== 'undefined') {
-            if (typeof info.timer !== 'number' || isNaN(info.timer)) {
-                throw new TypeError('Worker timer must be a number.');
-            }
-            if (info.timer !== 0 && info.timer < 1000) {
-                throw new RangeError('Worker timer must be at least 1000 (ms).');
+        if (typeof info.schedule !== 'undefined') {
+            if (typeof info.schedule === 'string' && !cron.validate(info.schedule)) {
+                throw new TypeError('Worker schedule must be a valid cron string');
+            } else if (typeof info.schedule === 'number' && info.schedule < 1000) {
+                throw new TypeError('Worker schedule must be a valid number and at least 1000 (ms).');
             }
         }
     }

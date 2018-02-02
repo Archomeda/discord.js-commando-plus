@@ -35,13 +35,13 @@ class CommandDisable extends Command {
         return msg.member.hasPermission('ADMINISTRATOR') || this.client.isOwner(msg.author);
     }
 
-    run(msg, args) {
+    async run(msg, args) {
         const { cmdOrGrpOrWkr } = args;
 
         let type = 'group';
         if (cmdOrGrpOrWkr.groupID) {
             type = 'command';
-        } else if (cmdOrGrpOrWkr.timer) {
+        } else if (cmdOrGrpOrWkr.schedule) {
             type = 'worker';
         }
 
@@ -51,7 +51,7 @@ class CommandDisable extends Command {
         if (cmdOrGrpOrWkr.guarded) {
             return msg.reply(this.localization.tl(`output.${type}-guarded`, msg.guild, { args, cmd: this }));
         }
-        cmdOrGrpOrWkr.setEnabledIn(msg.guild, false);
+        await cmdOrGrpOrWkr.setEnabledIn(msg.guild, false);
         return msg.reply(this.localization.tl(`output.${type}-disabled`, msg.guild, { args, cmd: this }));
     }
 }
