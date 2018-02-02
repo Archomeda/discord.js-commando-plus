@@ -22,7 +22,7 @@
       const darkMode = localStorage.getItem('dark-mode');
       return {
         darkMode: darkMode !== 'false' && darkMode !== null,
-        repository: CommandoPlusSource.repo
+        repository: CommandoPlusSource.repo,
       };
     },
 

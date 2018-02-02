@@ -158,7 +158,7 @@
       },
 
       setRepository(repo) {
-          this.$emit('setRepository', repo);
+        this.$emit('setRepository', repo);
       },
     },
 
