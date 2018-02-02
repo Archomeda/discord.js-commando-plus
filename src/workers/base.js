@@ -200,7 +200,7 @@ class Worker {
         if (typeof this.schedule === 'number') {
             // Explicitly run our worker after 5 seconds
             this._task = setTimeout(exec, 5000);
-        } else {
+        } else if (typeof this.schedule === 'string') {
             this._task = cron.schedule(this.schedule, exec, true);
         }
     }
