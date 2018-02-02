@@ -135,6 +135,17 @@ class SettingsProvider {
     }
 
     /**
+     * Gets whether a setting exists for a guild.
+     * @param {Guild|string} guild - Guild the setting is associated with (or 'global')
+     * @param {string} key - Name of the setting
+     * @return {boolean} True if the setting exists, false otherwise.
+     */
+    has(guild, key) {
+        const settings = this.settings.get(this.constructor.getGuildID(guild));
+        return settings && objectPath.has(settings, key);
+    }
+
+    /**
      * Sets a setting for a guild.
      * @param {Guild|string} guild - Guild to associate the setting with (or 'global')
      * @param {string} key - Name of the setting

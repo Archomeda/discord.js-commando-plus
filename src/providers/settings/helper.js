@@ -38,6 +38,19 @@ class GuildSettingsHelper {
     }
 
     /**
+     * Gets whether a setting exists for a guild.
+     * @param {string} key - Name of the setting
+     * @return {boolean} True if the setting exists, false otherwise.
+     * @see {@link SettingsProvider#has}
+     */
+    has(key) {
+        if (!this.client.settingsProvider) {
+            throw new Error('No settings provider is available.');
+        }
+        return this.client.settingsProvider.has(this.guild, key);
+    }
+
+    /**
      * Sets a setting for the guild.
      * @param {string} key - Name of the setting
      * @param {*} val - Value of the setting
