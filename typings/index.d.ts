@@ -143,7 +143,7 @@ declare module 'discord.js-commando-plus' {
         private _awaiting: Set<string>;
         private _commandPatterns: object;
         private _results: Map<string, CommandMessage>;
-        
+
         private buildCommandPattern(prefix: string): RegExp;
         private cacheCommandMessage(message: Message, oldMessage: Message, cmdMsg: CommandMessage, responses: Message | Message[], timeoutIds?: Object): void;
         private handleMessage(messge: Message, oldMessage?: Message): Promise<void>;
@@ -262,6 +262,7 @@ declare module 'discord.js-commando-plus' {
         public cacheProvider: CacheProvider;
         public commandPrefix: string;
         public dispatcher: CommandDispatcher;
+        public language: String;
         public localeProvider: LocaleProvider;
         public readonly owners: User[];
         public settingsProvider: SettingsProvider;
@@ -287,8 +288,13 @@ declare module 'discord.js-commando-plus' {
         on(event: 'commandUnregister', listener: (command: Command) => void): this;
         on(event: 'groupRegister', listener: (group: CommandGroup, registry: CommandRegistry) => void): this;
         on(event: 'groupStatusChange', listener: (guild: Guild, group: CommandGroup, enabled: boolean) => void): this;
+        on(event: 'languageChange', listener: (guild?: Guild, language?: string) => void): this;
         on(event: 'typeRegister', listener: (type: ArgumentType, registry: CommandRegistry) => void): this;
         on(event: 'unknownCommand', listener: (message: CommandMessage) => void): this;
+        on(event: 'workerRegister', listener: (worker: Worker, registry: Registry) => void): this;
+        on(event: 'workerReregister', listener: (newWorker: Worker, oldWorker: Worker) => void): this;
+        on(event: 'workerStatusChange', listener: (guild?: Guild, worker: Worker, enabled: boolean) => void): this;
+        on(event: 'workerUnregister', listener: (worker: Worker) => void): this;
         on(event: 'channelCreate', listener: (channel: Channel) => void): this;
         on(event: 'channelDelete', listener: (channel: Channel) => void): this;
         on(event: 'channelPinsUpdate', listener: (channel: Channel, time: Date) => void): this;
@@ -382,7 +388,7 @@ declare module 'discord.js-commando-plus' {
     export class GuildExtension extends Guild {
         private _commandPrefix: string;
         private _commandsEnabled: object;
-        private _groupsEndabled: object;
+        private _groupsEnabled: object;
         private _settings: GuildSettingsHelper;
         private static applyToClass(target: Function): void;
 

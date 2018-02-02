@@ -67,12 +67,6 @@ class CommandoClient extends discord.Client {
         super(options);
 
         /**
-         * The client's language.
-         * @type {string}
-         */
-        this._language = options.language;
-
-        /**
          * The client's command registry.
          * @type {CommandRegistry}
          */
@@ -119,6 +113,13 @@ class CommandoClient extends discord.Client {
          * @type {GuildSettingsHelper}
          */
         this.settings = new GuildSettingsHelper(this, null);
+
+        /**
+         * The client's language.
+         * @type {string}
+         * @private
+         */
+        this._language = options.language;
 
         /**
          * Internal global command prefix, controlled by the {@link CommandoClient#commandPrefix} getter/setter.
