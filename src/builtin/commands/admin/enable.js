@@ -6,6 +6,8 @@
  */
 
 const Command = require('../../../commands/base');
+const CommandGroup = require('../../../commands/group');
+const Worker = require('../../../workers/base');
 
 class CommandEnable extends Command {
     constructor(client) {
@@ -38,11 +40,15 @@ class CommandEnable extends Command {
     async run(msg, args) {
         const { cmdOrGrpOrWkr } = args;
 
-        let type = 'group';
-        if (cmdOrGrpOrWkr.groupID) {
+        let type;
+        if (cmdOrGrpOrWkr instanceof Command) {
             type = 'command';
-        } else if (cmdOrGrpOrWkr.schedule) {
+        } else if (cmdOrGrpOrWkr instanceof CommandGroup) {
+            type = 'group';
+        } else if (cmdOrGrpOrWkr instanceof Worker) {
             type = 'worker';
+        } else {
+            return undefined;
         }
 
         if (cmdOrGrpOrWkr.isEnabledIn(msg.guild)) {

@@ -6,6 +6,7 @@
  */
 
 const Command = require('../../../commands/base');
+const Worker = require('../../../workers/base');
 
 class CommandUnload extends Command {
     constructor(client) {
@@ -32,9 +33,18 @@ class CommandUnload extends Command {
         const { cmdOrWkr } = args;
         await cmdOrWkr.unload();
 
-        const type = cmdOrWkr.groupID ? 'command' : 'worker';
-        const registry = cmdOrWkr.groupID ? 'commands' : 'workers';
-        const name = cmdOrWkr.groupID ? cmdOrWkr.name : cmdOrWkr.id;
+        let type, registry, name;
+        if (cmdOrWkr instanceof Command) {
+            type = 'command';
+            registry = 'commands';
+            name = cmdOrWkr.name;
+        } else if (cmdOrWkr instanceof Worker) {
+            type = 'worker';
+            registry = 'workers';
+            name = cmdOrWkr.id;
+        } else {
+            return undefined;
+        }
 
         if (this.client.shard) {
             try {

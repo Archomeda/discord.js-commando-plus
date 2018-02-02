@@ -6,6 +6,8 @@
  */
 
 const Command = require('../../../commands/base');
+const CommandGroup = require('../../../commands/group');
+const Worker = require('../../../workers/base');
 
 class CommandReload extends Command {
     constructor(client) {
@@ -31,17 +33,21 @@ class CommandReload extends Command {
     async run(msg, args) {
         const { cmdOrGrpOrWkr } = args;
 
-        let type = 'group';
-        let registry = 'groups';
-        let name = cmdOrGrpOrWkr.id;
-        if (cmdOrGrpOrWkr.groupID) {
+        let type, registry, name;
+        if (cmdOrGrpOrWkr instanceof Command) {
             type = 'command';
             registry = 'commands';
             name = cmdOrGrpOrWkr.name;
-        } else if (cmdOrGrpOrWkr.schedule) {
+        } else if (cmdOrGrpOrWkr instanceof CommandGroup) {
+            type = 'group';
+            registry = 'groups';
+            name = cmdOrGrpOrWkr.id;
+        } else if (cmdOrGrpOrWkr instanceof Worker) {
             type = 'worker';
             registry = 'workers';
             name = cmdOrGrpOrWkr.id;
+        } else {
+            return undefined;
         }
 
         await cmdOrGrpOrWkr.reload();
