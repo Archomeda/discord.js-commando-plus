@@ -8,7 +8,7 @@
 <template>
   <div id="docs">
     <docs-navbar :sources="sources" :source="source" />
-    <router-view :source="source" :tag="tag" :darkMode="darkMode" @toggleDarkMode="toggleDarkMode" />
+    <router-view :source="source" :tag="tag" :darkMode="darkMode" @toggleDarkMode="toggleDarkMode" @setRepository="setRepository" />
   </div>
 </template>
 
@@ -83,6 +83,10 @@
 
       toggleDarkMode() {
         this.$emit('toggleDarkMode');
+      },
+
+      setRepository(repo) {
+          this.$emit('setRepository', repo);
       },
     },
 

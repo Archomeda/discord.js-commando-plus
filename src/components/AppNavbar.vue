@@ -11,14 +11,17 @@
 
       <nav>
         <router-link to="/docs">Documentation</router-link><!--
-        --><a href="https://github.com/Archomeda/discord.js-commando-plus">GitHub</a>
+        --><a href="https://github.com/${repository}">GitHub</a>
       </nav>
     </container>
   </header>
 </template>
 
 <script>
-  export default { name: 'navbar' };
+  export default {
+    name: 'navbar',
+    props: ['repository']
+  };
 </script>
 
 <style lang="scss">
