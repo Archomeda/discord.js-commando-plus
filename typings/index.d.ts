@@ -440,8 +440,8 @@ declare module 'discord.js-commando-plus' {
 
         public destroy(): Promise<void>;
         public init(client: CommandoClient): Promise<void>;
-        public preloadNamespace(namespace: string, lang: string): Promise<void>;
-        public preloadNamespaces(namespaces: string[], lang: string): Promise<void>;
+        public preloadNamespace(namespace: string, lang: string): void;
+        public preloadNamespaces(namespaces: string[], lang: string): void;
         public tl(module: string, namespace: string, key: string, lang: string, vars?: {}): string;
         public translate(module: string, namespace: string, key: string, lang: string, vars?: {}): string;
     }

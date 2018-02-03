@@ -3,7 +3,6 @@
  */
 
 const path = require('path');
-const { promisify } = require('util');
 const LocaleProvider = require('./base');
 const Backend = require('./i18next-commando-plus-backend');
 
@@ -37,7 +36,6 @@ class I18nextLocaleProvider extends LocaleProvider {
          * @readonly
          */
         Object.defineProperty(this, 'localizer', { value: i18next });
-        this.localizer.loadNamespacesAsync = promisify(this.localizer.loadNamespaces);
 
         /**
          * The path to the directory where the override localizations are located.
@@ -81,9 +79,9 @@ class I18nextLocaleProvider extends LocaleProvider {
         await this.localizer.loadLanguages(['nl-NL']);
     }
 
-    async preloadNamespaces(namespaces) {
+    preloadNamespaces(namespaces) {
         try {
-            return await this.localizer.loadNamespacesAsync(namespaces);
+            return this.localizer.loadNamespaces(namespaces);
         } catch (err) {
             // Consume error
         }
@@ -91,6 +89,8 @@ class I18nextLocaleProvider extends LocaleProvider {
     }
 
     translate(module, namespace, key, lang, vars) {
+        // Make sure we preload our namespace
+        this.preloadNamespace(`${module ? `${module}#` : ''}${namespace}`, lang);
         return this.localizer.t(`${module ? `${module}#` : ''}${namespace ? `${namespace}:` : ''}${key}`, {
             ...vars,
             lng: lang

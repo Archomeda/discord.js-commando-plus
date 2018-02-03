@@ -25,11 +25,7 @@ class CommandGroups extends Command {
         return msg.member.hasPermission('ADMINISTRATOR') || this.client.isOwner(msg.author);
     }
 
-    async run(msg) {
-        // Make sure to preload the localizations
-        await this.client.localeProvider.preloadNamespaces(this.client.registry.groups.map(g =>
-            `${g.moduleID}#groups`, msg.guild ? msg.guild.language : this.client.language));
-
+    run(msg) {
         let content = `\n__**${this.localization.tl('output.header', msg.guild, { cmd: this })}**__\n`;
         content += this.client.registry.groups.map(g =>
             `**${g.module.localization.tl('groups', g.name, msg.guild)}:** ${g.isEnabledIn(msg.guild) ?

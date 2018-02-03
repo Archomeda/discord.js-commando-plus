@@ -15,19 +15,21 @@ function getDefaults() {
 }
 
 function readLocaleFile(fileName, callback) {
-    fs.readFile(fileName, 'utf-8', (err, data) => {
-        if (err) {
-            return callback(err);
-        }
-        try {
-            data = data.replace(/^\uFEFF/, '');
-            data = JSON.parse(data);
-        } catch (err2) {
-            err2.message = `error parsing ${fileName}: ${err2.message}`;
-            return callback(err2);
-        }
-        return callback(null, data);
-    });
+    let data;
+    try {
+        data = fs.readFileSync(fileName, 'utf-8');
+    } catch (err) {
+        return callback(err);
+    }
+
+    try {
+        data = data.replace(/^\uFEFF/, '');
+        data = JSON.parse(data);
+    } catch (err) {
+        err.message = `error parsing ${fileName}: ${err.message}`;
+        return callback(err);
+    }
+    return callback(null, data);
 }
 
 /**

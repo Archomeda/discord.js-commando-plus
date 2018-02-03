@@ -45,7 +45,7 @@ class LocaleProvider {
      * Preloads an id.
      * @param {string} namespace - The id to preload
      * @param {string} lang - The language
-     * @return {Promise<void>} The promise.
+     * @return {void}
      */
     preloadNamespace(namespace, lang) {
         return this.preloadNamespaces([namespace], lang);
@@ -55,7 +55,7 @@ class LocaleProvider {
      * Preloads multiple namespaces.
      * @param {string[]} namespaces - The namespaces to preload
      * @param {string} lang - The language
-     * @return {Promise<void>} The promise.
+     * @return {void}
      * @abstract
      */
     preloadNamespaces(namespaces, lang) { // eslint-disable-line no-unused-vars

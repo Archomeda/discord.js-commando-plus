@@ -36,18 +36,8 @@ class CommandHelp extends Command {
         const commands = this.client.registry.findCommands(command, false, msg);
         const showAll = command && command.toLowerCase() === 'all';
 
-        // Make sure to preload the localizations
-        await this.client.localeProvider.preloadNamespaces(this.client.registry.groups.map(g =>
-            `${g.moduleID}#groups`, msg.guild ? msg.guild.language : this.client.language));
-
         if (command && !showAll) {
             if (commands.length === 1) {
-                // Make sure to preload the localizations
-                await this.client.localeProvider.preloadNamespace(
-                    `${commands[0].moduleID}#${commands[0].groupID}`,
-                    msg.guild ? msg.guild.language : this.client.language
-                );
-
                 /* eslint-disable max-len, indent */
                 let help = stripIndents`
                     ${oneLine`
