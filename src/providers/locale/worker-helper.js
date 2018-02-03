@@ -45,7 +45,7 @@ class WorkerLocaleHelper {
         return this.client.localeProvider.translate(
             this.worker.moduleID,
             this.worker.moduleID,
-            `${this.worker.name}.${key}`,
+            `${this.worker.id}.${key}`,
             guild && guild.language ? guild.language : this.client.language,
             vars
         );
