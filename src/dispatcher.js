@@ -330,7 +330,7 @@ class CommandDispatcher {
                 return undefined;
             }, this.client.options.commandEditableDuration * 1000);
             if (reactResponse) {
-                timeoutIds.react = setTimeout(async () => {
+                timeoutIds.react = setTimeout(async() => {
                     if (cmdMsg && cmdMsg.command) {
                         await cmdMsg.command.reactTimeout(cmdMsg, responses);
                     }
