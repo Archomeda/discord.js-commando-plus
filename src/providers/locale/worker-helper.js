@@ -28,7 +28,7 @@ class WorkerLocaleHelper {
          * @type {Worker}
          * @readonly
          */
-        Object.defineProperty(this, 'command', { value: worker });
+        Object.defineProperty(this, 'worker', { value: worker });
     }
 
     /**
