@@ -16,7 +16,7 @@ class WorkerLocaleHelper {
     constructor(client, worker) {
         /**
          * The client that is used for this helper.
-         * @name CommandLocaleHelper#client
+         * @name WorkerLocaleHelper#client
          * @type {CommandoClient}
          * @readonly
          */
@@ -24,7 +24,7 @@ class WorkerLocaleHelper {
 
         /**
          * The worker that is used for this helper, if associated with one.
-         * @name CommandLocaleHelper#worker
+         * @name WorkerLocaleHelper#worker
          * @type {Worker}
          * @readonly
          */
