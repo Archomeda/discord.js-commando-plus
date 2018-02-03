@@ -204,7 +204,7 @@ class Worker {
         };
         await this.onStart();
 
-        if (typeof this.schedule === 'number') {
+        if (typeof this.schedule === 'number' || !this.schedule) {
             // Explicitly run our worker after 5 seconds
             this._task = setTimeout(exec, 5000);
         } else if (typeof this.schedule === 'string') {
