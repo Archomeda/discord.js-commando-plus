@@ -329,16 +329,18 @@ class CommandDispatcher {
                 }
                 return undefined;
             }, this.client.options.commandEditableDuration * 1000);
-            timeoutIds.react = setTimeout(async() => {
-                if (cmdMsg && cmdMsg.command) {
-                    await cmdMsg.command.reactTimeout(cmdMsg, responses);
-                }
-                this._commandResponses.delete(reactResponse.id);
-                if (this.client.options.commandReactableDuration > this.client.options.commandEditableDuration) {
-                    return this._results.delete(message.id);
-                }
-                return undefined;
-            }, this.client.options.commandReactableDuration * 1000);
+            if (reactResponse) {
+                timeoutIds.react = setTimeout(async () => {
+                    if (cmdMsg && cmdMsg.command) {
+                        await cmdMsg.command.reactTimeout(cmdMsg, responses);
+                    }
+                    this._commandResponses.delete(reactResponse.id);
+                    if (this.client.options.commandReactableDuration > this.client.options.commandEditableDuration) {
+                        return this._results.delete(message.id);
+                    }
+                    return undefined;
+                }, this.client.options.commandReactableDuration * 1000);
+            }
 
             this._results.set(message.id, { message: cmdMsg, timeoutIds });
             if (reactResponse) {
