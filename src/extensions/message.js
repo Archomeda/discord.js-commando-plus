@@ -17,7 +17,8 @@ class MessageExtension {
     edit(content, options) {
         content = this.client.resolver.resolveString(content);
         // Kinda hacky to check it this way
-        content = formatFirstLetter(content, !content.startsWith('[') && this.channel.type !== 'dm');
+        content = formatFirstLetter(content,
+            ((options && options.reply) || !content.startsWith('[')) && this.channel.type !== 'dm');
         return this._edit(content, options);
     }
 
